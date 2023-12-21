@@ -8,19 +8,16 @@
     "authors": [
         {
             "name": "Marc Alexander",
-            "email": "",
             "homepage": "https://www.m-a-styles.de",
             "role": "Extensions Team Consultant"
         },
         {
             "name": "Ruslan Uzdenov",
-            "email": "",
             "homepage": "https://www.phpbbguru.net",
             "role": "Extensions Development Team"
         },
         {
             "name": "Matt Friedman",
-            "email": "",
             "homepage": "https://imattpro.github.io",
             "role": "Extensions Development Team Lead"
         }

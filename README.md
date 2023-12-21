@@ -1,6 +1,8 @@
 # phpBB Browser Push Notifications
 
-## Installation
+This is the repository for the development of the phpBB Browser Push Notifications extension.
+
+[![Build Status](https://github.com/phpbb-extensions/webpushnotifications/workflows/Tests/badge.svg)](https://github.com/phpbb-extensions/webpushnotifications/actions)
 
 An official phpBB extension that allows board users to receive browser-based push notifications.
 

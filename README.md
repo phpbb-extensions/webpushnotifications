@@ -8,7 +8,7 @@ An official phpBB extension that allows board users to receive browser-based pus
 
 ## Contributing
 
-Please fork this repository and submit a pull request to contribute to phpBB Media Embed PlugIn
+Please fork this repository and submit a pull request to contribute to this extension.
 
 ## License
 

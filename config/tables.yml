@@ -1,0 +1,2 @@
+phpbb.webpushnotifications.tables.notification_push: '%core.table_prefix%webpushnotifications_notification_push'
+phpbb.webpushnotifications.tables.push_subscriptions: '%core.table_prefix%webpushnotifications_push_subscriptions'

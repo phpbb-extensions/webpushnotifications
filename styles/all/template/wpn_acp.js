@@ -3,6 +3,33 @@
 'use strict';
 
 /**
+ * Convert raw key ArrayBuffer to base64 string.
+ *
+ * @param {ArrayBuffer} rawKey Raw key array buffer as exported by SubtleCrypto exportKey()
+ * @returns {string} Base64 encoded raw key string
+ */
+phpbb.rawKeyToBase64 = (rawKey) => {
+	const keyBuffer = new Uint8Array(rawKey);
+	let keyText = '';
+	const keyLength = keyBuffer.byteLength;
+	for (let i = 0; i < keyLength; i++) {
+		keyText += String.fromCharCode(keyBuffer[i]);
+	}
+
+	return window.btoa(keyText);
+};
+
+/**
+ * Base64URL encode base64 encoded string
+ *
+ * @param {string} base64String Base64 encoded string
+ * @returns {string} Base64URL encoded string
+ */
+phpbb.base64UrlEncode = (base64String) => {
+	return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+/**
  * This callback generates the VAPID keys for the web push notification service.
  */
 phpbb.addAjaxCallback('generate_vapid_keys', () => {

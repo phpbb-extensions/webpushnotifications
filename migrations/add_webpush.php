@@ -16,14 +16,14 @@ class add_webpush extends migration
 {
 	public function effectively_installed(): bool
 	{
-		return $this->db_tools->sql_table_exists($this->table_prefix . 'webpushnotifications_notification_push');
+		return $this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');
 	}
 
 	public function update_schema(): array
 	{
 		return [
 			'add_tables'	=> [
-				$this->table_prefix . 'webpushnotifications_notification_push' => [
+				$this->table_prefix . 'wpn_notification_push' => [
 					'COLUMNS'	=> [
 						'notification_type_id'	=> ['USINT', 0],
 						'item_id'				=> ['ULINT', 0],
@@ -34,7 +34,7 @@ class add_webpush extends migration
 					],
 					'PRIMARY_KEY' => ['notification_type_id', 'item_id', 'item_parent_id', 'user_id'],
 				],
-				$this->table_prefix . 'webpushnotifications_push_subscriptions' => [
+				$this->table_prefix . 'wpn_push_subscriptions' => [
 					'COLUMNS'	=> [
 						'subscription_id'	=> ['ULINT', null, 'auto_increment'],
 						'user_id'			=> ['ULINT', 0],
@@ -53,8 +53,8 @@ class add_webpush extends migration
 	{
 		return [
 			'drop_tables' => [
-				$this->table_prefix . 'webpushnotifications_notification_push',
-				$this->table_prefix . 'webpushnotifications_push_subscriptions',
+				$this->table_prefix . 'wpn_notification_push',
+				$this->table_prefix . 'wpn_push_subscriptions',
 			],
 		];
 	}
@@ -65,17 +65,12 @@ class add_webpush extends migration
 			['config.add', ['webpush_enable', false]],
 			['config.add', ['webpush_vapid_public', '']],
 			['config.add', ['webpush_vapid_private', '']],
-			['module.add', [
-				'acp',
-				'ACP_BOARD_CONFIGURATION',
-				[
-					'module_basename'	=> 'acp_board',
-					'module_langname'	=> 'ACP_WEBPUSH_SETTINGS',
-					'module_mode'		=> 'webpush',
-					'module_auth'		=> 'acl_a_board',
-					'after'				=> ['settings', 'ACP_JABBER_SETTINGS'],
-				],
-			]],
+			['module.add', ['acp', 'ACP_CLIENT_COMMUNICATION', [
+				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
+				'module_langname'	=> 'ACP_WEBPUSH_SETTINGS',
+				'module_mode'		=> 'webpush',
+				'after'				=> 'ACP_JABBER_SETTINGS',
+			]]],
 		];
 	}
 

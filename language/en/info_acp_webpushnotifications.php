@@ -38,8 +38,17 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'ACP_WEBPUSH_SETTINGS'		=> 'Web Push settings',
-	'LOG_CONFIG_WEBPUSH'		=> '<strong>Altered Web Push settings</strong>',
+	'ACP_WEBPUSH_SETTINGS'			=> 'Web Push settings',
+	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable and control the use of Web Push for board notifications. Web Push is a simple protocol for the delivery of real-time events to user agents, more commonly known as push messages. It is supported by most modern browsers on desktop and mobile devices.',
+	'WEBPUSH_ENABLE'				=> 'Enable Web Push',
+	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow receiving notifications via Web Push. It is required to enter or generate valid VAPID identification keys to be able to use Web Push.',
+	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Generate Identification keys',
+	'WEBPUSH_VAPID_PUBLIC'			=> 'Server identification public key',
+	'WEBPUSH_VAPID_PUBLIC_EXPLAIN'	=> 'The Voluntary Application Server Identification (VAPID) public key will be shared to authenticate push messages sent by your site.<br><em><strong>Warning:</strong> Changing the VAPID public key will automatically invalidate all Webpush subscriptions.</em>',
+	'WEBPUSH_VAPID_PRIVATE'			=> 'Server identification private key',
+	'WEBPUSH_VAPID_PRIVATE_EXPLAIN'	=> 'The Voluntary Application Server Identification (VAPID) private key will be used to create authenticated push messages sent by your site. The VAPID private key <strong>must</strong> be a valid public-private key pair with the VAPID public key.<br><em><strong>Warning:</strong> Changing the VAPID private key will automatically invalidate all Webpush subscriptions.</em>',
+
+	'LOG_CONFIG_WEBPUSH'				=> '<strong>Altered Web Push settings</strong>',
 	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Web Push message could not be sent:</strong> %s',
 	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Removed Web Push subscription:</strong>» %s',
 ]);

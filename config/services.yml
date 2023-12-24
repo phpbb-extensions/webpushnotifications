@@ -1,20 +1,23 @@
+imports:
+    - { resource: tables.yml }
+
 services:
-    phpbb.webpushnotifications.form_helper:
+    phpbb.wpn.form_helper:
         class: phpbb\webpushnotifications\form\form_helper
         arguments:
             - '@config'
             - '@request'
             - '@user'
 
-    phpbb.webpushnotifications.listener:
-        class: phpbb\webpushnotifications\event\listener
-        arguments:
-            - '@config'
-            - '@template'
-        tags:
-            - { name: event.listener }
-
-        phpbb.webpushnotifications.notification.method.webpush:
+#    phpbb.wpn.listener:
+#        class: phpbb\webpushnotifications\event\listener
+#        arguments:
+#            - '@config'
+#            - '@template'
+#        tags:
+#            - { name: event.listener }
+#
+        phpbb.wpn.notification.method.webpush:
         class: phpbb\webpushnotifications\notification\method\webpush
         shared: false
         arguments:
@@ -25,21 +28,21 @@ services:
             - '@user'
             - '%core.root_path%'
             - '%core.php_ext%'
-            - '%phpbb.webpushnotifications.tables.notification_push%'
-            - '%phpbb.webpushnotifications.tables.push_subscriptions%'
+            - '%phpbb.wpn.tables.notification_push%'
+            - '%phpbb.wpn.tables.push_subscriptions%'
         tags:
             - { name: notification.method }
 
-    phpbb.webpushnotifications.ucp.controller.webpush:
+    phpbb.wpn.ucp.controller.webpush:
         class: phpbb\webpushnotifications\ucp\controller\webpush
         arguments:
             - '@config'
             - '@controller.helper'
             - '@dbal.conn'
-            - '@form_helper'
+            - '?@form_helper'
             - '@path_helper'
             - '@request'
             - '@user'
             - '@template.twig.environment'
-            - '%phpbb.webpushnotifications.tables.notification_push%'
-            - '%phpbb.webpushnotifications.tables.push_subscriptions%'
+            - '%phpbb.wpn.tables.notification_push%'
+            - '%phpbb.wpn.tables.push_subscriptions%'

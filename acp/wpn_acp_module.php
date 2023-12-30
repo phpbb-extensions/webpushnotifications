@@ -10,14 +10,12 @@
 
 namespace phpbb\webpushnotifications\acp;
 
-use Minishlink\WebPush\VAPID;
 use phpbb\config\config;
 use phpbb\language\language;
 use phpbb\log\log;
 use phpbb\request\request;
 use phpbb\template\template;
 use phpbb\user;
-
 
 class wpn_acp_module
 {
@@ -28,8 +26,8 @@ class wpn_acp_module
 	/** @var config $config */
 	protected $config;
 
-	/** @var language $language */
-	protected $language;
+	/** @var language $lang */
+	protected $lang;
 
 	/** @var log $log */
 	protected $log;
@@ -111,7 +109,7 @@ class wpn_acp_module
 	/**
 	 * Save settings data to the database
 	 *
-	 * @return array Message and code for trigger error
+	 * @return void
 	 */
 	public function save_settings()
 	{

@@ -15,7 +15,7 @@ use phpbb\controller\helper as controller_helper;
 use phpbb\db\driver\driver_interface;
 use phpbb\exception\http_exception;
 use phpbb\webpushnotifications\form\form_helper;
-use phpbb\json\sanitizer as json_sanitizer;
+use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 use phpbb\path_helper;
 use phpbb\request\request_interface;
 use phpbb\symfony_request;

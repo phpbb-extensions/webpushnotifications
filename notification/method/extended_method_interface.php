@@ -11,7 +11,8 @@
 namespace phpbb\webpushnotifications\notification\method;
 
 use phpbb\controller\helper;
-use phpbb\form\form_helper;
+use phpbb\notification\method\method_interface;
+use phpbb\webpushnotifications\form\form_helper;
 
 interface extended_method_interface extends method_interface
 {

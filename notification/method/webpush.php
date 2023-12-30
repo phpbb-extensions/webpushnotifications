@@ -14,11 +14,12 @@ use Minishlink\WebPush\Subscription;
 use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
-use phpbb\form\form_helper;
 use phpbb\log\log_interface;
+use phpbb\notification\method\messenger_base;
 use phpbb\notification\type\type_interface;
 use phpbb\user;
 use phpbb\user_loader;
+use phpbb\webpushnotifications\form\form_helper;
 
 /**
 * Web Push notification method class
@@ -249,7 +250,16 @@ class webpush extends messenger_base implements extended_method_interface
 			{
 				if (!$report->isSuccess())
 				{
-					$report_data = \phpbb\json\sanitizer::sanitize($report->jsonSerialize());
+					$report_data = $report->jsonSerialize();
+					if (!empty($report_data))
+					{
+						$json_sanitizer = function (&$value)
+						{
+							$type_cast_helper = new \phpbb\request\type_cast_helper();
+							$type_cast_helper->set_var($value, $value, gettype($value), true);
+						};
+						array_walk_recursive($report_data, $json_sanitizer);
+					}
 					$this->log->add('admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$report_data['reason']]);
 				}
 			}
@@ -342,7 +352,7 @@ class webpush extends messenger_base implements extended_method_interface
 			'VAPID_PUBLIC_KEY'				=> $this->config['webpush_vapid_public'],
 			'U_WEBPUSH_WORKER_URL'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 			'SUBSCRIPTIONS'					=> $subscriptions,
-			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\ucp\controller\webpush::FORM_TOKEN_UCP),
+			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
 		];
 	}
 

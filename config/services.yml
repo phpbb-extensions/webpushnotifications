@@ -9,14 +9,16 @@ services:
             - '@request'
             - '@user'
 
-#    phpbb.wpn.listener:
-#        class: phpbb\webpushnotifications\event\listener
-#        arguments:
-#            - '@config'
-#            - '@template'
-#        tags:
-#            - { name: event.listener }
-#
+    phpbb.wpn.listener:
+        class: phpbb\webpushnotifications\event\listener
+        arguments:
+            - '@controller.helper'
+            - '@phpbb.wpn.form_helper'
+            - '@language'
+            - '@template'
+        tags:
+            - { name: event.listener }
+
     phpbb.wpn.notification.method.webpush:
         class: phpbb\webpushnotifications\notification\method\webpush
         shared: false

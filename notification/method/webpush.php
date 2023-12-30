@@ -20,6 +20,7 @@ use phpbb\notification\type\type_interface;
 use phpbb\user;
 use phpbb\user_loader;
 use phpbb\webpushnotifications\form\form_helper;
+use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 
 /**
 * Web Push notification method class
@@ -250,16 +251,7 @@ class webpush extends messenger_base implements extended_method_interface
 			{
 				if (!$report->isSuccess())
 				{
-					$report_data = $report->jsonSerialize();
-					if (!empty($report_data))
-					{
-						$json_sanitizer = function (&$value)
-						{
-							$type_cast_helper = new \phpbb\request\type_cast_helper();
-							$type_cast_helper->set_var($value, $value, gettype($value), true);
-						};
-						array_walk_recursive($report_data, $json_sanitizer);
-					}
+					$report_data = json_sanitizer::sanitize($report->jsonSerialize());
 					$this->log->add('admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$report_data['reason']]);
 				}
 			}

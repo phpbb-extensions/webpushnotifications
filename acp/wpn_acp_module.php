@@ -71,6 +71,8 @@ class wpn_acp_module
 				// Load a template from adm/style for our ACP page
 				$this->tpl_name = 'wpn_acp_settings';
 
+				$this->lang->add_lang('webpushnotifications_module_acp', 'phpbb/webpushnotifications');
+
 				// Set the page title for our ACP page
 				$this->page_title = $this->lang->lang('ACP_WEBPUSH_SETTINGS');
 

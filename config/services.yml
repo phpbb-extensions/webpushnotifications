@@ -1,0 +1,51 @@
+imports:
+    - { resource: tables.yml }
+
+services:
+    phpbb.wpn.form_helper:
+        class: phpbb\webpushnotifications\form\form_helper
+        arguments:
+            - '@config'
+            - '@request'
+            - '@user'
+
+    phpbb.wpn.listener:
+        class: phpbb\webpushnotifications\event\listener
+        arguments:
+            - '@controller.helper'
+            - '@phpbb.wpn.form_helper'
+            - '@language'
+            - '@template'
+        tags:
+            - { name: event.listener }
+
+    phpbb.wpn.notification.method.webpush:
+        class: phpbb\webpushnotifications\notification\method\webpush
+        shared: false
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@log'
+            - '@user_loader'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%phpbb.wpn.tables.notification_push%'
+            - '%phpbb.wpn.tables.push_subscriptions%'
+        tags:
+            - { name: notification.method }
+
+    phpbb.wpn.ucp.controller.webpush:
+        class: phpbb\webpushnotifications\ucp\controller\webpush
+        arguments:
+            - '@config'
+            - '@controller.helper'
+            - '@dbal.conn'
+            - '@phpbb.wpn.form_helper'
+            - '@path_helper'
+            - '@request'
+            - '@user'
+            - '@template.twig.environment'
+            - '%phpbb.wpn.tables.notification_push%'
+            - '%phpbb.wpn.tables.push_subscriptions%'
+

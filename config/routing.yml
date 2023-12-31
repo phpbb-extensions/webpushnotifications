@@ -1,0 +1,15 @@
+phpbb_webpushnotifications_ucp_push_get_notification_controller:
+    path: /push/notification
+    defaults: { _controller: phpbb.wpn.ucp.controller.webpush:notification }
+
+phpbb_webpushnotifications_ucp_push_worker_controller:
+    path: /push/worker
+    defaults: { _controller: phpbb.wpn.ucp.controller.webpush:worker }
+
+phpbb_webpushnotifications_ucp_push_subscribe_controller:
+    path: /push/subscribe
+    defaults: { _controller: phpbb.wpn.ucp.controller.webpush:subscribe }
+
+phpbb_webpushnotifications_ucp_push_unsubscribe_controller:
+    path: /push/unsubscribe
+    defaults: { _controller: phpbb.wpn.ucp.controller.webpush:unsubscribe }

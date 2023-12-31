@@ -38,7 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'NOTIFICATION_METHOD_WEBPUSH'	=> 'Web Push',
+	'PHPBB_WPN_NOTIFICATION_METHOD_WEBPUSH'	=> 'Web Push',
 	'NOTIFY_WEBPUSH_ENABLE'			=> 'Enable receiving Web Push notifications',
 	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Enable receiving browser-based push notifications.<br>The notifications can be turned off at any time in your browser settings, by unsubscribing, or by disabling the push notifications below.',
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Subscribe',

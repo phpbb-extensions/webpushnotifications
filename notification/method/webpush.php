@@ -78,7 +78,7 @@ class webpush extends messenger_base implements extended_method_interface
 	*/
 	public function get_type(): string
 	{
-		return 'notification.method.webpush';
+		return 'phpbb.wpn.notification.method.webpush';
 	}
 
 	/**

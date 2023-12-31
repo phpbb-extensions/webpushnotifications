@@ -122,8 +122,11 @@ class wpn_acp_module
 			'webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
 		];
 
-		// Validate config values
-		validate_config_vars($display_settings, $config_array, $this->errors);
+		if ($config_array['webpush_enable'])
+		{
+			// Validate config values
+			validate_config_vars($display_settings, $config_array, $this->errors);
+		}
 
 		if (count($this->errors))
 		{

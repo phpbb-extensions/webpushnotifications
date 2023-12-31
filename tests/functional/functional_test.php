@@ -44,16 +44,21 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->text());
 		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('input[type="button"]')->attr('value'));
 
-		$form = $crawler->selectButton('submit')->form([
+		$form_data = [
 			'config[webpush_enable]'	=> 1,
 			'config[webpush_vapid_public]'	=> 'BDnYSJHVZBxq834LqDGr893IfazEez7q-jYH2QBNlT0ji2C9UwGosiqz8Dp_ZN23lqAngBZyRjXVWF4ZLA8X2zI',
 			'config[webpush_vapid_private]'	=> 'IE5OYlmfWsMbBU1lzvr0bxrxVAXIteSkAnwGlZIhmRk',
-		]);
+		];
+		$form = $crawler->selectButton('submit')->form($form_data);
 		$crawler = self::submit($form);
 		$this->assertStringContainsString($this->lang('CONFIG_UPDATED'), $crawler->filter('.successbox')->text());
 
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
-		$this->assertEquals(1, $crawler->filter('input[name="config[webpush_enable]"]')->attr('value'));
+
+		foreach ($form_data as $config_name => $config_value)
+		{
+			$this->assertEquals($config_value, $crawler->filter('input[name="' . $config_name . '"]')->attr('value'));
+		}
 	}
 
 	public function test_ucp_module()

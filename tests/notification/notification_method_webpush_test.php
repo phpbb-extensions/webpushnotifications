@@ -11,6 +11,7 @@
 namespace phpbb\webpushnotifications\tests\notification;
 
 use phpbb\webpushnotifications\notification\method\webpush;
+use phpbb_database_test_case;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -51,11 +52,13 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 	public static function setUpBeforeClass(): void
 	{
 		self::start_webpush_testing();
+		parent::setUpBeforeClass();
 	}
 
 	public static function tearDownAfterClass(): void
 	{
 		self::stop_webpush_testing();
+		parent::tearDownAfterClass();
 	}
 
 	protected static function start_webpush_testing(): void
@@ -79,7 +82,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 
 	protected function setUp(): void
 	{
-		\phpbb_database_test_case::setUp();
+		phpbb_database_test_case::setUp();
 
 		global $phpbb_root_path, $phpEx;
 
@@ -412,7 +415,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 
 		// Add subscription data to admin user (user id 2)
 
-		$push_subscriptions_table = $this->container->getParameter('tables.push_subscriptions');
+		$push_subscriptions_table = $this->container->getParameter('tables.phpbb.wpn.push_subscriptions');
 
 		$sql = 'INSERT INTO ' . $push_subscriptions_table  . ' ' . $this->db->sql_build_array('INSERT', [
 				'user_id'		=> $user_id,

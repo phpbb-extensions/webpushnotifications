@@ -1,3 +1,3 @@
 parameters:
-    phpbb.wpn.tables.notification_push: '%core.table_prefix%wpn_notification_push'
-    phpbb.wpn.tables.push_subscriptions: '%core.table_prefix%wpn_push_subscriptions'
+    tables.phpbb.wpn.notification_push: '%core.table_prefix%wpn_notification_push'
+    tables.phpbb.wpn.push_subscriptions: '%core.table_prefix%wpn_push_subscriptions'

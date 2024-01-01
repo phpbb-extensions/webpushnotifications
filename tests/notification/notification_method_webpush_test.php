@@ -138,8 +138,8 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$phpbb_container->setParameter('tables.user_notifications', 'phpbb_user_notifications');
 		$phpbb_container->setParameter('tables.notification_types', 'phpbb_notification_types');
 		$phpbb_container->setParameter('tables.notification_emails', 'phpbb_notification_emails');
-		$phpbb_container->setParameter('tables.notification_push', 'phpbb_notification_push');
-		$phpbb_container->setParameter('tables.push_subscriptions', 'phpbb_push_subscriptions');
+		$phpbb_container->setParameter('tables.phpbb.wpn.notification_push', 'phpbb_wpn_notification_push');
+		$phpbb_container->setParameter('tables.phpbb.wpn.push_subscriptions', 'phpbb_wpn_push_subscriptions');
 //		$phpbb_container->set(
 //			'text_formatter.s9e.mention_helper',
 //			new \phpbb\textformatter\s9e\mention_helper(
@@ -159,8 +159,8 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			$phpbb_container->get('user'),
 			$phpbb_root_path,
 			$phpEx,
-			$phpbb_container->getParameter('tables.notification_push'),
-			$phpbb_container->getParameter('tables.push_subscriptions')
+			$phpbb_container->getParameter('tables.phpbb.wpn.notification_push'),
+			$phpbb_container->getParameter('tables.phpbb.wpn.push_subscriptions')
 		);
 
 		$phpbb_container->set('phpbb.wpn.notification.method.webpush', $this->notification_method_webpush);

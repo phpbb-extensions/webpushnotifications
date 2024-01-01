@@ -213,6 +213,10 @@ jobs:
               run: npm ci
               working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
 
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
               working-directory: ./phpBB3
@@ -335,6 +339,18 @@ jobs:
               run: .github/setup-database.sh $DB $MYISAM
               working-directory: ./phpBB3
 
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Setup node dependencies
+              run: npm ci
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
               working-directory: ./phpBB3
@@ -434,6 +450,18 @@ jobs:
                   MYISAM: '0'
               run: .github/setup-database.sh $DB $MYISAM
               working-directory: ./phpBB3
+
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Setup node dependencies
+              run: npm ci
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
 
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_

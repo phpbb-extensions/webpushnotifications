@@ -119,7 +119,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		);
 
 		$phpbb_container = $this->container = new ContainerBuilder();
-		$loader     = new YamlFileLoader($phpbb_container, new FileLocator(__DIR__ . '/fixtures'));
+		$loader     = new YamlFileLoader($phpbb_container, new FileLocator(__DIR__ . '/../../../../../../tests/notification/fixtures'));
 		$loader->load('services_notification.yml');
 		$phpbb_container->set('user_loader', $this->user_loader);
 		$phpbb_container->set('user', $user);

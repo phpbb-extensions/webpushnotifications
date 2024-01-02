@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 require_once __DIR__ . '/../../../../../../tests/notification/base.php';
+require_once __DIR__ . '/../../vendor/autoload.php'; // load the composer dependencies for this extension
 
 /**
  * @group slow

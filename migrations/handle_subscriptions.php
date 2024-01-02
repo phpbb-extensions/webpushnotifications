@@ -22,6 +22,18 @@ class handle_subscriptions extends container_aware_migration
 				($this->container->has('notification.method.webpush')),
 				['custom', [[$this, 'copy_subscription_tables']]],
 			]],
+			['if', [
+				(isset($this->config['webpush_enable'])),
+				['config.update', ['webpush_enable', $this->config['wpn_webpush_enable']]],
+			]],
+			['if', [
+				(isset($this->config['webpush_vapid_public'])),
+				['config.update', ['webpush_vapid_public', $this->config['wpn_webpush_vapid_public']]],
+			]],
+			['if', [
+				(isset($this->config['webpush_vapid_private'])),
+				['config.update', ['webpush_vapid_private', $this->config['wpn_webpush_vapid_private']]],
+			]],
 		];
 	}
 

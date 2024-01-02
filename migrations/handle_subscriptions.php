@@ -14,6 +14,11 @@ use phpbb\db\migration\container_aware_migration;
 
 class handle_subscriptions extends container_aware_migration
 {
+	public function effectively_installed()
+	{
+		return !$this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');
+	}
+
 	public function revert_data(): array
 	{
 		return [

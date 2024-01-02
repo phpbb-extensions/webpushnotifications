@@ -19,6 +19,11 @@ class add_webpush extends migration
 		return $this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');
 	}
 
+	static public function depends_on()
+	{
+			return ['\phpbb\webpushnotifications\migrations\handle_subscriptions'];
+	}
+
 	public function update_schema(): array
 	{
 		return [

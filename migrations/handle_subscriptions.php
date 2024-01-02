@@ -18,6 +18,10 @@ class handle_subscriptions extends container_aware_migration
 	{
 		return [
 			['custom', [[$this, 'update_subscriptions']]],
+			['if', [
+				($this->container->has('notification.method.webpush')),
+				['custom', [[$this, 'copy_subscription_tables']]],
+			]],
 		];
 	}
 
@@ -42,5 +46,28 @@ class handle_subscriptions extends container_aware_migration
 				WHERE method = '" . $this->db->sql_escape('phpbb.wpn.notification.method.webpush') . "'";
 
 		$this->db->sql_query($sql);
+	}
+
+	public function copy_subscription_tables()
+	{
+		$core_notification_push_table = $this->table_prefix . 'notification_push';
+		$core_push_subscriptions_table = $this->table_prefix . 'push_subscriptions';
+
+		$wpn_notification_push_table = $this->table_prefix . 'wpn_notification_push';
+		$wpn_push_subscriptions_table = $this->table_prefix . 'wpn_push_subscriptions';
+
+		/*
+		 * If webpush notification method exists in phpBB core,
+		 * copy all subscriptions data over the corresponding core tables.
+		 */
+		foreach ([
+				$core_notification_push_table => $wpn_notification_push_table,
+				$core_push_subscriptions_table => $wpn_push_subscriptions_table
+			] as $core_table => $ext_table)
+		{
+			$sql = 'INSERT INTO ' . $core_table . '
+					SELECT * FROM ' . $ext_table;
+			$this->db->sql_query($sql);
+		}
 	}
 }

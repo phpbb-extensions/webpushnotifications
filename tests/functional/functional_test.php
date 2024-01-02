@@ -45,9 +45,9 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('input[type="button"]')->attr('value'));
 
 		$form_data = [
-			'config[webpush_enable]'	=> 1,
-			'config[webpush_vapid_public]'	=> 'BDnYSJHVZBxq834LqDGr893IfazEez7q-jYH2QBNlT0ji2C9UwGosiqz8Dp_ZN23lqAngBZyRjXVWF4ZLA8X2zI',
-			'config[webpush_vapid_private]'	=> 'IE5OYlmfWsMbBU1lzvr0bxrxVAXIteSkAnwGlZIhmRk',
+			'config[wpn_webpush_enable]'	=> 1,
+			'config[wpn_webpush_vapid_public]'	=> 'BDnYSJHVZBxq834LqDGr893IfazEez7q-jYH2QBNlT0ji2C9UwGosiqz8Dp_ZN23lqAngBZyRjXVWF4ZLA8X2zI',
+			'config[wpn_webpush_vapid_private]'	=> 'IE5OYlmfWsMbBU1lzvr0bxrxVAXIteSkAnwGlZIhmRk',
 		];
 		$form = $crawler->selectButton('submit')->form($form_data);
 		$crawler = self::submit($form);
@@ -72,5 +72,4 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('PHPBB_WPN_NOTIFICATION_METHOD_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
 	}
-
 }

@@ -101,8 +101,8 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'allow_topic_notify'	=> true,
 			'allow_forum_notify'	=> true,
 			'allow_board_notifications'	=> true,
-			'webpush_vapid_public'	=> self::VAPID_KEYS['publicKey'],
-			'webpush_vapid_private'	=> self::VAPID_KEYS['privateKey'],
+			'wpn_webpush_vapid_public'	=> self::VAPID_KEYS['publicKey'],
+			'wpn_webpush_vapid_private'	=> self::VAPID_KEYS['privateKey'],
 		]);
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$lang = new \phpbb\language\language($lang_loader);
@@ -144,16 +144,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$phpbb_container->setParameter('tables.notification_emails', 'phpbb_notification_emails');
 		$phpbb_container->setParameter('tables.phpbb.wpn.notification_push', 'phpbb_wpn_notification_push');
 		$phpbb_container->setParameter('tables.phpbb.wpn.push_subscriptions', 'phpbb_wpn_push_subscriptions');
-//		$phpbb_container->set(
-//			'text_formatter.s9e.mention_helper',
-//			new \phpbb\textformatter\s9e\mention_helper(
-//				$this->db,
-//				$auth,
-//				$this->user,
-//				$phpbb_root_path,
-//				$phpEx
-//			)
-//		);
 
 		$this->notification_method_webpush = new webpush(
 			$phpbb_container->get('config'),
@@ -184,8 +174,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		);
 
 		$phpbb_container->set('notification_manager', $this->notifications);
-
-//		$phpbb_container->addCompilerPass(new \phpbb\di\pass\markpublic_pass());
 
 		$phpbb_container->compile();
 

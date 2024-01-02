@@ -30,8 +30,8 @@ services:
             - '@user'
             - '%core.root_path%'
             - '%core.php_ext%'
-            - '%phpbb.wpn.tables.notification_push%'
-            - '%phpbb.wpn.tables.push_subscriptions%'
+            - '%tables.phpbb.wpn.notification_push%'
+            - '%tables.phpbb.wpn.push_subscriptions%'
         tags:
             - { name: notification.method }
 
@@ -46,6 +46,6 @@ services:
             - '@request'
             - '@user'
             - '@template.twig.environment'
-            - '%phpbb.wpn.tables.notification_push%'
-            - '%phpbb.wpn.tables.push_subscriptions%'
+            - '%tables.phpbb.wpn.notification_push%'
+            - '%tables.phpbb.wpn.push_subscriptions%'
 

@@ -27,7 +27,7 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "none"
                       NOTESTS: 1
 
@@ -95,24 +95,26 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mariadb:10.1"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mariadb:10.2"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mariadb:10.3"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mariadb:10.4"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mariadb:10.5"
-                    - php: '7.2'
+                    - php: '7.3'
+                      db: "mysql:5.6"
+                      db_alias: "MySQL Slow Tests"
+                      SLOWTESTS: 1
+                    - php: '7.3'
                       db: "mysql:5.6"
                       db_alias: "MyISAM Tests"
                       MYISAM: 1
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mysql:5.6"
-                    - php: '7.2'
-                      db: "mysql:5.7"
                     - php: '7.3'
                       db: "mysql:5.7"
                     - php: '7.4'
@@ -196,14 +198,39 @@ jobs:
               run: .github/setup-database.sh $DB $MYISAM
               working-directory: ./phpBB3
 
+            - name: Setup LDAP
+              if: ${{ matrix.SLOWTESTS == 1 }}
+              run: .github/setup-ldap.sh
+              working-directory: ./phpBB3
+
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Setup node dependencies
+              run: npm ci
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
               working-directory: ./phpBB3
 
             - name: Run unit tests
+              if: ${{ matrix.SLOWTESTS != 1 }}
               env:
                   DB: ${{steps.database-type.outputs.db}}
               run: phpBB/vendor/bin/phpunit --configuration phpBB/ext/$EXTNAME/.github/phpunit-$DB-github.xml --bootstrap ./tests/bootstrap.php
+              working-directory: ./phpBB3
+
+            - name: Slow tests
+              env:
+                  DB: ${{steps.database-type.outputs.db}}
+              if: ${{ matrix.SLOWTESTS == 1 }}
+              run: phpBB/vendor/bin/phpunit --configuration phpBB/ext/$EXTNAME/.github/phpunit-$DB-github.xml --bootstrap ./tests/bootstrap.php --group slow
               working-directory: ./phpBB3
     # END MySQL and MariaDB Job
 
@@ -213,18 +240,16 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "postgres:9.5"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "postgres:9.6"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "postgres:10"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "postgres:11"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "postgres:12"
-                    - php: '7.2'
-                      db: "postgres:13"
                     - php: '7.3'
                       db: "postgres:13"
                     - php: '7.4'
@@ -310,6 +335,18 @@ jobs:
               run: .github/setup-database.sh $DB $MYISAM
               working-directory: ./phpBB3
 
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Setup node dependencies
+              run: npm ci
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
               working-directory: ./phpBB3
@@ -327,12 +364,12 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "sqlite3"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mcr.microsoft.com/mssql/server:2017-latest"
                       db_alias: 'MSSQL 2017'
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mcr.microsoft.com/mssql/server:2019-latest"
                       db_alias: 'MSSQL 2019'
 
@@ -409,6 +446,18 @@ jobs:
                   MYISAM: '0'
               run: .github/setup-database.sh $DB $MYISAM
               working-directory: ./phpBB3
+
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Setup node dependencies
+              run: npm ci
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+
+            - name: Setup Extension
+              run: composer install
+              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
 
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_

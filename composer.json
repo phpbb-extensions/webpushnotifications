@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "php": ">=7.1.3",
+        "php": ">=7.3",
         "composer/installers": "~1.0",
         "minishlink/web-push": "^7.0"
     },

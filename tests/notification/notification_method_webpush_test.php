@@ -46,7 +46,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 	protected function get_notification_methods()
 	{
 		return [
-			'phpbb.wpn.notification.method.webpush',
+			'notification.method.phpbb.wpn.webpush',
 		];
 	}
 
@@ -157,7 +157,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			$phpbb_container->getParameter('tables.phpbb.wpn.push_subscriptions')
 		);
 
-		$phpbb_container->set('phpbb.wpn.notification.method.webpush', $this->notification_method_webpush);
+		$phpbb_container->set('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush);
 
 		$this->notifications = new \phpbb_notification_manager_helper(
 			array(),

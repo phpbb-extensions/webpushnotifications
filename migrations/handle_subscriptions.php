@@ -57,10 +57,10 @@ class handle_subscriptions extends container_aware_migration
 		$sql = $core_webpush_exists ?
 			'UPDATE ' . $user_notifications_table . "
 				SET method = '" . $this->db->sql_escape('notification.method.webpush') . "'
-				WHERE method = '" . $this->db->sql_escape('phpbb.wpn.notification.method.webpush')  . "'" :
+				WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush')  . "'" :
 
 			'DELETE FROM ' . $user_notifications_table . "
-				WHERE method = '" . $this->db->sql_escape('phpbb.wpn.notification.method.webpush') . "'";
+				WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush') . "'";
 
 		$this->db->sql_query($sql);
 	}

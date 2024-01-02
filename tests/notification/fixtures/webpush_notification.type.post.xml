@@ -188,98 +188,98 @@
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>2</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>3</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>4</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>5</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>6</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>7</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.post</value>
 			<value>0</value>
 			<value>8</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>2</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>3</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>4</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>5</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>6</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>7</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 		<row>
 			<value>notification.type.forum</value>
 			<value>0</value>
 			<value>8</value>
-			<value>phpbb.wpn.notification.method.webpush</value>
+			<value>notification.method.phpbb.wpn.webpush</value>
 			<value>1</value>
 		</row>
 	</table>

@@ -19,7 +19,7 @@ services:
         tags:
             - { name: event.listener }
 
-    phpbb.wpn.notification.method.webpush:
+    notification.method.phpbb.wpn.webpush:
         class: phpbb\webpushnotifications\notification\method\webpush
         shared: false
         arguments:

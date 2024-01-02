@@ -70,6 +70,6 @@ class functional_test extends \phpbb_functional_test_case
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 
 		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
-		$this->assertContainsLang('PHPBB_WPN_NOTIFICATION_METHOD_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
+		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
 	}
 }

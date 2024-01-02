@@ -10,9 +10,9 @@
 
 namespace phpbb\webpushnotifications\migrations;
 
-use phpbb\db\migration\container_aware_migration;
+use phpbb\db\migration\migration;
 
-class handle_subscriptions extends container_aware_migration
+class handle_subscriptions extends migration
 {
 	public function effectively_installed()
 	{
@@ -24,7 +24,7 @@ class handle_subscriptions extends container_aware_migration
 		return [
 			['custom', [[$this, 'update_subscriptions']]],
 			['if', [
-				($this->container->has('notification.method.webpush')),
+				($this->db_tools->sql_table_exists($this->table_prefix . 'notification_push')),
 				['custom', [[$this, 'copy_subscription_tables']]],
 			]],
 			['if', [
@@ -47,7 +47,7 @@ class handle_subscriptions extends container_aware_migration
 		$user_notifications_table = $this->table_prefix . 'user_notifications';
 
 		// Check if webpush notification method exists in phpBB core (as of phpBB 4.0)
-		$core_webpush_exists = $this->container->has('notification.method.webpush');
+		$core_webpush_exists = $this->db_tools->sql_table_exists($this->table_prefix . 'notification_push');
 
 		/*
 		 * If webpush notification method exists in phpBB core,

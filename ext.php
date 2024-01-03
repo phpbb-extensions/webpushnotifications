@@ -16,6 +16,11 @@ namespace phpbb\webpushnotifications;
 class ext extends \phpbb\extension\base
 {
 	/**
+	 * @var array An array of installation error messages
+	 */
+	protected $errors = [];
+
+	/**
 	 * {@inheritdoc}
 	 *
 	 * Requires phpBB 3.3.12 due to new template and core events.
@@ -24,9 +29,61 @@ class ext extends \phpbb\extension\base
 	 */
 	public function is_enableable()
 	{
-		return
-			phpbb_version_compare(PHPBB_VERSION, '3.3.12-dev', '>=') &&
-			phpbb_version_compare(PHPBB_VERSION, '4.0.0-a1', '<') &&
-			phpbb_version_compare(PHP_VERSION_ID, '70300', '>=');
+		return $this->check_phpbb_version()->check_php_version()->result();
+	}
+
+	/**
+	 * Check the installed phpBB version meets this extension's requirements.
+	 *
+	 * @return \phpbb\webpushnotifications\ext
+	 */
+	protected function check_phpbb_version()
+	{
+		if (phpbb_version_compare(PHPBB_VERSION, '3.3.12-dev', '<') ||
+			phpbb_version_compare(PHPBB_VERSION, '4.0.0-a1', '>='))
+		{
+			$this->errors[] = 'PHPBB_VERSION_ERROR';
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Check the server PHP version meets this extension's requirements.
+	 *
+	 * @return \phpbb\webpushnotifications\ext
+	 */
+	protected function check_php_version()
+	{
+		if (phpbb_version_compare(PHP_VERSION_ID, '70300', '<'))
+		{
+			$this->errors[] = 'PHP_VERSION_ERROR';
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Return the is_enableable result. Either true, or the best enable failed
+	 * response for the current phpBB environment: array of error messages
+	 * in phpBB 3.3 or newer, false otherwise.
+	 *
+	 * @return array|bool
+	 */
+	protected function result()
+	{
+		if (empty($this->errors))
+		{
+			return true;
+		}
+
+		if (phpbb_version_compare(PHPBB_VERSION, '3.3.0-b1', '>='))
+		{
+			$language = $this->container->get('language');
+			$language->add_lang('install', 'phpbb/webpushnotifications');
+			return array_map([$language, 'lang'], $this->errors);
+		}
+
+		return false;
 	}
 }

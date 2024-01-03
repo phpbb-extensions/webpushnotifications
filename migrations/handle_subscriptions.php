@@ -32,16 +32,22 @@ class handle_subscriptions extends migration
 				['config.update', ['webpush_enable', $this->config['wpn_webpush_enable']]],
 			]],
 			['if', [
-				(isset($this->config['webpush_vapid_public'])),
+				(isset($this->config['webpush_vapid_public']) && empty($this->config['webpush_vapid_public'])),
 				['config.update', ['webpush_vapid_public', $this->config['wpn_webpush_vapid_public']]],
 			]],
 			['if', [
-				(isset($this->config['webpush_vapid_private'])),
+				(isset($this->config['webpush_vapid_private']) && empty($this->config['webpush_vapid_private'])),
 				['config.update', ['webpush_vapid_private', $this->config['wpn_webpush_vapid_private']]],
 			]],
 		];
 	}
 
+	/*
+	 * For phpBB 4.0 with core webpush notifications update notification method
+	 * from extension's notification.method.phpbb.wpn.webpush to the core one
+	 * notification.method.webpush otherwise remove notification method from
+	 * user notifications table on the extension purge.
+	 */
 	public function update_subscriptions()
 	{
 		$user_notifications_table = $this->table_prefix . 'user_notifications';
@@ -65,6 +71,11 @@ class handle_subscriptions extends migration
 		$this->db->sql_query($sql);
 	}
 
+	/*
+	 * For phpBB 4.0 with core webpush notifications copy all
+	 * webpush subscriptions data from extension's tables to the core ones
+	 * on the extension purge.
+	 */
 	public function copy_subscription_tables()
 	{
 		$core_notification_push_table = $this->table_prefix . 'notification_push';

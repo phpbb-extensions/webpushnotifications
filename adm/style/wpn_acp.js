@@ -75,5 +75,5 @@ phpbb.addAjaxCallback('generate_vapid_keys', () => {
 		const privateKeyInput = document.querySelector('#webpush_vapid_private');
 		publicKeyInput.value = keyPair.publicKey;
 		privateKeyInput.value = keyPair.privateKey;
-	})
-})
+	});
+});

@@ -30,7 +30,12 @@
     "require-dev": {
         "phing/phing": "2.4.*"
     },
-    "extra": {
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"extra": {
         "display-name": "phpBB Browser Push Notifications",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.12,<4.0.0@dev"

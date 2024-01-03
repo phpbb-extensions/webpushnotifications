@@ -68,7 +68,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function load_template_data($event)
 	{
-		if ($event['method_data']['id'] == 'phpbb.wpn.notification.method.webpush')
+		if ($event['method_data']['id'] === 'phpbb.wpn.notification.method.webpush')
 		{
 			$template_ary = $event['method_data']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
 			$this->template->assign_vars($template_ary);
@@ -77,10 +77,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Load language file
-	 *
-	 * @param \phpbb\event\data $event
 	 */
-	public function load_language($event)
+	public function load_language()
 	{
 		$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
 	}

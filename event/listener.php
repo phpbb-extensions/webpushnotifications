@@ -29,6 +29,7 @@ class listener implements EventSubscriberInterface
 		return [
 			'core.ucp_notifications_output_notification_types_modify_template_vars'	=> 'load_template_data',
 			'core.ucp_display_module_before'	=> 'load_language',
+			'core.acp_main_notice'				=> 'compatibility_notice',
 		];
 	}
 
@@ -82,5 +83,13 @@ class listener implements EventSubscriberInterface
 	public function load_language($event)
 	{
 		$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+	}
+
+	/**
+	 * Check if extension is compatible (it will not be compatible with phpBB 4)
+	 */
+	public function compatibility_notice()
+	{
+		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-a1', '>='));
 	}
 }

@@ -70,7 +70,7 @@
 		<if>
 			<equals arg1="${has-dependencies}" arg2="1" />
 			<then>
-				<exec dir="${package-directory}" command="php ../../../../../../../../composer.phar install --no-dev"
+				<exec dir="${package-directory}" command="php ../../../../../../../../composer.phar install --no-dev --no-plugins"
 					  checkreturn="true" />
 			</then>
 		</if>

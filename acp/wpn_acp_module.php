@@ -101,9 +101,9 @@ class wpn_acp_module
 	public function display_settings()
 	{
 		$this->template->assign_vars([
-			'S_WEBPUSH_ENABLE'		=> $this->config['webpush_enable'],
-			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['webpush_vapid_public'],
-			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['webpush_vapid_private'],
+			'S_WEBPUSH_ENABLE'		=> $this->config['wpn_webpush_enable'],
+			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['wpn_webpush_vapid_public'],
+			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['wpn_webpush_vapid_private'],
 			'U_ACTION'				=> $this->u_action,
 		]);
 	}
@@ -117,12 +117,12 @@ class wpn_acp_module
 	{
 		$config_array = $this->request->variable('config', ['' => ''], true);
 		$display_settings = [
-			'webpush_enable' => ['validate' => 'bool'],
-			'webpush_vapid_public' => ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PUBLIC'],
-			'webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
+			'wpn_webpush_enable' => ['validate' => 'bool'],
+			'wpn_webpush_vapid_public' => ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PUBLIC'],
+			'wpn_webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
 		];
 
-		if ($config_array['webpush_enable'])
+		if ($config_array['wpn_webpush_enable'])
 		{
 			// Validate config values
 			validate_config_vars($display_settings, $config_array, $this->errors);
@@ -140,9 +140,9 @@ class wpn_acp_module
 
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_CONFIG_WEBPUSH');
 
-		$this->config->set('webpush_enable', $config_array['webpush_enable']);
-		$this->config->set('webpush_vapid_public', $config_array['webpush_vapid_public']);
-		$this->config->set('webpush_vapid_private', $config_array['webpush_vapid_private']);
+		$this->config->set('wpn_webpush_enable', $config_array['wpn_webpush_enable']);
+		$this->config->set('wpn_webpush_vapid_public', $config_array['wpn_webpush_vapid_public']);
+		$this->config->set('wpn_webpush_vapid_private', $config_array['wpn_webpush_vapid_private']);
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
 	}

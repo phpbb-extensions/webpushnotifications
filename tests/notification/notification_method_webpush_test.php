@@ -46,7 +46,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 	protected function get_notification_methods()
 	{
 		return [
-			'phpbb.wpn.notification.method.webpush',
+			'notification.method.phpbb.wpn.webpush',
 		];
 	}
 
@@ -91,9 +91,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 
 		global $db, $config, $user, $auth, $cache, $phpbb_container, $phpbb_dispatcher;
 
-//		$avatar_helper = $this->getMockBuilder('\phpbb\avatar\helper')
-//			->disableOriginalConstructor()
-//			->getMock();
 		$db = $this->db = $this->new_dbal();
 		$config = $this->config = new \phpbb\config\config([
 			'allow_privmsg'			=> true,
@@ -101,8 +98,8 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'allow_topic_notify'	=> true,
 			'allow_forum_notify'	=> true,
 			'allow_board_notifications'	=> true,
-			'webpush_vapid_public'	=> self::VAPID_KEYS['publicKey'],
-			'webpush_vapid_private'	=> self::VAPID_KEYS['privateKey'],
+			'wpn_webpush_vapid_public'	=> self::VAPID_KEYS['publicKey'],
+			'wpn_webpush_vapid_private'	=> self::VAPID_KEYS['privateKey'],
 		]);
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$lang = new \phpbb\language\language($lang_loader);
@@ -144,16 +141,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$phpbb_container->setParameter('tables.notification_emails', 'phpbb_notification_emails');
 		$phpbb_container->setParameter('tables.phpbb.wpn.notification_push', 'phpbb_wpn_notification_push');
 		$phpbb_container->setParameter('tables.phpbb.wpn.push_subscriptions', 'phpbb_wpn_push_subscriptions');
-//		$phpbb_container->set(
-//			'text_formatter.s9e.mention_helper',
-//			new \phpbb\textformatter\s9e\mention_helper(
-//				$this->db,
-//				$auth,
-//				$this->user,
-//				$phpbb_root_path,
-//				$phpEx
-//			)
-//		);
 
 		$this->notification_method_webpush = new webpush(
 			$phpbb_container->get('config'),
@@ -167,7 +154,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			$phpbb_container->getParameter('tables.phpbb.wpn.push_subscriptions')
 		);
 
-		$phpbb_container->set('phpbb.wpn.notification.method.webpush', $this->notification_method_webpush);
+		$phpbb_container->set('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush);
 
 		$this->notifications = new \phpbb_notification_manager_helper(
 			array(),
@@ -184,8 +171,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		);
 
 		$phpbb_container->set('notification_manager', $this->notifications);
-
-//		$phpbb_container->addCompilerPass(new \phpbb\di\pass\markpublic_pass());
 
 		$phpbb_container->compile();
 
@@ -449,5 +434,122 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->assertArrayHasKey('messages', $response_data['data']);
 
 		return $response_data['data']['messages'];
+	}
+
+	/**
+	 * @depends test_get_subscription
+	 */
+	public function test_export_data_with_migration(): void
+	{
+		global $phpbb_root_path, $phpEx;
+
+		require_once __DIR__ . '/../../migrations/handle_subscriptions.php'; // load the extension migration
+
+		$this->config['wpn_webpush_enable'] = '1';
+		$this->config['webpush_enable'] = '';
+		$this->config['webpush_vapid_public'] = '';
+		$this->config['webpush_vapid_private'] = '';
+
+		$config_db = new \phpbb\config\db($this->container->get('dbal.conn'), $this->container->get('cache.driver'), 'phpbb_config');
+		foreach ($this->config as $config_name => $config_value)
+		{
+			$config_db->set($config_name, $config_value);
+		}
+
+		$factory = new \phpbb\db\tools\factory();
+		$db_tools = $factory->get($this->db);
+
+		$phpbb_notification_push_data = [
+			'COLUMNS'	=> [
+				'notification_type_id'	=> ['USINT', 0],
+				'item_id'				=> ['ULINT', 0],
+				'item_parent_id'		=> ['ULINT', 0],
+				'user_id'				=> ['ULINT', 0],
+				'push_data'				=> ['MTEXT', ''],
+				'notification_time'		=> ['TIMESTAMP', 0]
+			],
+			'PRIMARY_KEY' => ['notification_type_id', 'item_id', 'item_parent_id', 'user_id'],
+		];
+		$db_tools->sql_create_table('phpbb_notification_push', $phpbb_notification_push_data);
+
+		$phpbb_push_subscriptions_data = [
+			'COLUMNS'	=> [
+				'subscription_id'	=> ['ULINT', null, 'auto_increment'],
+				'user_id'			=> ['ULINT', 0],
+				'endpoint'			=> ['TEXT', ''],
+				'expiration_time'	=> ['TIMESTAMP', 0],
+				'p256dh'			=> ['VCHAR', ''],
+				'auth'				=> ['VCHAR', ''],
+			],
+			'PRIMARY_KEY' => ['subscription_id', 'user_id'],
+		];
+		$db_tools->sql_create_table('phpbb_push_subscriptions', $phpbb_push_subscriptions_data);
+
+		$config_tool = new \phpbb\db\migration\tool\config($config_db);
+		$this->container->set('migrator.tool.config', $config_tool);
+		$tools_collection = new \phpbb\di\service_collection($this->container);
+		$tools_collection->add('migrator.tool.config');
+
+		$migrator = new \phpbb\db\migrator(
+			$this->container,
+			$config_db,
+			$this->db,
+			$db_tools,
+			'phpbb_migrations',
+			$phpbb_root_path,
+			$phpEx,
+			'phpbb_',
+			$tools_collection,
+			new \phpbb\db\migration\helper()
+		);
+		$migrator->create_migrations_table();
+
+		$migration_class = '\phpbb\webpushnotifications\migrations\handle_subscriptions';
+		$migrator->populate_migrations([$migration_class]);
+
+		// Revert migration data
+		while ($migrator->migration_state($migration_class) !== false)
+		{
+			$migrator->revert($migration_class);
+		}
+
+		// Test reverting data results
+		$sql = 'SELECT config_name, config_value FROM ' . CONFIG_TABLE . "
+			WHERE config_name IN('webpush_enable', 'webpush_vapid_public', 'webpush_vapid_private')";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrowset($result);
+		$this->db->sql_freeresult($result);
+
+		$exported_config_data = [];
+		foreach ($data as $row)
+		{
+			$exported_config_data[$row['config_name']] = $row['config_value'];
+		}
+
+		$this->assertEquals($this->config['wpn_webpush_enable'], $exported_config_data['webpush_enable']);
+		$this->assertEquals($this->config['wpn_webpush_vapid_public'], $exported_config_data['webpush_vapid_public']);
+		$this->assertEquals($this->config['wpn_webpush_vapid_private'], $exported_config_data['webpush_vapid_private']);
+
+		$sql = "SELECT * FROM phpbb_user_notifications
+			WHERE method = '" . $this->db->sql_escape('notification.method.webpush') . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertGreaterThan(0, count($this->db->sql_fetchrowset($result)));
+		$this->db->sql_freeresult($result);
+
+		$sql = "SELECT * FROM phpbb_user_notifications
+			WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush') . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertEquals(0, count($this->db->sql_fetchrowset($result)));
+		$this->db->sql_freeresult($result);
+
+		$this->assertEquals(
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_wpn_notification_push')),
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_notification_push'))
+		);
+
+		$this->assertEquals(
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_wpn_push_subscriptions')),
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_push_subscriptions'))
+		);
 	}
 }

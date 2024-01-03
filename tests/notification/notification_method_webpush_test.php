@@ -507,11 +507,13 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$migration_class = '\phpbb\webpushnotifications\migrations\handle_subscriptions';
 		$migrator->populate_migrations([$migration_class]);
 
+		// Revert migration data
 		while ($migrator->migration_state($migration_class) !== false)
 		{
 			$migrator->revert($migration_class);
 		}
 
+		// Test reverting data results
 		$sql = 'SELECT config_name, config_value FROM ' . CONFIG_TABLE . "
 			WHERE config_name IN('webpush_enable', 'webpush_vapid_public', 'webpush_vapid_private')";
 		$result = $this->db->sql_query($sql);
@@ -527,5 +529,27 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->assertEquals($this->config['wpn_webpush_enable'], $exported_config_data['webpush_enable']);
 		$this->assertEquals($this->config['wpn_webpush_vapid_public'], $exported_config_data['webpush_vapid_public']);
 		$this->assertEquals($this->config['wpn_webpush_vapid_private'], $exported_config_data['webpush_vapid_private']);
+
+		$sql = "SELECT * FROM phpbb_user_notifications
+			WHERE method = '" . $this->db->sql_escape('notification.method.webpush') . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertGreaterThan(0, count($this->db->sql_fetchrowset($result)));
+		$this->db->sql_freeresult($result);
+
+		$sql = "SELECT * FROM phpbb_user_notifications
+			WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush') . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertEquals(0, count($this->db->sql_fetchrowset($result)));
+		$this->db->sql_freeresult($result);
+
+		$this->assertEquals(
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_wpn_notification_push')),
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_notification_push'))
+		);
+
+		$this->assertEquals(
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_wpn_push_subscriptions')),
+			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_push_subscriptions'))
+		);
 	}
 }

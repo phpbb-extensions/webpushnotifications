@@ -17,17 +17,17 @@
 		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_ENABLE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_ENABLE_EXPLAIN') }}</span></dt>
-			<dd><label><input type="radio" class="radio" name="config[webpush_enable]" value="1" {% if S_WEBPUSH_ENABLE %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="config[webpush_enable]" value="0"{% if not S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('NO') }}</label>
-				<input class="button2" data-ajax="generate_vapid_keys" type="button" name="config[webpush_enable]" value="{{ lang('WEBPUSH_GENERATE_VAPID_KEYS') }}"></dd>
+			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="1" {% if S_WEBPUSH_ENABLE %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="0"{% if not S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('NO') }}</label>
+				<input class="button2" data-ajax="generate_vapid_keys" type="button" name="config[wpn_webpush_enable]" value="{{ lang('WEBPUSH_GENERATE_VAPID_KEYS') }}"></dd>
 		</dl>
 		<dl>
 			<dt><label for="webpush_vapid_public">{{ lang('WEBPUSH_VAPID_PUBLIC') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PUBLIC_EXPLAIN') }}</span></dt>
-			<dd><label><input id="webpush_vapid_public" type="text" name="config[webpush_vapid_public]" size="25" maxlength="255" value="{{ WEBPUSH_VAPID_PUBLIC }}"></label></dd>
+			<dd><label><input id="webpush_vapid_public" type="text" name="config[wpn_webpush_vapid_public]" size="25" maxlength="255" value="{{ WEBPUSH_VAPID_PUBLIC }}"></label></dd>
 		</dl>
 		<dl>
 			<dt><label for="webpush_vapid_private">{{ lang('WEBPUSH_VAPID_PRIVATE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PRIVATE_EXPLAIN') }}</span></dt>
-			<dd><label><input id="webpush_vapid_private" type="password" name="config[webpush_vapid_private]" size="25" maxlength="255" autocomplete="off" value="{{ WEBPUSH_VAPID_PRIVATE }}"></label></dd>
+			<dd><label><input id="webpush_vapid_private" type="password" name="config[wpn_webpush_vapid_private]" size="25" maxlength="255" autocomplete="off" value="{{ WEBPUSH_VAPID_PRIVATE }}"></label></dd>
 		</dl>
 	</fieldset>
 	<fieldset class="submit-buttons">

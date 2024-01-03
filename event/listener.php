@@ -68,7 +68,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function load_template_data($event)
 	{
-		if ($event['method_data']['id'] === 'phpbb.wpn.notification.method.webpush')
+		if ($event['method_data']['id'] == 'notification.method.phpbb.wpn.webpush')
 		{
 			$template_ary = $event['method_data']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
 			$this->template->assign_vars($template_ary);

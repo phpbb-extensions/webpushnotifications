@@ -19,6 +19,11 @@ class add_webpush extends migration
 		return $this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');
 	}
 
+	static public function depends_on()
+	{
+			return ['\phpbb\webpushnotifications\migrations\handle_subscriptions'];
+	}
+
 	public function update_schema(): array
 	{
 		return [
@@ -62,9 +67,9 @@ class add_webpush extends migration
 	public function update_data(): array
 	{
 		return [
-			['config.add', ['webpush_enable', false]],
-			['config.add', ['webpush_vapid_public', '']],
-			['config.add', ['webpush_vapid_private', '']],
+			['config.add', ['wpn_webpush_enable', false]],
+			['config.add', ['wpn_webpush_vapid_public', '']],
+			['config.add', ['wpn_webpush_vapid_private', '']],
 			['module.add', ['acp', 'ACP_CLIENT_COMMUNICATION', [
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
 				'module_langname'	=> 'ACP_WEBPUSH_SETTINGS',
@@ -77,9 +82,9 @@ class add_webpush extends migration
 	public function revert_data(): array
 	{
 		return [
-			['config.remove', ['webpush_enable']],
-			['config.remove', ['webpush_vapid_public']],
-			['config.remove', ['webpush_vapid_private']],
+			['config.remove', ['wpn_webpush_enable']],
+			['config.remove', ['wpn_webpush_vapid_public']],
+			['config.remove', ['wpn_webpush_vapid_private']],
 			['module.remove', ['acp', 'ACP_BOARD_CONFIGURATION', 'ACP_WEBPUSH_SETTINGS']]
 		];
 	}

@@ -539,7 +539,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$sql = "SELECT * FROM phpbb_user_notifications
 			WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush') . "'";
 		$result = $this->db->sql_query($sql);
-		$this->assertEquals(0, count($this->db->sql_fetchrowset($result)));
+		$this->assertCount(0, $this->db->sql_fetchrowset($result));
 		$this->db->sql_freeresult($result);
 
 		$this->assertEquals(

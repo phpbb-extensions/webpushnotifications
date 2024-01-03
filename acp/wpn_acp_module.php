@@ -65,33 +65,28 @@ class wpn_acp_module
 		$form_key = 'phpbb/webpushnotifications';
 		add_form_key($form_key);
 
-		switch ($mode)
+		if ($mode === 'webpush')
 		{
-			case 'webpush':
-				// Load a template from adm/style for our ACP page
-				$this->tpl_name = 'wpn_acp_settings';
+			// Load a template from adm/style for our ACP page
+			$this->tpl_name = 'wpn_acp_settings';
 
-				$this->lang->add_lang('webpushnotifications_module_acp', 'phpbb/webpushnotifications');
+			$this->lang->add_lang('webpushnotifications_module_acp', 'phpbb/webpushnotifications');
 
-				// Set the page title for our ACP page
-				$this->page_title = $this->lang->lang('ACP_WEBPUSH_SETTINGS');
+			// Set the page title for our ACP page
+			$this->page_title = $this->lang->lang('ACP_WEBPUSH_SETTINGS');
 
-				if ($this->request->is_set_post('submit'))
+			if ($this->request->is_set_post('submit'))
+			{
+				if (!check_form_key($form_key))
 				{
-					if (!check_form_key($form_key))
-					{
-						$language = $phpbb_container->get('language');
-						trigger_error($language->lang('FORM_INVALID'), E_USER_WARNING);
-					}
-
-					$this->save_settings();
+					$language = $phpbb_container->get('language');
+					trigger_error($language->lang('FORM_INVALID'), E_USER_WARNING);
 				}
 
-				$this->display_settings();
-			break;
+				$this->save_settings();
+			}
 
-			default:
-			break;
+			$this->display_settings();
 		}
 	}
 

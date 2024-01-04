@@ -98,7 +98,7 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_WEBPUSH_ENABLE'		=> $this->config['wpn_webpush_enable'],
 			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['wpn_webpush_vapid_public'],
-			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['wpn_webpush_vapid_private'],
+			'WEBPUSH_VAPID_PRIVATE'	=> !$this->config['wpn_webpush_vapid_private'] ?: '********', // Replace private key with asterixes
 			'U_ACTION'				=> $this->u_action,
 		]);
 	}
@@ -116,6 +116,12 @@ class wpn_acp_module
 			'wpn_webpush_vapid_public' => ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PUBLIC'],
 			'wpn_webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
 		];
+
+		// Do not validate and update private key field if the content is ******** and the key was already set
+		if ($config_array['wpn_webpush_vapid_private'] == '********' && $this->config['wpn_webpush_vapid_private'])
+		{
+			unset($display_settings['wpn_webpush_vapid_private'], $config_array['wpn_webpush_vapid_private']);
+		}
 
 		if ($config_array['wpn_webpush_enable'])
 		{
@@ -135,9 +141,10 @@ class wpn_acp_module
 
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_CONFIG_WEBPUSH');
 
-		$this->config->set('wpn_webpush_enable', $config_array['wpn_webpush_enable']);
-		$this->config->set('wpn_webpush_vapid_public', $config_array['wpn_webpush_vapid_public']);
-		$this->config->set('wpn_webpush_vapid_private', $config_array['wpn_webpush_vapid_private']);
+		foreach ($config_array as $config_name => $config_value)
+		{
+			$this->config->set($config_name, $config_value);
+		}
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
 	}

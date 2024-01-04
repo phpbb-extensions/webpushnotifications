@@ -57,6 +57,7 @@ class functional_test extends \phpbb_functional_test_case
 
 		foreach ($form_data as $config_name => $config_value)
 		{
+			$config_value = ($config_name === 'config[wpn_webpush_vapid_private]') ? '********' : $config_value;
 			$this->assertEquals($config_value, $crawler->filter('input[name="' . $config_name . '"]')->attr('value'));
 		}
 	}

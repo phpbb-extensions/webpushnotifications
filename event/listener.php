@@ -88,6 +88,6 @@ class listener implements EventSubscriberInterface
 	 */
 	public function compatibility_notice()
 	{
-		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-a1', '>='));
+		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='));
 	}
 }

@@ -40,7 +40,7 @@ class ext extends \phpbb\extension\base
 	protected function check_phpbb_version()
 	{
 		if (phpbb_version_compare(PHPBB_VERSION, '3.3.12-dev', '<') ||
-			phpbb_version_compare(PHPBB_VERSION, '4.0.0-a1', '>='))
+			phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='))
 		{
 			$this->errors[] = 'PHPBB_VERSION_ERROR';
 		}

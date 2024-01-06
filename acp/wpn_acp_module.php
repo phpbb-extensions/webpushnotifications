@@ -79,8 +79,7 @@ class wpn_acp_module
 			{
 				if (!check_form_key($form_key))
 				{
-					$language = $phpbb_container->get('language');
-					trigger_error($language->lang('FORM_INVALID'), E_USER_WARNING);
+					trigger_error($this->lang->lang('FORM_INVALID'), E_USER_WARNING);
 				}
 
 				$this->save_settings();

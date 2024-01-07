@@ -117,7 +117,7 @@ class wpn_acp_module
 		];
 
 		// Do not validate and update private key field if the content is ******** and the key was already set
-		if ($config_array['wpn_webpush_vapid_private'] == '********' && $this->config['wpn_webpush_vapid_private'])
+		if ($config_array['wpn_webpush_vapid_private'] === '********' && $this->config['wpn_webpush_vapid_private'])
 		{
 			unset($display_settings['wpn_webpush_vapid_private'], $config_array['wpn_webpush_vapid_private']);
 		}

@@ -62,6 +62,24 @@ class functional_test extends \phpbb_functional_test_case
 		}
 	}
 
+	public function test_acp_enabling_webpush_for_all_users()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$this->add_lang_ext('phpbb/webpushnotifications', ['info_acp_webpushnotifications', 'webpushnotifications_module_acp']);
+
+		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
+
+		$this->assertContainsLang('WEBPUSH_ENABLE_FOR_ALL_USERS', $crawler->filter('dt')->eq(3)->filter('label')->text());
+		$this->assertContainsLang('WEBPUSH_ENABLE_FOR_ALL_USERS_EXPLAIN', $crawler->filter('dt')->eq(3)->filter('span')->text());
+		$this->assertContainsLang('WEBPUSH_ENABLE_FOR_ALL_USERS', $crawler->filter('input.button2')->eq(1)->attr('value'));
+
+		$form = $crawler->selectButton('webpush_enable_for_all_users')->form();
+		$crawler = self::submit($form);
+		$this->assertStringContainsString($this->lang('WEBPUSH_ENABLED_FOR_ALL_USERS'), $crawler->filter('.successbox')->text());
+	}
+
 	public function test_ucp_module()
 	{
 		$this->login();

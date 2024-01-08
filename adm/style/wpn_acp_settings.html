@@ -29,6 +29,10 @@
 			<dt><label for="webpush_vapid_private">{{ lang('WEBPUSH_VAPID_PRIVATE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PRIVATE_EXPLAIN') }}</span></dt>
 			<dd><label><input id="webpush_vapid_private" type="password" name="config[wpn_webpush_vapid_private]" size="25" maxlength="255" autocomplete="off" value="{{ WEBPUSH_VAPID_PRIVATE }}"></label></dd>
 		</dl>
+		<dl>
+			<dt><label>{{ lang('WEBPUSH_ENABLE_FOR_ALL_USERS') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_ENABLE_FOR_ALL_USERS_EXPLAIN') }}</span></dt>
+			<dd><input id="webpush_enable_for_all_users" class="button2" type="submit" name="webpush_enable_for_all_users" value="{{ lang('WEBPUSH_ENABLE_FOR_ALL_USERS') }}"></dd>
+		</dl>
 	</fieldset>
 	<fieldset class="submit-buttons">
 		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">&nbsp;

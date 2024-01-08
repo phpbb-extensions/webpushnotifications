@@ -85,6 +85,19 @@ class wpn_acp_module
 				$this->save_settings();
 			}
 
+			if ($this->request->is_set_post('webpush_enable_for_all_users')
+				&& $this->config['wpn_webpush_enable']
+				&& $this->config['wpn_webpush_vapid_public']
+			)
+			{
+				if (!check_form_key($form_key))
+				{
+					trigger_error($this->lang->lang('FORM_INVALID'), E_USER_WARNING);
+				}
+
+				$this->webpush_enable_for_all_users();
+			}
+
 			$this->display_settings();
 		}
 	}
@@ -146,5 +159,17 @@ class wpn_acp_module
 		}
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
+	}
+
+	/**
+	 * Enable webpush notifications for all users having
+	 * board notifications enabled for the same notification types
+	 *
+	 * @return void
+	 */
+	public function webpush_enable_for_all_users()
+	{
+		/* TODO: handle subscriptions */
+		trigger_error($this->lang->lang('WEBPUSH_ENABLED_FOR_ALL_USERS') . adm_back_link($this->u_action), E_USER_NOTICE);
 	}
 }

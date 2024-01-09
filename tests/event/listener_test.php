@@ -10,10 +10,6 @@
 
 namespace phpbb\webpushnotifications\tests\event;
 
-use phpbb\webpushnotifications\notification\method\webpush;
-use phpbb\webpushnotifications\ucp\controller\webpush as ucp_webpush;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 class listener_test extends \phpbb_database_test_case
 {
 	/** @var \phpbb\webpushnotifications\event\listener */
@@ -31,7 +27,7 @@ class listener_test extends \phpbb_database_test_case
 	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\template\template */
 	protected $template;
 
-	/** @var webpush */
+	/** @var \phpbb\webpushnotifications\notification\method\webpush */
 	protected $notification_method_webpush;
 
 	protected static function setup_extensions()
@@ -80,32 +76,17 @@ class listener_test extends \phpbb_database_test_case
 			$this->user
 		);
 
-		$phpbb_container = $this->container = new ContainerBuilder();
-		$phpbb_container->set('user_loader', $user_loader);
-		$phpbb_container->set('user', $this->user);
-		$phpbb_container->set('config', $this->config);
-		$phpbb_container->set('dbal.conn', $db);
-		$phpbb_container->set('log', new \phpbb\log\dummy());
-		$phpbb_container->setParameter('core.root_path', $phpbb_root_path);
-		$phpbb_container->setParameter('core.php_ext', $phpEx);
-		$phpbb_container->setParameter('tables.phpbb.wpn.notification_push', 'phpbb_wpn_notification_push');
-		$phpbb_container->setParameter('tables.phpbb.wpn.push_subscriptions', 'phpbb_wpn_push_subscriptions');
-
-		$this->notification_method_webpush = new webpush(
-			$phpbb_container->get('config'),
-			$phpbb_container->get('dbal.conn'),
-			$phpbb_container->get('log'),
-			$phpbb_container->get('user_loader'),
-			$phpbb_container->get('user'),
+		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
+			$this->config,
+			$db,
+			new \phpbb\log\dummy(),
+			$user_loader,
+			$this->user,
 			$phpbb_root_path,
 			$phpEx,
-			$phpbb_container->getParameter('tables.phpbb.wpn.notification_push'),
-			$phpbb_container->getParameter('tables.phpbb.wpn.push_subscriptions')
+			'phpbb_wpn_notification_push',
+			'phpbb_wpn_push_subscriptions'
 		);
-
-		$phpbb_container->set('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush);
-
-		$phpbb_container->compile();
 	}
 
 	protected function set_listener()
@@ -162,7 +143,7 @@ class listener_test extends \phpbb_database_test_case
 	public function get_ucp_template_data_data()
 	{
 		return [
-			[
+			[	// webpush method with a valid webpush subscription
 				2,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
@@ -170,7 +151,7 @@ class listener_test extends \phpbb_database_test_case
 				[['endpoint' => 'https://web.push.test.localhost/foo2', 'expirationTime' => 0]],
 				true,
 			],
-			[
+			[	// wrong method, but with a valid webpush subscription, expect no code execution
 				2,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.email',
@@ -178,7 +159,7 @@ class listener_test extends \phpbb_database_test_case
 				[],
 				false,
 			],
-			[
+			[	// webpush method with another valid webpush subscription
 				3,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
@@ -186,7 +167,7 @@ class listener_test extends \phpbb_database_test_case
 				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => 1]],
 				true,
 			],
-			[
+			[	// webpush method with an invalid webpush subscription, expect code execution but no subscription data
 				5,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
@@ -194,7 +175,7 @@ class listener_test extends \phpbb_database_test_case
 				[],
 				true,
 			],
-			[
+			[	// wrong method with an invalid webpush subscription, expect no code execution
 				5,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.email',
@@ -220,19 +201,17 @@ class listener_test extends \phpbb_database_test_case
 				'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
 				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 				'SUBSCRIPTIONS'					=> $subscriptions,
-				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(ucp_webpush::FORM_TOKEN_UCP),
+				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
 			]
 		);
 
 		$this->set_listener();
 
+		$method_data['method'] = $this->notification_method_webpush;
+		$event_data = ['method_data'];
+
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.ucp_notifications_output_notification_types_modify_template_vars', [$this->listener, 'load_template_data']);
-
-		$method_data['method'] = $this->notification_method_webpush;
-
-		$event_data = ['method_data'];
-		$event_data_returned = $dispatcher->trigger_event('core.ucp_notifications_output_notification_types_modify_template_vars', compact($event_data));
-		extract($event_data_returned);
+		$dispatcher->trigger_event('core.ucp_notifications_output_notification_types_modify_template_vars', compact($event_data));
 	}
 }

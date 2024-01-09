@@ -64,7 +64,7 @@ class listener_test extends \phpbb_database_test_case
 			->disableOriginalConstructor()
 			->getMock();
 		$this->controller_helper->method('route')
-			->willReturnCallback(function ($route, array $params = array()) {
+			->willReturnCallback(function ($route, array $params = []) {
 				return $route . '#' . serialize($params);
 			});
 
@@ -154,7 +154,7 @@ class listener_test extends \phpbb_database_test_case
 			[	// wrong method, but with a valid webpush subscription, expect no code execution
 				2,
 				'method_data' => [
-					'id' => 'notification.method.phpbb.email',
+					'id' => 'notification.method.email',
 				],
 				[],
 				false,
@@ -178,7 +178,7 @@ class listener_test extends \phpbb_database_test_case
 			[	// wrong method with an invalid webpush subscription, expect no code execution
 				5,
 				'method_data' => [
-					'id' => 'notification.method.phpbb.email',
+					'id' => 'notification.method.email',
 				],
 				[],
 				false,

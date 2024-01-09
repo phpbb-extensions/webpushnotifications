@@ -60,8 +60,8 @@ class listener_test extends \phpbb_database_test_case
 		$request = new \phpbb\request\request();
 		$request->enable_super_globals();
 		$user = new \phpbb\user($this->language, '\phpbb\datetime');
-		$user->data['user_id'] = 2;
-		$user->data['user_form_salt'] = '';
+		$this->user = $user;
+		$this->user->data['user_form_salt'] = '';
 		$user_loader = new \phpbb\user_loader($db, $phpbb_root_path, $phpEx, 'phpbb_users');
 
 		$this->controller_helper = $this->getMockBuilder('\phpbb\controller\helper')
@@ -77,12 +77,12 @@ class listener_test extends \phpbb_database_test_case
 		$this->form_helper = new \phpbb\webpushnotifications\form\form_helper(
 			$this->config,
 			$request,
-			$user
+			$this->user
 		);
 
 		$phpbb_container = $this->container = new ContainerBuilder();
 		$phpbb_container->set('user_loader', $user_loader);
-		$phpbb_container->set('user', $user);
+		$phpbb_container->set('user', $this->user);
 		$phpbb_container->set('config', $this->config);
 		$phpbb_container->set('dbal.conn', $db);
 		$phpbb_container->set('log', new \phpbb\log\dummy());
@@ -163,15 +163,43 @@ class listener_test extends \phpbb_database_test_case
 	{
 		return [
 			[
+				2,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
 				],
+				[['endpoint' => 'https://web.push.test.localhost/foo2', 'expirationTime' => 0]],
 				true,
 			],
 			[
+				2,
 				'method_data' => [
 					'id' => 'notification.method.phpbb.email',
 				],
+				[],
+				false,
+			],
+			[
+				3,
+				'method_data' => [
+					'id' => 'notification.method.phpbb.wpn.webpush',
+				],
+				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => 1]],
+				true,
+			],
+			[
+				5,
+				'method_data' => [
+					'id' => 'notification.method.phpbb.wpn.webpush',
+				],
+				[],
+				true,
+			],
+			[
+				5,
+				'method_data' => [
+					'id' => 'notification.method.phpbb.email',
+				],
+				[],
 				false,
 			],
 		];
@@ -180,8 +208,9 @@ class listener_test extends \phpbb_database_test_case
 	/**
 	 * @dataProvider get_ucp_template_data_data
 	 */
-	public function test_get_ucp_template_data($method_data, $expected)
+	public function test_get_ucp_template_data($user_id, $method_data, $subscriptions, $expected)
 	{
+		$this->user->data['user_id'] = $user_id;
 		$this->template->expects($expected ? self::once() : self::never())
 			->method('assign_vars')
 			->with([
@@ -190,7 +219,7 @@ class listener_test extends \phpbb_database_test_case
 				'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 				'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
 				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
-				'SUBSCRIPTIONS'					=> [['endpoint' => 'https://web.push.test.localhost/foo', 'expirationTime' => 0]],
+				'SUBSCRIPTIONS'					=> $subscriptions,
 				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(ucp_webpush::FORM_TOKEN_UCP),
 			]
 		);

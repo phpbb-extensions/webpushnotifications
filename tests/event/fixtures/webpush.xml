@@ -11,7 +11,7 @@
 		<column>expiration_time</column>
 		<row>
 			<value>1</value>
-			<value>1</value>
+			<value>2</value>
 			<value>https://web.push.test.localhost/foo</value>
 			<value></value>
 			<value></value>

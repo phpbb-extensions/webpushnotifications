@@ -60,6 +60,8 @@ class listener_test extends \phpbb_database_test_case
 		$request = new \phpbb\request\request();
 		$request->enable_super_globals();
 		$user = new \phpbb\user($this->language, '\phpbb\datetime');
+		$user->data['user_id'] = 2;
+		$user->data['user_form_salt'] = '';
 		$user_loader = new \phpbb\user_loader($db, $phpbb_root_path, $phpEx, 'phpbb_users');
 
 		$this->controller_helper = $this->getMockBuilder('\phpbb\controller\helper')

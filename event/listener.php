@@ -16,6 +16,7 @@ namespace phpbb\webpushnotifications\event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use phpbb\controller\helper as controller_helper;
 use phpbb\webpushnotifications\form\form_helper;
+use phpbb\webpushnotifications\notification\method\webpush;
 use phpbb\language\language;
 use phpbb\template\template;
 
@@ -27,7 +28,7 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.ucp_notifications_output_notification_types_modify_template_vars'	=> 'load_template_data',
+			'core.page_header'					=> 'load_template_data',
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
 		];
@@ -45,6 +46,9 @@ class listener implements EventSubscriberInterface
 	/* @var template */
 	protected $template;
 
+	/* @var webpush */
+	protected $webpush;
+
 	/**
 	 * Constructor
 	 *
@@ -52,13 +56,15 @@ class listener implements EventSubscriberInterface
 	 * @param form_helper $form_helper Form helper object
 	 * @param language $language Language object
 	 * @param template $template Template object
+	 * @param webpush $webpush Webpush notification method object
 	 */
-	public function __construct(controller_helper $controller_helper, form_helper $form_helper, language $language, template $template)
+	public function __construct(controller_helper $controller_helper, form_helper $form_helper, language $language, template $template, webpush $webpush)
 	{
 		$this->controller_helper = $controller_helper;
 		$this->form_helper = $form_helper;
 		$this->language = $language;
 		$this->template = $template;
+		$this->webpush = $webpush;
 	}
 
 	/**
@@ -68,11 +74,8 @@ class listener implements EventSubscriberInterface
 	 */
 	public function load_template_data($event)
 	{
-		if ($event['method_data']['id'] === 'notification.method.phpbb.wpn.webpush')
-		{
-			$template_ary = $event['method_data']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
-			$this->template->assign_vars($template_ary);
-		}
+		$template_ary = $this->webpush->get_ucp_template_data($this->controller_helper, $this->form_helper);
+		$this->template->assign_vars($template_ary);
 	}
 
 	/**

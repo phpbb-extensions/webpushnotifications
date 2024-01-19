@@ -44,6 +44,9 @@ class wpn_acp_module
 	/** @var array $errors */
 	protected $errors = [];
 
+	/** @var string Hide/replace private key with asterisks */
+	public const MASKED_PRIVATE_KEY = '********';
+
 	/**
 	 * Main ACP module
 	 *
@@ -97,7 +100,7 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_WEBPUSH_ENABLE'		=> $this->config['wpn_webpush_enable'],
 			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['wpn_webpush_vapid_public'],
-			'WEBPUSH_VAPID_PRIVATE'	=> !$this->config['wpn_webpush_vapid_private'] ?: '********', // Replace private key with asterixes
+			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['wpn_webpush_vapid_private'] ? self::MASKED_PRIVATE_KEY : '',
 			'U_ACTION'				=> $this->u_action,
 		]);
 	}
@@ -117,7 +120,7 @@ class wpn_acp_module
 		];
 
 		// Do not validate and update private key field if the content is ******** and the key was already set
-		if ($config_array['wpn_webpush_vapid_private'] === '********' && $this->config['wpn_webpush_vapid_private'])
+		if ($config_array['wpn_webpush_vapid_private'] === self::MASKED_PRIVATE_KEY && $this->config['wpn_webpush_vapid_private'])
 		{
 			unset($display_settings['wpn_webpush_vapid_private'], $config_array['wpn_webpush_vapid_private']);
 		}

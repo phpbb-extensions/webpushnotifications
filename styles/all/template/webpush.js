@@ -49,27 +49,29 @@ function PhpbbWebpush() {
 		subscribeButton = document.querySelector('#subscribe_webpush');
 		unsubscribeButton = document.querySelector('#unsubscribe_webpush');
 
-		// Service workers are only supported in secure context
-		if (window.isSecureContext !== true) {
-			subscribeButton.disabled = true;
-			return;
-		}
+		if (subscribeButton && unsubscribeButton) {
+			// Service workers are only supported in secure context
+			if (window.isSecureContext !== true) {
+				subscribeButton.disabled = true;
+				return;
+			}
 
-		if ('serviceWorker' in navigator && 'PushManager' in window) {
-			navigator.serviceWorker.register(serviceWorkerUrl)
-				.then(() => {
-					subscribeButton.addEventListener('click', subscribeButtonHandler);
-					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
+			if ('serviceWorker' in navigator && 'PushManager' in window) {
+				navigator.serviceWorker.register(serviceWorkerUrl)
+					.then(() => {
+						subscribeButton.addEventListener('click', subscribeButtonHandler);
+						unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
 
-					updateButtonState();
-				})
-				.catch(error => {
-					console.info(error);
-					// Service worker could not be registered
-					subscribeButton.disabled = true;
-				});
-		} else {
-			subscribeButton.disabled = true;
+						updateButtonState();
+					})
+					.catch(error => {
+						console.info(error);
+						// Service worker could not be registered
+						subscribeButton.disabled = true;
+					});
+			} else {
+				subscribeButton.disabled = true;
+			}
 		}
 	};
 
@@ -127,12 +129,14 @@ function PhpbbWebpush() {
 	 * @param {boolean} subscribed True if subscribed, false if not
 	 */
 	function setSubscriptionState(subscribed) {
-		if (subscribed) {
-			subscribeButton.classList.add('hidden');
-			unsubscribeButton.classList.remove('hidden');
-		} else {
-			subscribeButton.classList.remove('hidden');
-			unsubscribeButton.classList.add('hidden');
+		if (subscribeButton && unsubscribeButton) {
+			if (subscribed) {
+				subscribeButton.classList.add('hidden');
+				unsubscribeButton.classList.remove('hidden');
+			} else {
+				subscribeButton.classList.remove('hidden');
+				unsubscribeButton.classList.add('hidden');
+			}
 		}
 	}
 
@@ -282,6 +286,61 @@ function PhpbbWebpush() {
 
 		return outputArray;
 	}
+
+	/**
+	 * Handler for sending web push notification request to browser
+	 *
+	 * @returns {Promise<void>}
+	 */
+	this.sendWebpushRequestToBrowser = async function() {
+
+		const permission = Notification.permission;
+		if (permission !== 'granted' && permission !== 'denied') {
+			// Prevent the user from clicking the subscribe button multiple times.
+			const result = await Notification.requestPermission();
+			if (result === 'denied') {
+				return;
+			} else if (result === 'granted') {
+
+				subscribeButton = document.querySelector('#subscribe_webpush');
+				unsubscribeButton = document.querySelector('#unsubscribe_webpush');
+
+				const registration = await navigator.serviceWorker.getRegistration(serviceWorkerUrl);
+
+				// We might already have a subscription that is unknown to this instance of phpBB.
+				// Unsubscribe before trying to subscribe again.
+				if (typeof registration !== 'undefined') {
+					const subscribed = await registration.pushManager.getSubscription();
+					if (subscribed) {
+						await subscribed.unsubscribe();
+					}
+				}
+
+				const newSubscription = await registration.pushManager.subscribe({
+					userVisibleOnly: true,
+					applicationServerKey: urlB64ToUint8Array(vapidPublicKey),
+				});
+
+				fetch(subscribeUrl, {
+					method: 'POST',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: getFormData(newSubscription),
+				})
+					.then(response => {
+						if (subscribeButton && unsubscribeButton) {
+							updateButtonState();
+						}
+						return response.json();
+					})
+					.then(handleSubscribe)
+					.catch(error => {
+						phpbb.alert(ajaxErrorTitle, error);
+					});
+			}
+		}
+	}
 }
 
 function domReady(callBack) {
@@ -297,4 +356,5 @@ phpbb.webpush = new PhpbbWebpush();
 domReady(() => {
 	/* global phpbbWebpushOptions */
 	phpbb.webpush.init(phpbbWebpushOptions);
+	phpbb.webpush.sendWebpushRequestToBrowser();
 });

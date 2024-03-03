@@ -2,6 +2,8 @@
 <dataset>
 	<table name="phpbb_banlist">
 	</table>
+	<table name="phpbb_log">
+	</table>
 	<table name="phpbb_forums_watch">
 		<column>forum_id</column>
 		<column>user_id</column>
@@ -135,6 +137,12 @@
 		<column>username_clean</column>
 		<column>user_permissions</column>
 		<column>user_sig</column>
+		<row>
+			<value>1</value>
+			<value>Anonymous</value>
+			<value></value>
+			<value></value>
+		</row>
 		<row>
 			<value>2</value>
 			<value>poster</value>

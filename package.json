@@ -3,6 +3,6 @@
 	"author": "phpBB Limited",
 	"license": "GPL-2.0",
 	"devDependencies": {
-		"web-push-testing": "^1.0.0"
+		"web-push-testing": "^1.1.1"
 	}
 }

@@ -21,7 +21,7 @@ class add_webpush extends migration
 
 	public static function depends_on()
 	{
-		return ['\phpbb\webpushnotifications\migrations\handle_subscriptions'];
+		return ['\phpbb\db\migration\data\v33x\v3312rc1'];
 	}
 
 	public function update_schema(): array

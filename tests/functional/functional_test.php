@@ -40,7 +40,7 @@ class functional_test extends \phpbb_functional_test_case
 
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
 
-		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS', $crawler->filter('div.main > h1')->text());
+		$this->assertContainsLang('ACP_WEBPUSH_EXT_SETTINGS', $crawler->filter('div.main > h1')->text());
 		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->text());
 		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('input[type="button"]')->attr('value'));
 

@@ -72,7 +72,7 @@ class add_webpush extends migration
 			['config.add', ['wpn_webpush_vapid_private', '']],
 			['module.add', ['acp', 'ACP_CLIENT_COMMUNICATION', [
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
-				'module_langname'	=> 'ACP_WEBPUSH_SETTINGS',
+				'module_langname'	=> 'ACP_WEBPUSH_EXT_SETTINGS',
 				'module_mode'		=> 'webpush',
 				'after'				=> 'ACP_JABBER_SETTINGS',
 			]]],
@@ -85,7 +85,7 @@ class add_webpush extends migration
 			['config.remove', ['wpn_webpush_enable']],
 			['config.remove', ['wpn_webpush_vapid_public']],
 			['config.remove', ['wpn_webpush_vapid_private']],
-			['module.remove', ['acp', 'ACP_BOARD_CONFIGURATION', 'ACP_WEBPUSH_SETTINGS']]
+			['module.remove', ['acp', 'ACP_BOARD_CONFIGURATION', 'ACP_WEBPUSH_EXT_SETTINGS']]
 		];
 	}
 }

@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "An official phpBB extension that allows board users to receive browser-based push notifications.",
     "homepage": "https://www.phpbb.com",
-    "version": "1.0.0-RC1",
+    "version": "1.0.0-RC2",
     "license": "GPL-2.0-only",
     "authors": [
         {

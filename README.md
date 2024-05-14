@@ -31,6 +31,27 @@ To run this extension from the repo (and not from a pre-built package) on a loca
   php bin/phpbbcli.php extension:enable phpbb/webpushnotifications # install the extension
   ```
 
+## Testing Push Notifications
+
+Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications:
+
+1. **User Account Setup:**
+	- Create at least two distinct user accounts for testing purposes.
+    - In each user account's notifications preferences, assign web push notifications and subscribe to them to receive Push Notifications.
+
+2. **Message, Quote, or Reply Interaction:**
+	- Initiate a user-to-user interaction by performing one of the following actions using "User Account 1":
+		- **Private Message:** Send a direct message from "User Account 1" to "User Account 2".
+		- **Quote:** Quote a post or message authored by "User Account 2" using "User Account 1".
+		- **Reply:** Respond to a post or message authored by "User Account 2" using "User Account 1".
+
+3. **Observing Push Notifications:**
+	- Once the interaction is performed from "User Account 1" to engage with "User Account 2," you promptly should see a notification for "User Account 2."
+
+4. **Caveats for Local Testing**
+    - Local testing of Push Notifications only works from a `localhost` address or if your local server has a secure SSL certificate.
+    - We have seen success on Windows using manually installed PHP, Apache and MySQL. However, for reasons not yet known we do not see success on Mac using MAMP.
+
 ## License
 
 [GNU General Public License v2](license.txt)

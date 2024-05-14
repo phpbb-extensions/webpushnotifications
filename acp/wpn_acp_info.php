@@ -16,10 +16,10 @@ class wpn_acp_info
 	{
 		return [
 			'filename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
-			'title'		=> 'ACP_WEBPUSH_SETTINGS',
+			'title'		=> 'ACP_WEBPUSH_EXT_SETTINGS',
 			'modes'		=> [
 				'webpush'	=> [
-					'title' => 'ACP_WEBPUSH_SETTINGS',
+					'title' => 'ACP_WEBPUSH_EXT_SETTINGS',
 					'auth' => 'ext_phpbb/webpushnotifications && acl_a_server',
 					'cat' => ['ACP_CLIENT_COMMUNICATION']
 				],

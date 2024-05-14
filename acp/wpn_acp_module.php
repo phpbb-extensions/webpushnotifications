@@ -76,7 +76,7 @@ class wpn_acp_module
 			$this->lang->add_lang('webpushnotifications_module_acp', 'phpbb/webpushnotifications');
 
 			// Set the page title for our ACP page
-			$this->page_title = $this->lang->lang('ACP_WEBPUSH_SETTINGS');
+			$this->page_title = $this->lang->lang('ACP_WEBPUSH_EXT_SETTINGS');
 
 			if ($this->request->is_set_post('submit'))
 			{

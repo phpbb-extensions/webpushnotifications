@@ -14,6 +14,11 @@ use phpbb\db\migration\migration;
 
 class handle_subscriptions extends migration
 {
+	public static function depends_on()
+	{
+		return ['\phpbb\webpushnotifications\migrations\add_webpush'];
+	}
+
 	public function effectively_installed()
 	{
 		return !$this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');

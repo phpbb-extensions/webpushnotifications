@@ -135,7 +135,7 @@ class webpush extends messenger_base implements extended_method_interface
 					'title'		=> strip_tags($notification->get_title()),
 					'text'		=> strip_tags($notification->get_reference()),
 					'url'		=> htmlspecialchars_decode($notification->get_url()),
-					'avatar'	=> preg_replace("#(?<=src=\")\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $notification->get_avatar()),
+					'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 				]),
 				'notification_time'		=> time(),
 			];
@@ -432,6 +432,29 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		$this->remove_subscriptions($remove_subscriptions);
+	}
+
+	/**
+	 * Takes an avatar string (usually they are in full html format already) and
+	 * extracts the image src tag url code. Then, if the avatar string is a relative
+	 * path, it's converted to absolute path.
+	 *
+	 * Converts <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * into https://myboard.url/path/to/avatar=123456789.gif
+	 *
+	 * @param string $avatar_html
+	 * @return string Absolute path to avatar image
+	 */
+	protected function prepare_avatar($avatar_html)
+	{
+		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
+
+		if (preg_match($pattern, $avatar_html, $matches))
+		{
+			$avatar_html = $matches[1];
+		}
+
+		return preg_replace("#^\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $avatar_html, 1);
 	}
 
 	/**

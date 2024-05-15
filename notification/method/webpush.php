@@ -17,6 +17,7 @@ use phpbb\db\driver\driver_interface;
 use phpbb\log\log_interface;
 use phpbb\notification\method\messenger_base;
 use phpbb\notification\type\type_interface;
+use phpbb\path_helper;
 use phpbb\user;
 use phpbb\user_loader;
 use phpbb\webpushnotifications\form\form_helper;
@@ -41,6 +42,9 @@ class webpush extends messenger_base implements extended_method_interface
 	/** @var user */
 	protected $user;
 
+	/** @var path_helper */
+	protected $path_helper;
+
 	/** @var string Notification Web Push table */
 	protected $notification_webpush_table;
 
@@ -60,7 +64,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, string $phpbb_root_path,
+	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper, string $phpbb_root_path,
 								string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
@@ -69,6 +73,7 @@ class webpush extends messenger_base implements extended_method_interface
 		$this->db = $db;
 		$this->log = $log;
 		$this->user = $user;
+		$this->path_helper = $path_helper;
 		$this->notification_webpush_table = $notification_webpush_table;
 		$this->push_subscriptions_table = $push_subscriptions_table;
 	}
@@ -130,7 +135,7 @@ class webpush extends messenger_base implements extended_method_interface
 					'title'		=> strip_tags($notification->get_title()),
 					'text'		=> strip_tags($notification->get_reference()),
 					'url'		=> htmlspecialchars_decode($notification->get_url()),
-					'avatar'	=> $notification->get_avatar(),
+					'avatar'	=> preg_replace("#(?<=src=\")\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $notification->get_avatar()),
 				]),
 				'notification_time'		=> time(),
 			];
@@ -427,5 +432,20 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		$this->remove_subscriptions($remove_subscriptions);
+	}
+
+	/**
+	 * Returns the board url (and caches it in the function)
+	 */
+	protected function get_board_url()
+	{
+		static $board_url;
+
+		if (empty($board_url))
+		{
+			$board_url = generate_board_url();
+		}
+
+		return $board_url;
 	}
 }

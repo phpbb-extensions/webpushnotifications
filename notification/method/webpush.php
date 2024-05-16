@@ -476,6 +476,7 @@ class webpush extends messenger_base implements extended_method_interface
 		$image_dir = rtrim($this->config['avatar_path'], DIRECTORY_SEPARATOR);
 
 		// Ensure image_dir is relative
+		$image_dir = str_replace(['../', '..\\', './', '.\\'], '', $image_dir);
 		if ($image_dir && ($image_dir[0] === '/' || $image_dir[0] === '\\'))
 		{
 			$image_dir = '';

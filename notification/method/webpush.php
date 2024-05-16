@@ -451,12 +451,12 @@ class webpush extends messenger_base implements extended_method_interface
 	{
 		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
 
-		if (preg_match($pattern, $avatar, $matches))
+		if (preg_match_all($pattern, $avatar, $matches, PREG_SET_ORDER))
 		{
-			$avatar = $matches[2] ?? $matches[1];
+			$avatar = $matches[1][1] ?? $matches[0][1];
 		}
 
-		if (strpos($avatar, 'download/file'))
+		if (strpos($avatar, 'download/file.' . $this->php_ext))
 		{
 			$avatar = $this->get_uploaded_avatar($avatar);
 		}
@@ -505,7 +505,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 		if (empty($board_url))
 		{
-			$board_url = generate_board_url();
+			$board_url = generate_board_url() . DIRECTORY_SEPARATOR;
 		}
 
 		return $board_url;

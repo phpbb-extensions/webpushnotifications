@@ -456,7 +456,43 @@ class webpush extends messenger_base implements extended_method_interface
 			$avatar = $matches[2] ?? $matches[1];
 		}
 
+		if (strpos($avatar, 'download/file'))
+		{
+			$avatar = $this->get_uploaded_avatar($avatar);
+		}
+
 		return preg_replace("#^\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $avatar, 1);
+	}
+
+	/**
+	 * Get the actual path to uploaded avatars
+	 *
+	 * @param string $file
+	 * @return string
+	 */
+	protected function get_uploaded_avatar($file)
+	{
+		$prefix = $this->config['avatar_salt'] . '_';
+		$image_dir = rtrim($this->config['avatar_path'], DIRECTORY_SEPARATOR);
+
+		// Ensure image_dir is relative
+		if ($image_dir && ($image_dir[0] === '/' || $image_dir[0] === '\\'))
+		{
+			$image_dir = '';
+		}
+
+		// Extract file extension
+		$ext = pathinfo($file, PATHINFO_EXTENSION);
+
+		// Extract filename using regex
+		$filename = '';
+		if (preg_match('/avatar=(.+?)_/', $file, $matches))
+		{
+			$filename = $matches[1];
+		}
+
+		// Construct final path
+		return $filename ? $this->path_helper->get_web_root_path() . $image_dir . DIRECTORY_SEPARATOR . $prefix . $filename . '.' . $ext : '';
 	}
 
 	/**

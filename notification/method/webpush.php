@@ -439,22 +439,24 @@ class webpush extends messenger_base implements extended_method_interface
 	 * extracts the image src tag url code. Then, if the avatar string is a relative
 	 * path, it's converted to absolute path.
 	 *
-	 * Converts <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * Converts:
+	 * 		<img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * 	or  <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
 	 * into https://myboard.url/path/to/avatar=123456789.gif
 	 *
-	 * @param string $avatar_html
+	 * @param string $avatar
 	 * @return string Absolute path to avatar image
 	 */
-	protected function prepare_avatar($avatar_html)
+	protected function prepare_avatar($avatar)
 	{
 		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
 
-		if (preg_match($pattern, $avatar_html, $matches))
+		if (preg_match($pattern, $avatar, $matches))
 		{
-			$avatar_html = $matches[1];
+			$avatar = $matches[2] ?? $matches[1];
 		}
 
-		return preg_replace("#^\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $avatar_html, 1);
+		return preg_replace("#^\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $avatar, 1);
 	}
 
 	/**

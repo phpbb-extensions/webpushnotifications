@@ -456,7 +456,7 @@ class webpush extends messenger_base implements extended_method_interface
 			$avatar = $matches[1][1] ?? $matches[0][1];
 		}
 
-		return preg_replace("#^\\{$this->path_helper->get_web_root_path()}#", $this->get_board_url(), $avatar, 1);
+		return preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $avatar, 1);
 	}
 
 	/**

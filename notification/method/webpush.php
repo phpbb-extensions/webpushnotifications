@@ -451,12 +451,11 @@ class webpush extends messenger_base implements extended_method_interface
 	{
 		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
 
-		if (preg_match_all($pattern, $avatar, $matches, PREG_SET_ORDER))
-		{
-			$avatar = $matches[1][1] ?? $matches[0][1];
-		}
+		preg_match_all($pattern, $avatar, $matches);
 
-		return preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $avatar, 1);
+		$path = !empty($matches[1]) ? end($matches[1]) : $avatar;
+
+		return preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1);
 	}
 
 	/**

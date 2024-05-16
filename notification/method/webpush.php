@@ -493,7 +493,7 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		// Construct final path
-		return $filename ? $this->path_helper->get_web_root_path() . $image_dir . DIRECTORY_SEPARATOR . $prefix . $filename . '.' . $ext : '';
+		return $filename ? $this->path_helper->get_web_root_path() . $image_dir . '/' . $prefix . $filename . '.' . $ext : '';
 	}
 
 	/**
@@ -505,7 +505,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 		if (empty($board_url))
 		{
-			$board_url = generate_board_url() . DIRECTORY_SEPARATOR;
+			$board_url = generate_board_url() . '/';
 		}
 
 		return $board_url;

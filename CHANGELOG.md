@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.0-RC3 - 2024-05-16
+
+- Fixed an issue with user avatars not being displayed in the push notifications.
+- Added Russian translation.
+
 ### 1.0.0-RC2 - 2024-05-14
 
 - NOTE: If upgrading from RC1 to RC2, you must fully uninstall (disable and purge) RC1 and install RC2 as a fresh installation.

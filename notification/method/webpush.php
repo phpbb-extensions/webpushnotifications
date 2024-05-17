@@ -17,6 +17,7 @@ use phpbb\db\driver\driver_interface;
 use phpbb\log\log_interface;
 use phpbb\notification\method\messenger_base;
 use phpbb\notification\type\type_interface;
+use phpbb\path_helper;
 use phpbb\user;
 use phpbb\user_loader;
 use phpbb\webpushnotifications\form\form_helper;
@@ -41,6 +42,9 @@ class webpush extends messenger_base implements extended_method_interface
 	/** @var user */
 	protected $user;
 
+	/** @var path_helper */
+	protected $path_helper;
+
 	/** @var string Notification Web Push table */
 	protected $notification_webpush_table;
 
@@ -55,13 +59,14 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param log_interface $log
 	 * @param user_loader $user_loader
 	 * @param user $user
+	 * @param path_helper $path_helper
 	 * @param string $phpbb_root_path
 	 * @param string $php_ext
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, string $phpbb_root_path,
-								string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
+	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
+								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
 
@@ -69,6 +74,7 @@ class webpush extends messenger_base implements extended_method_interface
 		$this->db = $db;
 		$this->log = $log;
 		$this->user = $user;
+		$this->path_helper = $path_helper;
 		$this->notification_webpush_table = $notification_webpush_table;
 		$this->push_subscriptions_table = $push_subscriptions_table;
 	}
@@ -430,10 +436,16 @@ class webpush extends messenger_base implements extended_method_interface
 	}
 
 	/**
-	 * Takes an avatar string (usually in full html format already) and extracts the src path.
+	 * Takes an avatar string (usually in full html format already) and extracts the url.
+	 * If the avatar url is a relative path, it's converted to an absolute path.
+	 *
+	 * Converts:
+	 *    <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * or <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * into https://myboard.url/path/to/avatar=123456789.gif
 	 *
 	 * @param string $avatar
-	 * @return array
+	 * @return string Absolute path to avatar image
 	 */
 	protected function prepare_avatar($avatar)
 	{
@@ -443,6 +455,23 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$path = !empty($matches[1]) ? end($matches[1]) : $avatar;
 
-		return ['src' => preg_replace('#^\./#', '/', $path)];
+		return preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1);
+	}
+
+	/**
+	 * Returns the board url (and caches it in the function)
+	 *
+	 * @return string the generated board url
+	 */
+	protected function get_board_url()
+	{
+		static $board_url;
+
+		if (empty($board_url))
+		{
+			$board_url = generate_board_url() . '/';
+		}
+
+		return $board_url;
 	}
 }

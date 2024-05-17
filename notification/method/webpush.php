@@ -59,13 +59,14 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param log_interface $log
 	 * @param user_loader $user_loader
 	 * @param user $user
+	 * @param path_helper $path_helper
 	 * @param string $phpbb_root_path
 	 * @param string $php_ext
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper, string $phpbb_root_path,
-								string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
+	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
+								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
 
@@ -435,13 +436,12 @@ class webpush extends messenger_base implements extended_method_interface
 	}
 
 	/**
-	 * Takes an avatar string (usually they are in full html format already) and
-	 * extracts the image src tag url code. Then, if the avatar string is a relative
-	 * path, it's converted to absolute path.
+	 * Takes an avatar string (usually in full html format already) and extracts the url.
+	 * If the avatar url is a relative path, it's converted to an absolute path.
 	 *
 	 * Converts:
-	 * 		<img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
-	 * 	or  <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 *    <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * or <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
 	 * into https://myboard.url/path/to/avatar=123456789.gif
 	 *
 	 * @param string $avatar
@@ -460,6 +460,8 @@ class webpush extends messenger_base implements extended_method_interface
 
 	/**
 	 * Returns the board url (and caches it in the function)
+	 *
+	 * @return string the generated board url
 	 */
 	protected function get_board_url()
 	{

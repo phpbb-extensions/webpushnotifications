@@ -12,12 +12,14 @@ function webpushWorkerUpdate() {
 			});
 	}
 }
-
-function domReady(callBack) {
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', callBack);
-	} else {
-		callBack();
+// Do not redeclare function if exist
+if (typeof domReady === 'undefined') {
+	window.domReady = function(callBack) {
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', callBack);
+		} else {
+			callBack();
+		}
 	}
 }
 

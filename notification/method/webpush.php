@@ -445,7 +445,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 * into https://myboard.url/path/to/avatar=123456789.gif
 	 *
 	 * @param string $avatar
-	 * @return string Absolute path to avatar image
+	 * @return array 'src' => Absolute path to avatar image
 	 */
 	protected function prepare_avatar($avatar)
 	{
@@ -455,7 +455,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$path = !empty($matches[1]) ? end($matches[1]) : $avatar;
 
-		return preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1);
+		return ['src' => preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1)];
 	}
 
 	/**

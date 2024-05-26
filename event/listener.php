@@ -30,6 +30,7 @@ class listener implements EventSubscriberInterface
 			'core.ucp_notifications_output_notification_types_modify_template_vars'	=> 'load_template_data',
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
+			'core.page_header_after'			=> 'service_worker_url',
 		];
 	}
 
@@ -89,5 +90,16 @@ class listener implements EventSubscriberInterface
 	public function compatibility_notice()
 	{
 		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='));
+	}
+
+	/**
+	 * Generate service worker URL globally for update
+	 */
+	public function service_worker_url()
+	{
+		if (!$this->template->retrieve_var('U_WEBPUSH_WORKER_URL'))
+		{
+			$this->template->assign_var('U_WEBPUSH_WORKER_URL', $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'));
+		}
 	}
 }

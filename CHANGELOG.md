@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.0-RC4 - 2024-05-26
+
+- Fixed an issue with the Push Service Worker not updating in a user's browser after an extension update.
+- Made sure all extension template files are properly namespaced.
+
 ### 1.0.0-RC3 - 2024-05-16
 
 - Fixed an issue with user avatars not being displayed in the push notifications.

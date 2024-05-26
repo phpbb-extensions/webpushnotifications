@@ -57,10 +57,9 @@ function PhpbbWebpush() {
 
 		if ('serviceWorker' in navigator && 'PushManager' in window) {
 			navigator.serviceWorker.register(serviceWorkerUrl)
-				.then((registration) => {
+				.then(() => {
 					subscribeButton.addEventListener('click', subscribeButtonHandler);
 					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
-					registration.update();
 
 					updateButtonState();
 				})

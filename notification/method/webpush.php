@@ -445,7 +445,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 * into https://myboard.url/path/to/avatar=123456789.gif
 	 *
 	 * @param string $avatar
-	 * @return string Absolute path to avatar image
+	 * @return array 'src' => Absolute path to avatar image
 	 */
 	protected function prepare_avatar($avatar)
 	{

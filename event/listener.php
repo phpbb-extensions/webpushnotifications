@@ -97,6 +97,9 @@ class listener implements EventSubscriberInterface
 	 */
 	public function service_worker_url()
 	{
-		$this->template->assign_var('U_WEBPUSH_WORKER_URL', $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'));
+		if (!$this->template->retrieve_var('U_WEBPUSH_WORKER_URL'))
+		{
+			$this->template->assign_var('U_WEBPUSH_WORKER_URL', $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'));
+		}
 	}
 }

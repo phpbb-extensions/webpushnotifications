@@ -2,7 +2,7 @@
 
 function webpushWorkerUpdate() {
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register(serviceWorkerUrl)
+		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
 			.then((registration) => {
 				registration.update();
 			})

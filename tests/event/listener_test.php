@@ -30,6 +30,9 @@ class listener_test extends \phpbb_database_test_case
 	/** @var \phpbb\webpushnotifications\notification\method\webpush */
 	protected $notification_method_webpush;
 
+	/* @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\notification\manager */
+	protected $phpbb_notifications;
+
 	protected static function setup_extensions()
 	{
 		return ['phpbb/webpushnotifications'];
@@ -81,6 +84,10 @@ class listener_test extends \phpbb_database_test_case
 			->setMethods(array())
 			->getMock();
 
+		$this->notifications = $this->getMockBuilder('\phpbb\notification\manager')
+			->disableOriginalConstructor()
+			->getMock();
+
 		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
 			$this->config,
 			$db,
@@ -101,7 +108,8 @@ class listener_test extends \phpbb_database_test_case
 			$this->controller_helper,
 			$this->form_helper,
 			$this->language,
-			$this->template
+			$this->template,
+			$this->notifications
 		);
 	}
 
@@ -114,7 +122,6 @@ class listener_test extends \phpbb_database_test_case
 	public function test_getSubscribedEvents()
 	{
 		self::assertEquals([
-			'core.ucp_notifications_output_notification_types_modify_template_vars',
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
 			'core.page_header_after',
@@ -215,10 +222,13 @@ class listener_test extends \phpbb_database_test_case
 		$this->set_listener();
 
 		$method_data['method'] = $this->notification_method_webpush;
-		$event_data = ['method_data'];
+
+		$this->notifications->expects(self::once())
+			->method('get_subscription_methods')
+			->willReturn([$method_data['id'] => $method_data]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
-		$dispatcher->addListener('core.ucp_notifications_output_notification_types_modify_template_vars', [$this->listener, 'load_template_data']);
-		$dispatcher->trigger_event('core.ucp_notifications_output_notification_types_modify_template_vars', compact($event_data));
+		$dispatcher->addListener('core.page_header_after', [$this->listener, 'load_template_data']);
+		$dispatcher->trigger_event('core.page_header_after');
 	}
 }

@@ -15,8 +15,8 @@
 	font-size: 12px;
 	border-top: solid 1px #b9b9b9;
 	display: flex;
-	justify-content: space-evenly;
-	padding: 5px;
+	justify-content: space-between;
+	padding: 5px 25px;
 }
 
 .wpn-notification-dropdown-footer button:disabled {

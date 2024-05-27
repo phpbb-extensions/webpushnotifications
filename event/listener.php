@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use phpbb\controller\helper as controller_helper;
 use phpbb\webpushnotifications\form\form_helper;
 use phpbb\language\language;
+use phpbb\notification\manager;
 use phpbb\template\template;
 
 /**
@@ -27,10 +28,9 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.ucp_notifications_output_notification_types_modify_template_vars'	=> 'load_template_data',
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
-			'core.page_header_after'			=> 'service_worker_url',
+			'core.page_header_after'			=> [['load_template_data'], ['service_worker_url']],
 		];
 	}
 
@@ -46,6 +46,9 @@ class listener implements EventSubscriberInterface
 	/* @var template */
 	protected $template;
 
+	/* @var manager */
+	protected $phpbb_notifications;
+
 	/**
 	 * Constructor
 	 *
@@ -53,25 +56,30 @@ class listener implements EventSubscriberInterface
 	 * @param form_helper $form_helper Form helper object
 	 * @param language $language Language object
 	 * @param template $template Template object
+	 * @param manager $phpbb_notifications Notifications manager object
 	 */
-	public function __construct(controller_helper $controller_helper, form_helper $form_helper, language $language, template $template)
+	public function __construct(controller_helper $controller_helper, form_helper $form_helper, language $language, template $template, manager $phpbb_notifications)
 	{
 		$this->controller_helper = $controller_helper;
 		$this->form_helper = $form_helper;
 		$this->language = $language;
 		$this->template = $template;
+		$this->phpbb_notifications = $phpbb_notifications;
 	}
 
 	/**
 	 * Load template data
-	 *
-	 * @param \phpbb\event\data $event
 	 */
-	public function load_template_data($event)
+	public function load_template_data()
 	{
-		if ($event['method_data']['id'] === 'notification.method.phpbb.wpn.webpush')
+		$methods = $this->phpbb_notifications->get_subscription_methods();
+		if (array_key_exists('notification.method.phpbb.wpn.webpush', $methods))
 		{
-			$template_ary = $event['method_data']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
+			if (!$this->language->is_set('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'))
+			{
+				$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+			}
+			$template_ary = $methods['notification.method.phpbb.wpn.webpush']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
 			$this->template->assign_vars($template_ary);
 		}
 	}

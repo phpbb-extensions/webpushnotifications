@@ -10,3 +10,15 @@
 .button.hidden {
 	display: none;
 }
+
+.wpn-notification-dropdown-footer {
+	font-size: 12px;
+	border-top: solid 1px #b9b9b9;
+	display: flex;
+	justify-content: space-evenly;
+	padding: 5px;
+}
+
+.wpn-notification-dropdown-footer button:disabled {
+	opacity: 0.7;
+}

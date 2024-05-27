@@ -16,6 +16,7 @@ services:
             - '@phpbb.wpn.form_helper'
             - '@language'
             - '@template'
+            - '@notification_manager'
         tags:
             - { name: event.listener }
 

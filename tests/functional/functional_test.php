@@ -73,4 +73,19 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
 	}
+
+	public function test_dropdown_subscribe_button()
+	{
+		$this->login();
+
+		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
+
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
+		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBED', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->text());
+
+		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
+		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+	}
 }

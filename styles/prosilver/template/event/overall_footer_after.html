@@ -1,4 +1,6 @@
-<script>
-	const serviceWorkerUrl = '{{ U_WEBPUSH_WORKER_URL }}';
-</script>
-{% INCLUDEJS('@phpbb_webpushnotifications/update_worker.js') %}
+{% if U_WEBPUSH_WORKER_URL %}
+	<script>
+		const serviceWorkerUrl = '{{ U_WEBPUSH_WORKER_URL }}';
+	</script>
+	{% INCLUDEJS '@phpbb_webpushnotifications/update_worker.js' %}
+{% endif %}

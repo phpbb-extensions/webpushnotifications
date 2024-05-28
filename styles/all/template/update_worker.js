@@ -13,6 +13,7 @@ function webpushWorkerUpdate() {
 	}
 }
 // Do not redeclare function if exist
+/* global domReady */
 if (typeof domReady === 'undefined') {
 	window.domReady = function(callBack) {
 		if (document.readyState === 'loading') {
@@ -20,7 +21,7 @@ if (typeof domReady === 'undefined') {
 		} else {
 			callBack();
 		}
-	}
+	};
 }
 
 domReady(() => {

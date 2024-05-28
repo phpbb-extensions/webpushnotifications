@@ -1,8 +1,9 @@
 'use strict';
 
+/* global phpbbWebpushOptions, domReady */
 function webpushWorkerUpdate() {
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
+		navigator.serviceWorker.getRegistration(phpbbWebpushOptions.serviceWorkerUrl)
 			.then((registration) => {
 				registration.update();
 			})
@@ -20,10 +21,9 @@ if (typeof domReady === 'undefined') {
 		} else {
 			callBack();
 		}
-	}
+	};
 }
 
 domReady(() => {
-	/* global serviceWorkerUrl */
 	webpushWorkerUpdate();
 });

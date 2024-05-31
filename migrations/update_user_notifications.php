@@ -63,6 +63,7 @@ class update_user_notifications extends migration
 
 		$sql = 'SELECT user_id
 			FROM ' . $this->table_prefix . 'users
+			WHERE user_type <> ' . USER_IGNORE . '
 			ORDER BY user_id ASC';
 		$result = $this->db->sql_query_limit($sql, $limit, $start);
 

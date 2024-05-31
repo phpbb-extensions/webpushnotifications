@@ -39,8 +39,10 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'	=> 'Браузерные push—уведомления',
+	'NOTIFY_WEBPUSH_ENABLE_SHORT'	=> 'Браузерные push—уведомления',
 	'NOTIFY_WEBPUSH_ENABLE'			=> 'Включить браузерные push—уведомления',
 	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Включение возможности получения браузерных push—уведомлений.<br>Данная возможность может быть отключена в любое время в настройках браузера, с помощью отписки от браузерных push—уведомлений в личном разделе или путём отключения данной функции ниже.',
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Подписаться',
 	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Отписаться',
+	'NOTIFY_WEBPUSH_SUBSCRIBED'		=> 'Включено',
 ]);

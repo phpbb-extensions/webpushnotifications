@@ -30,7 +30,7 @@ class update_user_notifications extends migration
 		$sql = 'SELECT method
 			FROM ' . $this->table_prefix . "user_notifications
 			WHERE method = '" . $this->db->sql_escape('notification.method.phpbb.wpn.webpush') . "'";
-		$result = $this->db->sql_query($sql);
+		$result = $this->db->sql_query_limit($sql, 1);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 

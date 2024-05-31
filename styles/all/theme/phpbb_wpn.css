@@ -13,8 +13,10 @@
 
 .wpn-notification-dropdown-footer {
 	font-size: 12px;
+	white-space: nowrap;
 	border-top: solid 1px #b9b9b9;
 	display: flex;
+	flex-wrap: nowrap;
 	justify-content: space-between;
 	padding: 5px 25px;
 }

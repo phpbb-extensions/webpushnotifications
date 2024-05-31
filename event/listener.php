@@ -31,6 +31,7 @@ class listener implements EventSubscriberInterface
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
 			'core.page_header_after'			=> 'load_template_data',
+			'core.user_add_modify_notifications_data' => 'add_user_notification_data',
 		];
 	}
 
@@ -98,5 +99,25 @@ class listener implements EventSubscriberInterface
 	public function compatibility_notice()
 	{
 		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='));
+	}
+
+	/**
+	 * Add default web push notification settings for new users
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function add_user_notification_data($event)
+	{
+		$notifications_data = $event['notifications_data'];
+		$notifications_data[] = [
+			'item_type'	=> 'notification.type.quote',
+			'method'	=> 'notification.method.phpbb.wpn.webpush',
+		];
+		$notifications_data[] = [
+			'item_type'	=> 'notification.type.pm',
+			'method'	=> 'notification.method.phpbb.wpn.webpush',
+		];
+		$event['notifications_data'] = $notifications_data;
 	}
 }

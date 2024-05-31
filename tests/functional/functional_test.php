@@ -72,6 +72,12 @@ class functional_test extends \phpbb_functional_test_case
 
 		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
+
+		$wp_list = $crawler->filter('.table1');
+		$this->assert_checkbox_is_checked($wp_list, 'notification.type.quote_notification.method.phpbb.wpn.webpush');
+		$this->assert_checkbox_is_checked($wp_list, 'notification.type.pm_notification.method.phpbb.wpn.webpush');
+		$this->assert_checkbox_is_unchecked($wp_list, 'notification.type.bookmark_notification.method.phpbb.wpn.webpush');
+		$this->assert_checkbox_is_unchecked($wp_list, 'notification.type.group_request_notification.method.phpbb.wpn.webpush');
 	}
 
 	public function test_dropdown_subscribe_button()

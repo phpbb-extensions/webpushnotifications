@@ -1,4 +1,4 @@
-{% if NOTIFICATIONS_WEBPUSH_ENABLE and not notification_types|default %}
+{% if NOTIFICATIONS_WEBPUSH_ENABLE and not notification_types|default and not notification_list|default %}
 	<div class="wpn-notification-dropdown-footer">
 		<span>{{ lang('NOTIFY_WEBPUSH_ENABLE_SHORT') ~ lang('COLON') }}</span>
 		<button id="subscribe_webpush" name="subscribe_webpush"><i class="icon fa-toggle-off fa-fw icon-lightgray"></i><span>{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}</span></button>

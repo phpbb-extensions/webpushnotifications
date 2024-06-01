@@ -1,8 +1,9 @@
 'use strict';
 
+/* global phpbbWebpushOptions, domReady */
 function webpushWorkerUpdate() {
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
+		navigator.serviceWorker.getRegistration(phpbbWebpushOptions.serviceWorkerUrl)
 			.then((registration) => {
 				registration.update();
 			})
@@ -13,7 +14,6 @@ function webpushWorkerUpdate() {
 	}
 }
 // Do not redeclare function if exist
-/* global domReady */
 if (typeof domReady === 'undefined') {
 	window.domReady = function(callBack) {
 		if (document.readyState === 'loading') {
@@ -25,6 +25,5 @@ if (typeof domReady === 'undefined') {
 }
 
 domReady(() => {
-	/* global serviceWorkerUrl */
 	webpushWorkerUpdate();
 });

@@ -4,6 +4,7 @@
 
 - New: Added an enable push subscriptions toggle switch to the footer of the Notifications drop down.
 - Fixed an issue where the Subscribe button was appearing on some UCP pages unexpectedly.
+- Fixed an issue where push notifications failed on Android devices using Firefox as their browser.
 - Requires phpBB 3.3.12 or newer.
 
 ### 1.0.0-RC4 - 2024-05-26

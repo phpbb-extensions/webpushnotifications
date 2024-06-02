@@ -10,6 +10,7 @@
 
 namespace phpbb\webpushnotifications\ucp\controller;
 
+use phpbb\config\config;
 use phpbb\controller\helper as controller_helper;
 use phpbb\db\driver\driver_interface;
 use phpbb\exception\http_exception;
@@ -30,6 +31,9 @@ class webpush
 {
 	/** @var string UCP form token name */
 	public const FORM_TOKEN_UCP = 'ucp_webpush';
+
+	/** @var config */
+	protected $config;
 
 	/** @var controller_helper */
 	protected $controller_helper;
@@ -61,6 +65,7 @@ class webpush
 	/**
 	 * Constructor for webpush controller
 	 *
+	 * @param config $config
 	 * @param controller_helper $controller_helper
 	 * @param driver_interface $db
 	 * @param form_helper $form_helper
@@ -71,9 +76,10 @@ class webpush
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(controller_helper $controller_helper, driver_interface $db, form_helper $form_helper, path_helper $path_helper,
+	public function __construct(config $config, controller_helper $controller_helper, driver_interface $db, form_helper $form_helper, path_helper $path_helper,
 								request_interface $request, user $user, Environment $template, string $notification_webpush_table, string $push_subscriptions_table)
 	{
+		$this->config = $config;
 		$this->controller_helper = $controller_helper;
 		$this->db = $db;
 		$this->form_helper = $form_helper;
@@ -129,6 +135,7 @@ class webpush
 		// @todo: only work for logged in users, no anonymous & bot
 		$content = $this->template->render('@phpbb_webpushnotifications/push_worker.js.twig', [
 			'U_WEBPUSH_GET_NOTIFICATION'	=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_get_notification_controller'),
+			'ASSETS_VERSION'				=> $this->config['assets_version'],
 		]);
 
 		$response = new Response($content);

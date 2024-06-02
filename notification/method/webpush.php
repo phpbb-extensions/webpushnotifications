@@ -194,6 +194,12 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$web_push = new \Minishlink\WebPush\WebPush($auth);
 
+		// Fix encryption payload size for Firefox on Android
+		if (preg_match('/android.*firefox/i', $this->user->browser))
+		{
+			$web_push->setAutomaticPadding(2820);
+		}
+
 		$number_of_notifications = 0;
 		$remove_subscriptions = [];
 

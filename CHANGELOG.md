@@ -1,9 +1,10 @@
 # Changelog
 
-### 1.0.0-RC5 - 2024-05-31
+### 1.0.0-RC6 - 2024-06-01
 
 - New: Added an enable push subscriptions toggle switch to the footer of the Notifications drop down.
-- New: New and existing users will have push notification preferences for PMs and being quoted in posts set by default. (Note this will not apply to existing users of boards that have installed a previous version of this extension.)
+- Fixed an issue where the Subscribe button was appearing on some UCP pages unexpectedly.
+- Fixed an issue where push notifications failed on Android devices using Firefox as their browser.
 - Requires phpBB 3.3.12 or newer.
 
 ### 1.0.0-RC4 - 2024-05-26

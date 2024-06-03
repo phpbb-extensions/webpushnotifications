@@ -1,3 +1,3 @@
-phpbb_ucp_routing:
+phpbb_webpushnotifications_ucp_routing:
     resource: wpn_ucp.yml
     prefix: /user

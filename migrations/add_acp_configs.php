@@ -28,6 +28,7 @@ class add_acp_configs extends migration
 	{
 		return [
 			['config.add', ['wpn_webpush_method_enabled', false]],
+			['config.add', ['wpn_webpush_dropdown_subscribe', false]],
 		];
 	}
 
@@ -35,6 +36,7 @@ class add_acp_configs extends migration
 	{
 		return [
 			['config.remove', ['wpn_webpush_method_enabled']],
+			['config.remove', ['wpn_webpush_dropdown_subscribe']],
 		];
 	}
 }

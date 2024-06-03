@@ -98,11 +98,12 @@ class wpn_acp_module
 	public function display_settings()
 	{
 		$this->template->assign_vars([
-			'S_WEBPUSH_ENABLE'		=> $this->config['wpn_webpush_enable'],
-			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['wpn_webpush_vapid_public'],
-			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['wpn_webpush_vapid_private'] ? self::MASKED_PRIVATE_KEY : '',
-			'S_WEBPUSH_METHOD_ENABLED' => $this->config['wpn_webpush_method_enabled'],
-			'U_ACTION'				=> $this->u_action,
+			'S_WEBPUSH_ENABLE'					=> $this->config['wpn_webpush_enable'],
+			'WEBPUSH_VAPID_PUBLIC'				=> $this->config['wpn_webpush_vapid_public'],
+			'WEBPUSH_VAPID_PRIVATE'				=> $this->config['wpn_webpush_vapid_private'] ? self::MASKED_PRIVATE_KEY : '',
+			'S_WPN_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> $this->config['wpn_webpush_dropdown_subscribe'],
+			'S_WEBPUSH_METHOD_ENABLED' 			=> $this->config['wpn_webpush_method_enabled'],
+			'U_ACTION'							=> $this->u_action,
 		]);
 	}
 
@@ -118,6 +119,7 @@ class wpn_acp_module
 			'wpn_webpush_enable' => ['validate' => 'bool'],
 			'wpn_webpush_vapid_public' => ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PUBLIC'],
 			'wpn_webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
+			'wpn_webpush_dropdown_subscribe' => ['validate' => 'bool'],
 			'wpn_webpush_method_enabled' => ['validate' => 'bool'],
 		];
 

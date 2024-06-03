@@ -96,6 +96,11 @@ class webpush extends messenger_base implements extended_method_interface
 			&& !empty($this->config['wpn_webpush_vapid_public']) && !empty($this->config['wpn_webpush_vapid_private']);
 	}
 
+	public function is_enabled_by_default()
+	{
+		return $this->config['wpn_webpush_method_enabled'];
+	}
+
 	/**
 	* {@inheritdoc}
 	*/

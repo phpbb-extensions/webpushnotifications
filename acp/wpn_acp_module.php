@@ -101,6 +101,7 @@ class wpn_acp_module
 			'S_WEBPUSH_ENABLE'		=> $this->config['wpn_webpush_enable'],
 			'WEBPUSH_VAPID_PUBLIC'	=> $this->config['wpn_webpush_vapid_public'],
 			'WEBPUSH_VAPID_PRIVATE'	=> $this->config['wpn_webpush_vapid_private'] ? self::MASKED_PRIVATE_KEY : '',
+			'S_WEBPUSH_METHOD_ENABLED' => $this->config['wpn_webpush_method_enabled'],
 			'U_ACTION'				=> $this->u_action,
 		]);
 	}
@@ -117,6 +118,7 @@ class wpn_acp_module
 			'wpn_webpush_enable' => ['validate' => 'bool'],
 			'wpn_webpush_vapid_public' => ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PUBLIC'],
 			'wpn_webpush_vapid_private'=> ['validate' => 'string:25:255', 'lang' => 'WEBPUSH_VAPID_PRIVATE'],
+			'wpn_webpush_method_enabled' => ['validate' => 'bool'],
 		];
 
 		// Do not validate and update private key field if the content is ******** and the key was already set

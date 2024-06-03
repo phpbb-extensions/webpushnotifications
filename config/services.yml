@@ -40,6 +40,7 @@ services:
     phpbb.wpn.ucp.controller.webpush:
         class: phpbb\webpushnotifications\ucp\controller\webpush
         arguments:
+            - '@config'
             - '@controller.helper'
             - '@dbal.conn'
             - '@phpbb.wpn.form_helper'

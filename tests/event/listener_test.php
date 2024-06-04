@@ -205,6 +205,7 @@ class listener_test extends \phpbb_database_test_case
 	 */
 	public function test_get_ucp_template_data($user_id, $method_data, $subscriptions, $expected)
 	{
+		$this->config['wpn_webpush_dropdown_subscribe'] = true;
 		$this->user->data['user_id'] = $user_id;
 		$this->template->expects($expected ? self::once() : self::never())
 			->method('assign_vars')

@@ -65,6 +65,7 @@ class functional_test extends \phpbb_functional_test_case
 	public function test_ucp_module()
 	{
 		$this->login();
+		$this->admin_login();
 
 		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
 
@@ -72,20 +73,54 @@ class functional_test extends \phpbb_functional_test_case
 
 		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
+
+		// Assert checkbox is unchecked by default
+		$wp_list = $crawler->filter('.table1');
+		$this->assert_checkbox_is_unchecked($wp_list, 'notification.type.quote_notification.method.phpbb.wpn.webpush');
+		$this->assert_checkbox_is_unchecked($wp_list, 'notification.type.pm_notification.method.phpbb.wpn.webpush');
+
+		$this->set_acp_option('wpn_webpush_method_enabled', 1);
+
+		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
+
+		// Assert checkbox is checked
+		$wp_list = $crawler->filter('.table1');
+		$this->assert_checkbox_is_checked($wp_list, 'notification.type.quote_notification.method.phpbb.wpn.webpush');
+		$this->assert_checkbox_is_checked($wp_list, 'notification.type.pm_notification.method.phpbb.wpn.webpush');
 	}
 
 	public function test_dropdown_subscribe_button()
 	{
 		$this->login();
+		$this->admin_login();
 
 		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
 
+		// Assert subscribe dropdown is not present by default
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+
+		$this->set_acp_option('wpn_webpush_dropdown_subscribe', 1);
+
+		// Assert subscribe dropdown is present
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
 		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->text());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBED', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->text());
 
+		// Assert subscribe button is not displayed in UCP when dropdown subscribe is present
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+	}
+
+	protected function set_acp_option($option, $value)
+	{
+		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
+		$form = $crawler->selectButton('Submit')->form();
+		$values = $form->getValues();
+		$values["config[{$option}]"] = $value;
+		$form->setValues($values);
+		$crawler = self::submit($form);
+		$this->assertEquals(1, $crawler->filter('.successbox')->count());
 	}
 }

@@ -45,4 +45,5 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Подписаться',
 	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Отписаться',
 	'NOTIFY_WEBPUSH_SUBSCRIBED'		=> 'Включено',
+	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Посетите настройки уведомлений, чтобы установить предпочтительные push-уведомления.',
 ]);

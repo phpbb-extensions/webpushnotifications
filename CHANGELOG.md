@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.0.0-RC7 - 2024-06-03
+
+- New: Added an ACP option to show or hide the push subscriptions toggle switch in the footer of the Notifications drop down.
+- New: Added an ACP option to make all user-based web push notification settings enabled or disabled by default. With this option enabled, users need only subscribe to start getting notifications. With this option disabled, users who subscribe will still need to visit the UCP and enable the notifications they want to receive.
+- Rewrote the fix for the issue with the Push Service Worker not updating in a user's browser after an extension update.
+- Fixed some internal code issues detected by the EPV.
+
 ### 1.0.0-RC6 - 2024-06-01
 
 - New: Added an enable push subscriptions toggle switch to the footer of the Notifications drop down.

@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.0 - 2024-06-04
+
+- First official release.
+
 ### 1.0.0-RC7 - 2024-06-03
 
 - New: Added an ACP option to show or hide the push subscriptions toggle switch in the footer of the Notifications drop down.

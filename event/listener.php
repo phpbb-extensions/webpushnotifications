@@ -73,13 +73,16 @@ class listener implements EventSubscriberInterface
 	public function load_template_data()
 	{
 		$methods = $this->phpbb_notifications->get_subscription_methods();
-		if (array_key_exists('notification.method.phpbb.wpn.webpush', $methods))
+		$webpush_method = $methods['notification.method.phpbb.wpn.webpush'] ?? null;
+
+		if ($webpush_method !== null)
 		{
 			if (!$this->language->is_set('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'))
 			{
 				$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
 			}
-			$template_ary = $methods['notification.method.phpbb.wpn.webpush']['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
+
+			$template_ary = $webpush_method['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
 			$this->template->assign_vars($template_ary);
 		}
 	}

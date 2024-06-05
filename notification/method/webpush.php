@@ -101,7 +101,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 */
 	public function is_enabled_by_default()
 	{
-		return $this->config['wpn_webpush_method_enabled'];
+		return (bool) $this->config['wpn_webpush_method_enabled'];
 	}
 
 	/**
@@ -205,7 +205,7 @@ class webpush extends messenger_base implements extended_method_interface
 		// Fix encryption payload size for Firefox on Android
 		if (preg_match('/android.*firefox/i', $this->user->browser))
 		{
-			$web_push->setAutomaticPadding(2820);
+			$web_push->setAutomaticPadding(2000);
 		}
 
 		$number_of_notifications = 0;

@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.0-RC8 - 2024-06-05
+
+- Fixed (for real this time) an issue where push notifications failed on Android devices using Firefox. 
+- Tweaked padding in the notification dropdown subscribe button to align with header elements.
+
 ### 1.0.0-RC7 - 2024-06-03
 
 - New: Added an ACP option to show or hide the push subscriptions toggle switch in the footer of the Notifications drop down.

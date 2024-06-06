@@ -1,8 +1,13 @@
 # Changelog
 
-### 1.0.0 - 2024-06-04
+### 1.0.0 - 2024-06-05
 
 - First official release.
+
+### 1.0.0-RC8 - 2024-06-05
+
+- Fixed (for real this time) an issue where push notifications failed on Android devices using Firefox. 
+- Tweaked padding in the notification dropdown subscribe button to align with header elements.
 
 ### 1.0.0-RC7 - 2024-06-03
 

@@ -51,6 +51,9 @@ class webpush extends messenger_base implements extended_method_interface
 	/** @var string Notification push subscriptions table */
 	protected $push_subscriptions_table;
 
+	/** @var int Fallback size for padding if endpoint is mozilla, see https://github.com/web-push-libs/web-push-php/issues/108#issuecomment-2133477054 */
+	const MOZILLA_FALLBACK_PADDING = 2820;
+
 	/**
 	 * Notification Method Web Push constructor
 	 *
@@ -202,12 +205,6 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$web_push = new \Minishlink\WebPush\WebPush($auth);
 
-		// Fix encryption payload size for Firefox on Android
-		if (preg_match('/android.*firefox/i', $this->user->browser))
-		{
-			$web_push->setAutomaticPadding(2000);
-		}
-
 		$number_of_notifications = 0;
 		$remove_subscriptions = [];
 
@@ -237,6 +234,7 @@ class webpush extends messenger_base implements extended_method_interface
 			{
 				try
 				{
+					$this->set_endpoint_padding($web_push, $subscription['endpoint']);
 					$push_subscription = Subscription::create([
 						'endpoint'			=> $subscription['endpoint'],
 						'keys'				=> [
@@ -462,7 +460,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param string $avatar
 	 * @return array 'src' => Absolute path to avatar image
 	 */
-	protected function prepare_avatar($avatar)
+	protected function prepare_avatar($avatar): array
 	{
 		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
 
@@ -488,5 +486,22 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		return $board_url;
+	}
+
+	/**
+	 * Set web push padding for endpoint
+	 *
+	 * @param \Minishlink\WebPush\WebPush $web_push
+	 * @param string $endpoint
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	protected function set_endpoint_padding(\Minishlink\WebPush\WebPush $web_push, string $endpoint): void
+	{
+		if (strpos($endpoint, 'mozilla.com') || strpos($endpoint, 'mozaws.net'))
+		{
+			$web_push->setAutomaticPadding(self::MOZILLA_FALLBACK_PADDING);
+		}
 	}
 }

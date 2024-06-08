@@ -495,13 +495,19 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param string $endpoint
 	 *
 	 * @return void
-	 * @throws \Exception
 	 */
 	protected function set_endpoint_padding(\Minishlink\WebPush\WebPush $web_push, string $endpoint): void
 	{
 		if (strpos($endpoint, 'mozilla.com') || strpos($endpoint, 'mozaws.net'))
 		{
-			$web_push->setAutomaticPadding(self::MOZILLA_FALLBACK_PADDING);
+			try
+			{
+				$web_push->setAutomaticPadding(self::MOZILLA_FALLBACK_PADDING);
+			}
+			catch (\Exception $e)
+			{
+				// This shouldn't happen since we won't pass padding length outside limits
+			}
 		}
 	}
 }

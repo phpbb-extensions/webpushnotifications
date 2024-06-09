@@ -216,7 +216,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 			$user_subscriptions = $user_subscription_map[$notification->user_id] ?? [];
 
-			if ($user['user_type'] == USER_INACTIVE && $user['user_inactive_reason'] == INACTIVE_MANUAL
+			if (($user['user_type'] == USER_INACTIVE && $user['user_inactive_reason'] == INACTIVE_MANUAL)
 				|| empty($user_subscriptions))
 			{
 				continue;

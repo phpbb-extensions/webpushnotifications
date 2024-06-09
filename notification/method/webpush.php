@@ -52,7 +52,7 @@ class webpush extends messenger_base implements extended_method_interface
 	protected $push_subscriptions_table;
 
 	/** @var int Fallback size for padding if endpoint is mozilla, see https://github.com/web-push-libs/web-push-php/issues/108#issuecomment-2133477054 */
-	const MOZILLA_FALLBACK_PADDING = 2820;
+	public const MOZILLA_FALLBACK_PADDING = 2820;
 
 	/**
 	 * Notification Method Web Push constructor
@@ -216,7 +216,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 			$user_subscriptions = $user_subscription_map[$notification->user_id] ?? [];
 
-			if ($user['user_type'] == USER_INACTIVE && $user['user_inactive_reason'] == INACTIVE_MANUAL
+			if (($user['user_type'] == USER_INACTIVE && $user['user_inactive_reason'] == INACTIVE_MANUAL)
 				|| empty($user_subscriptions))
 			{
 				continue;

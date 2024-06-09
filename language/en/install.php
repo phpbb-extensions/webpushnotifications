@@ -38,6 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'PHPBB_VERSION_ERROR'	=> 'This extension is not compatible with your board. You must be using phpBB 3.3.12 or newer, up to but not including phpBB 4.x.x.',
-	'PHP_VERSION_ERROR'		=> 'This extension is not compatible with your server. Your server must be running PHP 7.3 or newer.',
+	'PHPBB_VERSION_MAX_ERROR'	=> 'This extension can not be installed on your board. You are using phpBB 4, which already contains the features in this extension.',
+	'PHPBB_VERSION_MIN_ERROR'	=> 'This extension is not compatible with your board. You must be using phpBB 3.3.12 or newer.',
+	'PHP_VERSION_ERROR'	=> 'This extension is not compatible with your server. Your server must be running PHP 7.3 or newer.',
 ]);

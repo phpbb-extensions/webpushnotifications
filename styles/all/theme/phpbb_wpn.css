@@ -25,3 +25,13 @@
 .wpn-notification-dropdown-footer button:disabled {
 	opacity: 0.7;
 }
+
+@media only screen and (max-width: 550px), only screen and (max-device-width: 550px) {
+	.wpn-notification-dropdown-footer button > span {
+		display: none;
+	}
+
+	.wpn-notification-dropdown-footer button > .icon {
+		font-size: 24px;
+	}
+}

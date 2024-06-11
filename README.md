@@ -37,16 +37,16 @@ Testing push notifications necessitates user-to-user interactions to observe the
 
 1. **User Account Setup:**
 	- Create at least two distinct user accounts for testing purposes.
-    - In each user account's notifications preferences, assign web push notifications and subscribe to them to receive Push Notifications.
+    - In user1's account notifications preferences, assign web push notifications and subscribe to receive Push Notifications.
 
 2. **Message, Quote, or Reply Interaction:**
-	- Initiate a user-to-user interaction by performing one of the following actions using "User Account 1":
-		- **Private Message:** Send a direct message from "User Account 1" to "User Account 2".
-		- **Quote:** Quote a post or message authored by "User Account 2" using "User Account 1".
-		- **Reply:** Respond to a post or message authored by "User Account 2" using "User Account 1".
+	- Initiate a user-to-user interaction by performing one of the following actions using "User Account 2":
+		- **Private Message:** Send a direct message from "User Account 2" to "User Account 1".
+		- **Quote:** Quote a post or message authored by "User Account 1" using "User Account 2".
+		- **Reply:** Respond to a post or message authored by "User Account 1" using "User Account 2".
 
 3. **Observing Push Notifications:**
-	- Once the interaction is performed from "User Account 1" to engage with "User Account 2," you promptly should see a notification for "User Account 2."
+	- Once the interaction is performed from "User Account 2" to engage with "User Account 1," you promptly should see a notification for "User Account 1."
 
 4. **Caveats for Local Testing**
     - Local testing of Push Notifications only works from a `localhost` address or if your local server has a secure SSL certificate.

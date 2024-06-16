@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.0.0-RC9 - 2024-06-16
+
+- The subscribe toggle in the notification dropdown has been optimized for better mobile usability.
+- Notifications missed by logged-out users will now be delivered once they log back in.
+- Users who are unable to subscribe due to previously denying notifications in their browser settings will now see an alert message.
+
 ### 1.0.0-RC8 - 2024-06-05
 
 - Fixed (for real this time) an issue where push notifications failed on Android devices using Firefox. 

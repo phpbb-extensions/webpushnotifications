@@ -46,4 +46,5 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Unsubscribe',
 	'NOTIFY_WEBPUSH_SUBSCRIBED'		=> 'Subscribed',
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Visit notifications settings to set your preferred push notifications.',
+	'NOTIFY_WEBPUSH_DENIED'			=> 'You have denied notifications from this site. To subscribe, please allow notifications in your browser settings.',
 ]);

@@ -39,11 +39,11 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'	=> 'Web Push',
-	'NOTIFY_WEBPUSH_ENABLE_SHORT'	=> 'Enable Web Push notifications',
-	'NOTIFY_WEBPUSH_ENABLE'			=> 'Enable receiving Web Push notifications',
-	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Enable receiving browser-based push notifications.<br>The notifications can be turned off at any time in your browser settings, by unsubscribing, or by disabling the push notifications below.',
+	'NOTIFY_WEBPUSH_NOTIFICATIONS'	=> 'Web Push Notifications',
+	'NOTIFY_WEBPUSH_DISABLE'		=> 'Disable Push Notifications',
+	'NOTIFY_WEBPUSH_ENABLE'			=> 'Enable Push Notifications',
+	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Enabling push notifications will activate them on this device only. You can turn off notifications at any time through your browser settings or by clicking the button above. Additionally, if no web push notification types are selected below, you will not receive any web push notifications.',
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Subscribe',
-	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Unsubscribe',
 	'NOTIFY_WEBPUSH_SUBSCRIBED'		=> 'Subscribed',
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Visit notifications settings to set your preferred push notifications.',
 	'NOTIFY_WEBPUSH_DENIED'			=> 'You have denied notifications from this site. To subscribe, please allow notifications in your browser settings.',

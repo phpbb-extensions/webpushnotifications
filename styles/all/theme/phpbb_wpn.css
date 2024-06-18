@@ -12,6 +12,10 @@
 	display: none;
 }
 
+.wpn.button {
+	margin: 0 0 8px;
+}
+
 .wpn-notification-dropdown-footer {
 	font-size: 12px;
 	white-space: nowrap;
@@ -39,5 +43,11 @@
 @media only screen and (max-width: 350px), only screen and (max-device-width: 350px) {
 	.wpn-notification-dropdown-footer button > .icon {
 		font-size: 24px;
+	}
+}
+
+@media only screen and (max-width: 700px), only screen and (max-device-width: 700px) {
+	.wpn.button {
+		margin-top: 8px;
 	}
 }

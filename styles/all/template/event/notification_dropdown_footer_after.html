@@ -2,10 +2,10 @@
 	<div class="wpn-notification-dropdown-footer" title="{{ lang('NOTIFY_WEBPUSH_DROPDOWN_TITLE') }}">
 		<span class="ellipsis-text">{{ lang('NOTIFY_WEBPUSH_ENABLE') ~ lang('COLON') }}</span>
 		<button id="subscribe_webpush" name="subscribe_webpush" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}">
-			<i class="icon fa-toggle-off fa-fw icon-lightgray"></i><span>{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}</span>
+			<i class="icon fa-toggle-off fa-fw icon-lightgray" aria-hidden="true" title="{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}"></i>
 		</button>
 		<button id="unsubscribe_webpush" name="unsubscribe_webpush" class="hidden">
-			<i class="icon fa-toggle-on fa-fw icon-blue"></i><span>{{ lang('NOTIFY_WEBPUSH_SUBSCRIBED') }}</span>
+			<i class="icon fa-toggle-on fa-fw icon-blue" aria-hidden="true" title="{{ lang('NOTIFY_WEBPUSH_SUBSCRIBED') }}"></i>
 		</button>
 	</div>
 {% endif %}

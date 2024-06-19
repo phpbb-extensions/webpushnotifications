@@ -44,7 +44,7 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_ENABLE'			=> 'Enable Push Notifications',
 	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Enabling push notifications will activate them on this device only. You can turn off notifications at any time through your browser settings or by clicking the button above. Additionally, if no web push notification types are selected below, you will not receive any web push notifications.',
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Subscribe',
-	'NOTIFY_WEBPUSH_SUBSCRIBED'		=> 'Subscribed',
+	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Unsubscribe',
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Visit notifications settings to set your preferred push notifications.',
 	'NOTIFY_WEBPUSH_DENIED'			=> 'You have denied notifications from this site. To subscribe, please allow notifications in your browser settings.',
 ]);

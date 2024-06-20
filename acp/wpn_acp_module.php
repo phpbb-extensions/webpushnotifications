@@ -105,6 +105,13 @@ class wpn_acp_module
 			'S_WEBPUSH_METHOD_ENABLED' 		=> $this->config['wpn_webpush_method_enabled'],
 			'U_ACTION'						=> $this->u_action,
 		]);
+
+		if (!$this->request->server('HTTPS', false))
+		{
+			$this->errors[] = $this->lang->lang('WEBPUSH_INSECURE_SERVER_ERROR');
+		}
+
+		$this->display_errors();
 	}
 
 	/**
@@ -135,13 +142,8 @@ class wpn_acp_module
 			validate_config_vars($display_settings, $config_array, $this->errors);
 		}
 
-		if (count($this->errors))
+		if ($this->display_errors())
 		{
-			$this->template->assign_vars([
-				'S_ERROR'			=> (bool) count($this->errors),
-				'ERROR_MSG'			=> implode('<br>', $this->errors),
-			]);
-
 			return;
 		}
 
@@ -153,5 +155,22 @@ class wpn_acp_module
 		}
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
+	}
+
+	/**
+	 * Display any errors
+	 *
+	 * @return bool
+	 */
+	public function display_errors()
+	{
+		$has_errors = (bool) count($this->errors);
+
+		$this->template->assign_vars([
+			'S_ERROR'	=> $has_errors,
+			'ERROR_MSG'	=> $has_errors ? implode('<br>', $this->errors) : '',
+		]);
+
+		return $has_errors;
 	}
 }

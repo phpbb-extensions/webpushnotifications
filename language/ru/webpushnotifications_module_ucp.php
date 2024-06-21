@@ -39,10 +39,10 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'	=> 'Браузерные',
-	'NOTIFY_WEBPUSH_NOTIFICATIONS'	=> 'Web Push Notifications',
-	'NOTIFY_WEBPUSH_DISABLE'		=> 'Disable Push Notifications',
+	'NOTIFY_WEBPUSH_NOTIFICATIONS'	=> 'Веб-уведомления',
+	'NOTIFY_WEBPUSH_DISABLE'		=> 'Отключить веб-уведомления',
 	'NOTIFY_WEBPUSH_ENABLE'			=> 'Браузерные уведомления',
-	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Включение возможности получения браузерных push—уведомлений.<br>Данная возможность может быть отключена в любое время в настройках браузера, с помощью кнопки «Отписаться» или путём отключения типов уведомлений в категории  «Браузерные» ниже.',
+	'NOTIFY_WEBPUSH_ENABLE_EXPLAIN'	=> 'Включение веб-уведомлений активирует их только на этом устройстве. Вы можете отключить уведомления в любое время через настройки браузера или нажав на кнопку выше. Кроме того, если ниже не выбрано ни одного типа веб-уведомлений, вы не будете получать никаких веб-уведомлений.',
 	'NOTIFY_WEBPUSH_SUBSCRIBE'		=> 'Подписаться',
 	'NOTIFY_WEBPUSH_UNSUBSCRIBE'	=> 'Отписаться',
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Посетите настройки уведомлений, чтобы установить предпочтительные типы браузерных уведомлений.',

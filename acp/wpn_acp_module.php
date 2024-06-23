@@ -106,7 +106,7 @@ class wpn_acp_module
 			'U_ACTION'						=> $this->u_action,
 		]);
 
-		if (!$this->request->server('HTTPS', false))
+		if (!$this->request->server('HTTPS', false) && $this->request->server('SERVER_NAME') !== 'localhost')
 		{
 			$this->errors[] = $this->lang->lang('WEBPUSH_INSECURE_SERVER_ERROR');
 		}

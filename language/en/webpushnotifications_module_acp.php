@@ -50,4 +50,5 @@ $lang = array_merge($lang, [
 	'WEBPUSH_METHOD_ENABLED_EXPLAIN'=> 'When this setting is enabled, users who subscribe and allow browser notifications will start receiving them automatically. They only need to visit the UCP Notification settings to disable any unwanted notifications.<br><br>If this setting is disabled, users will not receive any notifications, even if they have subscribed, until they visit the UCP Notification settings to enable the specific notifications they wish to receive.',
 	'WEBPUSH_DROPDOWN_SUBSCRIBE'	=> 'Show “Subscribe” button in notification dropdown',
 	'WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN'=> 'Enable or disable the “Subscribe” button in the Notification dropdown, allowing users to easily subscribe to push notifications from any page of the forum.',
+	'WEBPUSH_INSECURE_SERVER_ERROR' => 'This board is not using a secure SSL/HTTPS server protocol, which is required to enable and use web push notifications.',
 ]);

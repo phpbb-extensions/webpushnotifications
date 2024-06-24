@@ -71,7 +71,7 @@ class functional_test extends \phpbb_functional_test_case
 
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 
-		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_NOTIFICATIONS', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
 
 		// Assert checkbox is unchecked by default
@@ -105,8 +105,8 @@ class functional_test extends \phpbb_functional_test_case
 		// Assert subscribe dropdown is present
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
-		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->text());
-		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBED', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->html());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_UNSUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->html());
 
 		// Assert subscribe button is not displayed in UCP when dropdown subscribe is present
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');

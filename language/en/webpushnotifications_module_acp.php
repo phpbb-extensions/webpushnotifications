@@ -47,8 +47,8 @@ $lang = array_merge($lang, [
 	'WEBPUSH_VAPID_PRIVATE'			=> 'Server identification private key',
 	'WEBPUSH_VAPID_PRIVATE_EXPLAIN'	=> 'The Voluntary Application Server Identification (VAPID) private key is used to generate authenticated push messages dispatched from your site. The VAPID private key <strong>must</strong> form a valid public-private key pair alongside the VAPID public key.<br><em><strong>Caution:</strong> Modifying the VAPID private key will automatically render all Web Push subscriptions invalid.</em>',
 	'WEBPUSH_METHOD_ENABLED'		=> 'Enable user-based web push notifications by default',
-	'WEBPUSH_METHOD_ENABLED_EXPLAIN'=> 'When this setting is enabled, users who subscribe and allow browser notifications will start receiving them automatically. They only need to visit the UCP Notification settings to disable any unwanted notifications.<br><br>If this setting is disabled, users will not receive any notifications, even if they have subscribed, until they visit the UCP Notification settings to enable the specific notifications they wish to receive.',
-	'WEBPUSH_DROPDOWN_SUBSCRIBE'	=> 'Show “Subscribe” button in notification dropdown',
-	'WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN'=> 'Enable or disable the “Subscribe” button in the Notification dropdown, allowing users to easily subscribe to push notifications from any page of the forum.',
+	'WEBPUSH_METHOD_ENABLED_EXPLAIN'=> 'When this setting is enabled, users who have also enabled and allowed browser notifications will start receiving them automatically. They can visit the UCP Notification settings to disable any unwanted notifications.<br><br>If this setting is disabled, users will not receive any notifications, even if they have enabled push notifications, until they visit the UCP Notification settings to allow the specific notifications they wish to receive.',
+	'WEBPUSH_DROPDOWN_SUBSCRIBE'	=> 'Show web push settings in the notification dropdown',
+	'WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN'=> 'Show or hide the “Enable Web Push” toggle switch in the notification dropdown. This allows users to easily enable or disable push notifications from any page of the forum.',
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'This board is not using a secure SSL/HTTPS server protocol, which is required to enable and use web push notifications.',
 ]);

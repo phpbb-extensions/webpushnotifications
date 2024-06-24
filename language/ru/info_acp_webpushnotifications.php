@@ -38,7 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'ACP_WEBPUSH_EXT_SETTINGS'			=> 'Настройки браузерных push—уведомлений',
+	'ACP_WEBPUSH_EXT_SETTINGS'			=> 'Браузерные уведомления',
 	'ACP_WEBPUSH_REMOVE_WARNING'		=> 'Браузерные push—уведомления теперь встроены в phpBB',
 	'ACP_WEBPUSH_REMOVE_NOTICE'			=> 'Расширение «phpBB Browser Push Notifications» больше не требуется и должно быть удалено.<br>Все системные и пользовательские настройки, связанные с данным расширением, будут перенесены в соответствующие настройки браузерных push—уведомлений конференции автоматически при удалении данного расширения.',
 	'LOG_CONFIG_WEBPUSH'				=> '<strong>Изменены настройки браузерных push—уведомлений</strong>',

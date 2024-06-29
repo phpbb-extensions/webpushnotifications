@@ -91,6 +91,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
 			$this->config,
 			$db,
+			$this->language,
 			new \phpbb\log\dummy(),
 			$user_loader,
 			$this->user,

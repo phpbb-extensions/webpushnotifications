@@ -146,6 +146,9 @@ class webpush extends messenger_base implements extended_method_interface
 	{
 		$insert_buffer = new \phpbb\db\sql_insert_buffer($this->db, $this->notification_webpush_table);
 
+		// Load all users we want to notify
+		$notify_users = $this->load_receivers();
+
 		/** @var type_interface $notification */
 		foreach ($this->queue as $notification)
 		{
@@ -176,7 +179,7 @@ class webpush extends messenger_base implements extended_method_interface
 		// Restore current user's language
 		$this->language->set_user_language($this->user->data['user_lang'], true);
 
-		$this->notify_using_webpush();
+		$this->notify_using_webpush($notify_users);
 
 		return false;
 	}
@@ -184,32 +187,15 @@ class webpush extends messenger_base implements extended_method_interface
 	/**
 	 * Notify using Web Push
 	 *
+	 * @param array	$notify_users	Array of user ids to notify
 	 * @return void
 	 */
-	protected function notify_using_webpush(): void
+	protected function notify_using_webpush($notify_users = []): void
 	{
 		if (empty($this->queue))
 		{
 			return;
 		}
-
-		// Load all users we want to notify
-		$user_ids = [];
-		foreach ($this->queue as $notification)
-		{
-			$user_ids[] = $notification->user_id;
-		}
-
-		// Do not send push notifications to banned users
-		if (!function_exists('phpbb_get_banned_user_ids'))
-		{
-			include($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
-		}
-		$banned_users = phpbb_get_banned_user_ids($user_ids);
-
-		// Load all the users we need
-		$notify_users = array_diff($user_ids, $banned_users);
-		$this->user_loader->load_users($notify_users, array(USER_IGNORE));
 
 		// Get subscriptions for users
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);
@@ -531,5 +517,32 @@ class webpush extends messenger_base implements extended_method_interface
 				// This shouldn't happen since we won't pass padding length outside limits
 			}
 		}
+	}
+
+	/**
+	 * Load all users data to send notifications
+	 *
+	 * @return array	Array of user ids to notify
+	 */
+	protected function load_receivers(): array
+	{
+		$notify_users = $user_ids = [];
+		foreach ($this->queue as $notification)
+		{
+			$user_ids[] = $notification->user_id;
+		}
+
+		// Do not send push notifications to banned users
+		if (!function_exists('phpbb_get_banned_user_ids'))
+		{
+			include($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
+		}
+		$banned_users = phpbb_get_banned_user_ids($user_ids);
+
+		// Load all the users we need
+		$notify_users = array_diff($user_ids, $banned_users);
+		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
+
+		return $notify_users;
 	}
 }

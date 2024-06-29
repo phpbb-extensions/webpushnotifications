@@ -154,9 +154,12 @@ class webpush extends messenger_base implements extended_method_interface
 		{
 			$data = $notification->get_insert_array();
 
-			// Choose receiving user's language
+			// Change notification language if needed only
 			$recipient_data = $this->user_loader->get_user($notification->user_id);
-			$this->language->set_user_language($recipient_data['user_lang'], $this->language->get_used_language() !== $recipient_data['user_lang']);
+			if ($this->language->get_used_language() !== $recipient_data['user_lang'])
+			{
+				$this->language->set_user_language($recipient_data['user_lang'], true);
+			}
 
 			$data += [
 				'push_data'		=> json_encode([
@@ -176,8 +179,11 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$insert_buffer->flush();
 
-		// Restore current user's language
-		$this->language->set_user_language($this->user->data['user_lang'], $this->language->get_used_language() !== $this->user->data['user_lang']);
+		// Restore current user's language if needed only
+		if ($this->language->get_used_language() !== $this->user->data['user_lang'])
+		{
+			$this->language->set_user_language($this->user->data['user_lang'], true);
+		}
 
 		$this->notify_using_webpush($notify_users);
 

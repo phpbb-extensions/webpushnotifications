@@ -14,6 +14,7 @@ use Minishlink\WebPush\Subscription;
 use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
+use phpbb\language\language;
 use phpbb\log\log_interface;
 use phpbb\notification\method\messenger_base;
 use phpbb\notification\type\type_interface;
@@ -35,6 +36,9 @@ class webpush extends messenger_base implements extended_method_interface
 
 	/** @var driver_interface */
 	protected $db;
+
+	/** @var language */
+	protected $language;
 
 	/** @var log_interface */
 	protected $log;
@@ -62,6 +66,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 *
 	 * @param config $config
 	 * @param driver_interface $db
+	 * @param language $language
 	 * @param log_interface $log
 	 * @param user_loader $user_loader
 	 * @param user $user
@@ -71,13 +76,14 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
+	public function __construct(config $config, driver_interface $db, language $language, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
 								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
 
 		$this->config = $config;
 		$this->db = $db;
+		$this->language = $language;
 		$this->log = $log;
 		$this->user = $user;
 		$this->path_helper = $path_helper;
@@ -144,6 +150,11 @@ class webpush extends messenger_base implements extended_method_interface
 		foreach ($this->queue as $notification)
 		{
 			$data = $notification->get_insert_array();
+
+			// Choose receiving user's language
+			$user = $this->user_loader->get_user($data['user_id']);
+			$this->language->set_user_language($user['user_lang'], true);
+
 			$data += [
 				'push_data'		=> json_encode([
 					'heading'	=> $this->config['sitename'],
@@ -161,6 +172,9 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		$insert_buffer->flush();
+
+		// Restore current user's language
+		$this->language->set_user_language($this->user->data['user_lang'], true);
 
 		$this->notify_using_webpush();
 

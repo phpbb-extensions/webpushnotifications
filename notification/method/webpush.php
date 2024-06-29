@@ -146,8 +146,8 @@ class webpush extends messenger_base implements extended_method_interface
 	{
 		$insert_buffer = new \phpbb\db\sql_insert_buffer($this->db, $this->notification_webpush_table);
 
-		// Load all users we want to notify
-		$notify_users = $this->load_receivers();
+		// Load all users data we want to notify
+		$notify_users = $this->load_recipients_data();
 
 		/** @var type_interface $notification */
 		foreach ($this->queue as $notification)
@@ -155,8 +155,8 @@ class webpush extends messenger_base implements extended_method_interface
 			$data = $notification->get_insert_array();
 
 			// Choose receiving user's language
-			$user = $this->user_loader->get_user($data['user_id']);
-			$this->language->set_user_language($user['user_lang'], true);
+			$recipient_data = $this->user_loader->get_user($notification->user_id);
+			$this->language->set_user_language($recipient_data['user_lang'], $this->language->get_used_language() !== $recipient_data['user_lang']);
 
 			$data += [
 				'push_data'		=> json_encode([
@@ -177,7 +177,7 @@ class webpush extends messenger_base implements extended_method_interface
 		$insert_buffer->flush();
 
 		// Restore current user's language
-		$this->language->set_user_language($this->user->data['user_lang'], true);
+		$this->language->set_user_language($this->user->data['user_lang'], $this->language->get_used_language() !== $this->user->data['user_lang']);
 
 		$this->notify_using_webpush($notify_users);
 
@@ -524,7 +524,7 @@ class webpush extends messenger_base implements extended_method_interface
 	 *
 	 * @return array	Array of user ids to notify
 	 */
-	protected function load_receivers(): array
+	protected function load_recipients_data(): array
 	{
 		$notify_users = $user_ids = [];
 		foreach ($this->queue as $notification)

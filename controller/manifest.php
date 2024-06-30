@@ -64,7 +64,7 @@ class manifest
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
-			'short_name'	=> substr($this->config['sitename'], 0, 12), // TODO need an ACP option for short name
+			'short_name'	=> $this->config['pwa_short_name'] ?? substr($this->config['sitename'], 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),
@@ -72,17 +72,16 @@ class manifest
 			'scope'			=> $board_url,
 		];
 
-		// TODO add support for icons
-		if (isset($this->config['wpn_app_icon_small'], $this->config['wpn_app_icon_large']))
+		if (!empty($this->config['pwa_icon_small']) && !empty($this->config['pwa_icon_large']))
 		{
 			$manifest['icons'] = [
 				[
-					'src' => $this->config['icons_path'] . $this->config['wpn_app_icon_small'],
+					'src' => $this->config['icons_path'] . '/' . $this->config['pwa_icon_small'],
 					'sizes' => '192x192',
 					'type' => 'image/png'
 				],
 				[
-					'src' => $this->config['icons_path'] . $this->config['wpn_app_icon_large'],
+					'src' => $this->config['icons_path'] . '/' . $this->config['pwa_icon_large'],
 					'sizes' => '512x512',
 					'type' => 'image/png'
 				]

@@ -126,6 +126,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
 			'core.page_header_after',
+			'core.acp_board_config_edit_add',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 

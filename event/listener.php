@@ -31,6 +31,7 @@ class listener implements EventSubscriberInterface
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
 			'core.page_header_after'			=> 'load_template_data',
+			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
 		];
 	}
 
@@ -101,5 +102,28 @@ class listener implements EventSubscriberInterface
 	public function compatibility_notice()
 	{
 		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='));
+	}
+
+	/**
+	 * Progressive web app options for the ACP
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return void
+	 */
+	public function acp_pwa_options($event)
+	{
+		if ($event['mode'] === 'settings' && array_key_exists('legend4', $event['display_vars']['vars']))
+		{
+			$this->language->add_lang('webpushnotifications_common_acp', 'phpbb/webpushnotifications');
+
+			$my_config_vars = [
+				'legend_pwa_settings'=> 'PWA_SETTINGS',
+				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'string', 'type' => 'text:40:12', 'explain' => true],
+				'pwa_icon_small'	=> ['lang' => 'PWA_ICON_SMALL', 'validate' => 'string', 'type' => 'text:40:255', 'explain' => true],
+				'pwa_icon_large'	=> ['lang' => 'PWA_ICON_LARGE', 'validate' => 'string', 'type' => 'text:40:255', 'explain' => true],
+			];
+
+			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend4']));
+		}
 	}
 }

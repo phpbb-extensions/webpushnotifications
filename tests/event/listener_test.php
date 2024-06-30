@@ -218,6 +218,7 @@ class listener_test extends \phpbb_database_test_case
 				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 				'SUBSCRIPTIONS'					=> $subscriptions,
 				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
+				'U_MANIFEST_URL'				=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			]
 		);
 

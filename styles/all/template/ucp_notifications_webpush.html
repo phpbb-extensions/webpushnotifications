@@ -1,8 +1,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="{{ SITENAME }}">
-{% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ ROOT_PATH }}images/icons/{{ U_TOUCH_ICON }}">{% endif %}
 <link rel="manifest" href="{{ U_MANIFEST_URL }}">
+{% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ T_ICONS_PATH ~ U_TOUCH_ICON }}">{% endif %}
 
 <script>
 	phpbbWebpushOptions = {

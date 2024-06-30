@@ -60,7 +60,7 @@ class manifest
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'Forbidden');
 		}
 
-		$root_path = $this->path_helper->get_web_root_path();
+		$board_url = generate_board_url() . '/';
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
@@ -68,8 +68,8 @@ class manifest
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),
-			'start_url'		=> $root_path,
-			'scope'			=> $root_path
+			'start_url'		=> $board_url,
+			'scope'			=> $board_url,
 		];
 
 		// TODO add support for icons
@@ -77,12 +77,12 @@ class manifest
 		{
 			$manifest['icons'] = [
 				[
-					'src' => $root_path . 'images/icons/' . $this->config['wpn_app_icon_small'],
+					'src' => $this->config['icons_path'] . $this->config['wpn_app_icon_small'],
 					'sizes' => '192x192',
 					'type' => 'image/png'
 				],
 				[
-					'src' => $root_path . 'images/icons/' . $this->config['wpn_app_icon_large'],
+					'src' => $this->config['icons_path'] . $this->config['wpn_app_icon_large'],
 					'sizes' => '512x512',
 					'type' => 'image/png'
 				]

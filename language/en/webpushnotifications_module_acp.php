@@ -38,7 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.',
+	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To enable push notifications on Apple mobile devices, your site needs to operate as a Progressive Web Application (PWA) and be added to users’ home screens. This feature is now built into phpBB. For a better user experience, you can find additional PWA settings under <strong>Board settings</strong>, where you can configure an optional app name and app icons for your site.',
 	'WEBPUSH_ENABLE'				=> 'Enable Web Push',
 	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow users to receive notifications in their browser or device via Web Push. To utilize Web Push, you must input or generate valid VAPID identification keys.',
 	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Generate Identification keys',

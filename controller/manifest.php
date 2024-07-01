@@ -60,7 +60,7 @@ class manifest
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'Forbidden');
 		}
 
-		$board_path = $this->path_helper->get_web_root_path();
+		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],

@@ -10,6 +10,8 @@
 
 namespace phpbb\webpushnotifications\tests\event;
 
+require_once __DIR__ . '/../../../../../includes/functions_acp.php';
+
 class listener_test extends \phpbb_database_test_case
 {
 	/** @var \phpbb\webpushnotifications\event\listener */
@@ -20,6 +22,9 @@ class listener_test extends \phpbb_database_test_case
 
 	/* @var \phpbb\webpushnotifications\form\form_helper */
 	protected $form_helper;
+
+	/** @var \FastImageSize\FastImageSize|\PHPUnit\Framework\MockObject\MockObject  */
+	protected $imagesize;
 
 	/** @var \phpbb\language\language */
 	protected $language;
@@ -91,6 +96,9 @@ class listener_test extends \phpbb_database_test_case
 			->disableOriginalConstructor()
 			->getMock();
 
+		$this->imagesize = $this->getMockBuilder('\FastImageSize\FastImageSize')
+			->getMock();
+
 		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
 			$this->config,
 			$db,
@@ -113,7 +121,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->listener = new \phpbb\webpushnotifications\event\listener(
 			$this->config,
 			$this->controller_helper,
-			new \FastImageSize\FastImageSize(),
+			$this->imagesize,
 			$this->form_helper,
 			$this->language,
 			$this->template,
@@ -244,5 +252,119 @@ class listener_test extends \phpbb_database_test_case
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.page_header_after', [$this->listener, 'load_template_data']);
 		$dispatcher->trigger_event('core.page_header_after');
+	}
+
+	public function acp_pwa_options_data()
+	{
+		return [
+			[ // expected config and mode
+				'settings',
+				['vars' => ['legend4' => []]],
+				['legend_pwa_settings', 'pwa_short_name', 'pwa_icon_small', 'pwa_icon_large', 'legend4'],
+			],
+			[ // unexpected mode
+				'foobar',
+				['vars' => ['legend4' => []]],
+				['legend4'],
+			],
+			[ // unexpected config
+				'post',
+				['vars' => ['foobar' => []]],
+				['foobar'],
+			],
+			[ // unexpected config and mode
+				'foobar',
+				['vars' => ['foobar' => []]],
+				['foobar'],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider acp_pwa_options_data
+	 */
+	public function test_acp_pwa_options($mode, $display_vars, $expected_keys)
+	{
+		$this->set_listener();
+
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.acp_board_config_edit_add', [$this->listener, 'acp_pwa_options']);
+
+		$event_data = ['display_vars', 'mode'];
+		$event_data_after = $dispatcher->trigger_event('core.acp_board_config_edit_add', compact($event_data));
+
+		foreach ($event_data as $expected)
+		{
+			self::assertArrayHasKey($expected, $event_data_after);
+		}
+		extract($event_data_after, EXTR_OVERWRITE);
+
+		$keys = array_keys($display_vars['vars']);
+
+		self::assertEquals($expected_keys, $keys);
+
+	}
+
+	public function validate_pwa_options_data()
+	{
+		return [
+			[
+				['pwa_icon_small' => '192.png', 'pwa_icon_large' => '512.png'],
+				['PWA_IMAGE_NOT_FOUND'],
+			],
+			[
+				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '512.png'],
+				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_SIZE_INVALID'],
+			],
+			[
+				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '12.png'],
+				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_SIZE_INVALID'],
+			],
+			[
+				['pwa_icon_small' => '192.jpg', 'pwa_icon_large' => '512.gif'],
+				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_MIME_INVALID'],
+			],
+			[
+				['pwa_icon_small' => '', 'pwa_icon_large' => ''],
+				[],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider validate_pwa_options_data
+	 */
+	public function test_validate_pwa_options($cfg_array, $expected_error)
+	{
+		$this->config['icons_path'] = 'images/icons';
+		$config_name = key($cfg_array);
+		$config_definition = ['validate' => 'pwa_options'];
+		$small_image = $cfg_array['pwa_icon_small'] ? explode('.', $cfg_array['pwa_icon_small']) : ['', ''];
+		$large_image = $cfg_array['pwa_icon_large'] ? explode('.', $cfg_array['pwa_icon_large']) : ['', ''];
+		$error = [];
+
+		$this->set_listener();
+
+		$this->imagesize->expects(self::any())
+			->method('getImageSize')
+			->willReturnMap([
+				[$this->root_path . $this->config['icons_path'] . '/', '', false],
+				[$this->root_path . $this->config['icons_path'] . '/' . $cfg_array['pwa_icon_small'], '', ['width' => (int) $small_image[0], 'height' => (int) $small_image[0], 'type' => $small_image[1] === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+				[$this->root_path . $this->config['icons_path'] . '/' . $cfg_array['pwa_icon_large'], '', ['width' => (int) $large_image[0], 'height' => (int) $large_image[0], 'type' => $large_image[1] === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+			]);
+
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.validate_config_variable', [$this->listener, 'validate_pwa_options']);
+
+		$event_data = ['cfg_array', 'config_name', 'config_definition', 'error'];
+		$event_data_after = $dispatcher->trigger_event('core.validate_config_variable', compact($event_data));
+
+		foreach ($event_data as $expected)
+		{
+			self::assertArrayHasKey($expected, $event_data_after);
+		}
+		extract($event_data_after, EXTR_OVERWRITE);
+
+		self::assertEquals($expected_error, $error);
 	}
 }

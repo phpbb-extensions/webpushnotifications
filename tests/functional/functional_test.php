@@ -113,6 +113,34 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
 	}
 
+	public function test_manifest()
+	{
+		$expected = [
+			'name'			=> 'yourdomain.com',
+			'short_name'	=> 'yourdomain',
+			'display'		=> 'standalone',
+			'orientation'	=> 'portrait',
+			'dir'			=> 'ltr',
+			'start_url'		=> '/',
+			'scope'			=> '/',
+		];
+
+		$this->login();
+		$this->admin_login();
+
+		$crawler = self::request('GET', 'adm/index.php?i=acp_board&mode=settings&sid=' . $this->sid);
+
+		$form_data = [
+			'config[pwa_short_name]'	=> $expected['short_name'],
+		];
+		$form = $crawler->selectButton('submit')->form($form_data);
+		$crawler = self::submit($form);
+		$this->assertStringContainsString($this->lang('CONFIG_UPDATED'), $crawler->filter('.successbox')->text());
+
+		self::request('GET', 'app.php/manifest', [], false);
+		$this->assertEquals(json_encode($expected), self::get_content());
+	}
+
 	protected function set_acp_option($option, $value)
 	{
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);

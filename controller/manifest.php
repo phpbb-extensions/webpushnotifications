@@ -60,7 +60,7 @@ class manifest
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'Forbidden');
 		}
 
-		$board_url = generate_board_url() . '/';
+		$board_path = $this->path_helper->get_web_root_path();
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
@@ -68,8 +68,8 @@ class manifest
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),
-			'start_url'		=> $board_url,
-			'scope'			=> $board_url,
+			'start_url'		=> $board_path,
+			'scope'			=> $board_path,
 		];
 
 		if (!empty($this->config['pwa_icon_small']) && !empty($this->config['pwa_icon_large']))

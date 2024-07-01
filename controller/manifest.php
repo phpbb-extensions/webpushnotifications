@@ -64,7 +64,7 @@ class manifest
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
-			'short_name'	=> $this->config['pwa_short_name'] ?? substr($this->config['sitename'], 0, 12),
+			'short_name'	=> $this->config['pwa_short_name'] ?: substr($this->config['sitename'], 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),

@@ -33,6 +33,9 @@ class listener_test extends \phpbb_database_test_case
 	/* @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\notification\manager */
 	protected $phpbb_notifications;
 
+	/** @var string */
+	protected $root_path;
+
 	protected static function setup_extensions()
 	{
 		return ['phpbb/webpushnotifications'];
@@ -101,16 +104,21 @@ class listener_test extends \phpbb_database_test_case
 			'phpbb_wpn_notification_push',
 			'phpbb_wpn_push_subscriptions'
 		);
+
+		$this->root_path = $phpbb_root_path;
 	}
 
 	protected function set_listener()
 	{
 		$this->listener = new \phpbb\webpushnotifications\event\listener(
+			$this->config,
 			$this->controller_helper,
+			new \FastImageSize\FastImageSize(),
 			$this->form_helper,
 			$this->language,
 			$this->template,
-			$this->notifications
+			$this->notifications,
+			$this->root_path
 		);
 	}
 
@@ -127,6 +135,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.acp_main_notice',
 			'core.page_header_after',
 			'core.acp_board_config_edit_add',
+			'core.validate_config_variable',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 

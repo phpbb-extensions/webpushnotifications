@@ -181,15 +181,8 @@ class listener implements EventSubscriberInterface
 			return;
 		}
 
-		// Check if image file exists
+		// Check if image is valid
 		$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
-		if (!file_exists($image))
-		{
-			$this->add_error($event, 'PWA_IMAGE_NOT_FOUND', $value);
-			return;
-		}
-
-		// Check if image is the correct dimensions and type
 		$image_info = $this->imagesize->getImageSize($image);
 		if ($image_info !== false)
 		{

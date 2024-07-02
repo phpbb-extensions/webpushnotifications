@@ -48,6 +48,5 @@ $lang = array_merge($lang, [
 	'PWA_ICON_SIZE_INVALID'		=> '“%s” does not have the correct image dimensions.',
 	'PWA_ICON_MIME_INVALID'		=> '“%s” must be a PNG image file.',
 	'PWA_IMAGE_INVALID'			=> '“%s” does not appear to be a valid image file.',
-	'PWA_IMAGE_NOT_FOUND'		=> '“%s” could not be found.',
-	'PWA_IMAGE_NOT_PROVIDED'	=> '%s must not be empty. All icon fields must contain and image.',
+	'PWA_IMAGE_NOT_PROVIDED'	=> '%s field must not be empty. All icon fields must contain and image.',
 ]);

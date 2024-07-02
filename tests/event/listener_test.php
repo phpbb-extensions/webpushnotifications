@@ -310,19 +310,19 @@ class listener_test extends \phpbb_database_test_case
 		return [
 			[
 				['pwa_icon_small' => '192.png', 'pwa_icon_large' => '512.png'],
-				['PWA_IMAGE_NOT_FOUND'],
+				[],
 			],
 			[
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '512.png'],
-				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_SIZE_INVALID'],
+				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '12.png'],
-				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_SIZE_INVALID'],
+				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
 				['pwa_icon_small' => '192.jpg', 'pwa_icon_large' => '512.gif'],
-				['PWA_IMAGE_NOT_FOUND', 'PWA_ICON_MIME_INVALID'],
+				['PWA_ICON_MIME_INVALID'],
 			],
 			[
 				['pwa_icon_small' => '', 'pwa_icon_large' => ''],

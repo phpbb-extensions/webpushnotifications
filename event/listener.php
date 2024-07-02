@@ -166,39 +166,55 @@ class listener implements EventSubscriberInterface
 	 */
 	public function validate_pwa_options($event)
 	{
-		if ($event['config_definition']['validate'] !== 'pwa_options' || empty($event['cfg_array']['pwa_icon_small']) || empty($event['cfg_array']['pwa_icon_large']))
+		// Ignore validation if icon fields are empty
+		if ($event['config_definition']['validate'] !== 'pwa_options' || (empty($event['cfg_array']['pwa_icon_small']) && empty($event['cfg_array']['pwa_icon_large'])))
 		{
 			return;
 		}
 
 		$value = $event['cfg_array'][$event['config_name']];
-		$error = $event['error'];
 
-		$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
-		if (!file_exists($image))
+		// Don't allow empty values, if one icon is set, both must be set.
+		if (empty($value))
 		{
-			$error[] = $this->language->lang('PWA_IMAGE_NOT_FOUND', $value);
+			$this->add_error($event, 'PWA_IMAGE_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
+			return;
 		}
 
+		// Check if image is valid
+		$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
 		$image_info = $this->imagesize->getImageSize($image);
 		if ($image_info !== false)
 		{
 			if (($event['config_name'] === 'pwa_icon_small' && $image_info['width'] !== 192 && $image_info['height'] !== 192) ||
 				($event['config_name'] === 'pwa_icon_large' && $image_info['width'] !== 512 && $image_info['height'] !== 512))
 			{
-				$error[] = $this->language->lang('PWA_ICON_SIZE_INVALID', $value);
+				$this->add_error($event, 'PWA_ICON_SIZE_INVALID', $value);
 			}
 
 			if ($image_info['type'] !== IMAGETYPE_PNG)
 			{
-				$error[] = $this->language->lang('PWA_ICON_MIME_INVALID', $value);
+				$this->add_error($event, 'PWA_ICON_MIME_INVALID', $value);
 			}
 		}
 		else
 		{
-			$error[] = $this->language->lang('PWA_IMAGE_INVALID', $value);
+			$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
 		}
+	}
 
+	/**
+	 * Add errors to the error array
+	 *
+	 * @param \phpbb\event\data $event
+	 * @param string $error_key
+	 * @param string $param
+	 * @return void
+	 */
+	protected function add_error($event, $error_key, $param = null)
+	{
+		$error = $event['error'];
+		$error[] = $this->language->lang($error_key, $param);
 		$event['error'] = $error;
 	}
 }

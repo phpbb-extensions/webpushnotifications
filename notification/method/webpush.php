@@ -386,6 +386,8 @@ class webpush extends messenger_base implements extended_method_interface
 			'U_WEBPUSH_WORKER_URL'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 			'SUBSCRIPTIONS'					=> $subscriptions,
 			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
+			'U_MANIFEST_URL'				=> $controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
+			'U_TOUCH_ICON'					=> $this->config['pwa_icon_small'],
 		];
 	}
 

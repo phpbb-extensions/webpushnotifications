@@ -12,11 +12,14 @@ services:
     phpbb.wpn.listener:
         class: phpbb\webpushnotifications\event\listener
         arguments:
+            - '@config'
             - '@controller.helper'
+            - '@upload_imagesize'
             - '@phpbb.wpn.form_helper'
             - '@language'
             - '@template'
             - '@notification_manager'
+            - '%core.root_path%'
         tags:
             - { name: event.listener }
 
@@ -52,3 +55,10 @@ services:
             - '%tables.phpbb.wpn.notification_push%'
             - '%tables.phpbb.wpn.push_subscriptions%'
 
+    phpbb.wpn.controller.manifest:
+        class: phpbb\webpushnotifications\controller\manifest
+        arguments:
+            - '@config'
+            - '@language'
+            - '@path_helper'
+            - '@user'

@@ -45,8 +45,9 @@ $lang = array_merge($lang, [
 	'PWA_ICON_SMALL_EXPLAIN'	=> 'Имя файла изображения формата PNG размером 192 x 192 пикселя. Файл изображения должен быть загружен на сервер в папку <samp>images/icons</samp>.',
 	'PWA_ICON_LARGE'			=> 'Большой значок для мобильного устройства',
 	'PWA_ICON_LARGE_EXPLAIN'	=> 'Имя файла изображения формата PNG размером 512 x 512 пикселей. Файл изображения должен быть загружен на сервер в папку <samp>images/icons</samp>.',
-	'PWA_ICON_SIZE_INVALID'		=> 'Изображение %s имеет некорректные размеры.',
-	'PWA_ICON_MIME_INVALID'		=> 'Файл изображения %s должен иметь формат PNG.',
-	'PWA_IMAGE_INVALID'			=> 'Файл %s не яввляется файлом изображения.',
-	'PWA_IMAGE_NOT_FOUND'		=> 'Файл %s не найден.',
+	'PWA_ICON_SIZE_INVALID'		=> 'Изображение “%s” имеет некорректные размеры.',
+	'PWA_ICON_MIME_INVALID'		=> 'Файл изображения “%s” должен иметь формат PNG.',
+	'PWA_IMAGE_INVALID'			=> 'Файл “%s” не яввляется файлом изображения.',
+	'PWA_IMAGE_NOT_FOUND'		=> 'Файл “%s” не найден.',
+	'PWA_IMAGE_NOT_PROVIDED'	=> '“%s” must not be empty. All icon fields must contain and image.',
 ]);

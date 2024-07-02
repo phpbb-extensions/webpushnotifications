@@ -1,8 +1,17 @@
 # Changelog
 
-### 1.0.0 - 2024-06-16
+### 1.0.0 - 2024-07-01
 
 - First official release.
+
+### 1.0.0-RC10 - 2024-07-01
+
+- Apple mobile devices are now supported through the implementation of progressive web app capabilities.
+- Notifications are now sent in the recipient’s preferred board language.
+- Re-worded and redesigned the enable/subscribe push notification buttons:
+  - In the UCP, the enable/subscribe button clearly indicates its state.
+  - The enable/subscribe toggle in the notification dropdown is now hidden if subscribing is not supported.
+- Added a warning message in the ACP for boards on servers that are not compatible with push notifications.
 
 ### 1.0.0-RC9 - 2024-06-16
 

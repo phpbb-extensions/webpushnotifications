@@ -3,10 +3,11 @@
 		<div class="inner">
 			<fieldset>
 				<dl>
-					<dt><label for="subscribe_webpush">{{ lang('NOTIFY_WEBPUSH_ENABLE') ~ lang('COLON') }}</label><br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span></dt>
+					<dt><label for="subscribe_webpush">{{ lang('NOTIFY_WEBPUSH_NOTIFICATIONS') ~ lang('COLON') }}</label></dt>
 					<dd>
-						<input id="subscribe_webpush" type="submit" name="subscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}" class="button1 button button-form" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}">
-						<input id="unsubscribe_webpush" type="submit" name="unsubscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_UNSUBSCRIBE') }}" class="button1 button button-form hidden">
+						<input id="subscribe_webpush" type="submit" name="subscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_ENABLE') }}" class="wpn button1 button button-form" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}" data-disabled-msg="{{ lang('NOTIFY_WEBPUSH_DISABLED') }}">
+						<input id="unsubscribe_webpush" type="submit" name="unsubscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_DISABLE') }}" class="wpn button1 button button-form hidden">
+						<br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span>
 					</dd>
 				</dl>
 			</fieldset>

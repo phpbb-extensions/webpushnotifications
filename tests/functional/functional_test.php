@@ -41,7 +41,7 @@ class functional_test extends \phpbb_functional_test_case
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
 
 		$this->assertContainsLang('ACP_WEBPUSH_EXT_SETTINGS', $crawler->filter('div.main > h1')->text());
-		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->text());
+		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->html());
 		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('input[type="button"]')->attr('value'));
 
 		$form_data = [
@@ -71,7 +71,7 @@ class functional_test extends \phpbb_functional_test_case
 
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 
-		$this->assertContainsLang('NOTIFY_WEBPUSH_ENABLE', $crawler->filter('label[for="subscribe_webpush"]')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_NOTIFICATIONS', $crawler->filter('label[for="subscribe_webpush"]')->text());
 		$this->assertContainsLang('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH', $crawler->filter('th.mark')->eq(2)->text());
 
 		// Assert checkbox is unchecked by default
@@ -105,12 +105,40 @@ class functional_test extends \phpbb_functional_test_case
 		// Assert subscribe dropdown is present
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
-		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->text());
-		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBED', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->html());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_UNSUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->html());
 
 		// Assert subscribe button is not displayed in UCP when dropdown subscribe is present
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+	}
+
+	public function test_manifest()
+	{
+		$expected = [
+			'name'			=> 'yourdomain.com',
+			'short_name'	=> 'yourdomain',
+			'display'		=> 'standalone',
+			'orientation'	=> 'portrait',
+			'dir'			=> 'ltr',
+			'start_url'		=> '/',
+			'scope'			=> '/',
+		];
+
+		$this->login();
+		$this->admin_login();
+
+		$crawler = self::request('GET', 'adm/index.php?i=acp_board&mode=settings&sid=' . $this->sid);
+
+		$form_data = [
+			'config[pwa_short_name]'	=> $expected['short_name'],
+		];
+		$form = $crawler->selectButton('submit')->form($form_data);
+		$crawler = self::submit($form);
+		$this->assertStringContainsString($this->lang('CONFIG_UPDATED'), $crawler->filter('.successbox')->text());
+
+		self::request('GET', 'app.php/manifest', [], false);
+		$this->assertEquals(json_encode($expected), self::get_content());
 	}
 
 	protected function set_acp_option($option, $value)

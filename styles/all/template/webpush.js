@@ -52,6 +52,7 @@ function PhpbbWebpush() {
 		// Service workers are only supported in secure context
 		if (window.isSecureContext !== true) {
 			subscribeButton.disabled = true;
+			handleDisabledState();
 			return;
 		}
 
@@ -71,7 +72,27 @@ function PhpbbWebpush() {
 		} else {
 			subscribeButton.disabled = true;
 		}
+		handleDisabledState();
 	};
+
+	/**
+	 * If subscribing is disabled, hide dropdown toggle and update subscribe button text
+	 *
+	 * @return void
+	 */
+	function handleDisabledState() {
+		if (subscribeButton.disabled) {
+			const notificationList = document.getElementById('notification_list');
+			const footer = notificationList.querySelector('.wpn-notification-dropdown-footer');
+			if (footer) {
+				footer.style.display = 'none';
+			}
+
+			if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
+				subscribeButton.value = subscribeButton.getAttribute('data-disabled-msg');
+			}
+		}
+	}
 
 	/**
 	 * Update button state depending on notifications state

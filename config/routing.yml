@@ -1,3 +1,7 @@
 phpbb_webpushnotifications_ucp_routing:
     resource: wpn_ucp.yml
     prefix: /user
+
+phpbb_webpushnotifications_manifest_controller:
+    path: /manifest
+    defaults: { _controller: phpbb.wpn.controller.manifest:handle }

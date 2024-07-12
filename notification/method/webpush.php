@@ -28,7 +28,6 @@ use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 * Web Push notification method class
 * This class handles sending push messages for notifications
 */
-
 class webpush extends messenger_base implements extended_method_interface
 {
 	/** @var config */

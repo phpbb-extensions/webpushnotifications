@@ -160,13 +160,6 @@ class webpush extends messenger_base implements extended_method_interface
 				$this->language->set_user_language($recipient_data['user_lang'], true);
 			}
 
-			// Load count of unread notifications for user being notified
-			$notifications = $this->notification_manager->load_notifications($this->get_type(), [
-				'user_id'		=> $notification->user_id,
-				'limit'			=> 0,
-				'count_unread'	=> true,
-			]);
-
 			$data += [
 				'push_data'		=> json_encode([
 					'heading'	=> $this->config['sitename'],
@@ -174,7 +167,7 @@ class webpush extends messenger_base implements extended_method_interface
 					'text'		=> strip_tags($notification->get_reference()),
 					'url'		=> htmlspecialchars_decode($notification->get_url()),
 					'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
-					'unread'	=> $notifications['unread_count'],
+					'unread'	=> $this->pushed_notifications_count($notification->user_id) + 1,
 				]),
 				'notification_time'		=> time(),
 				'push_token'			=> hash('sha256', random_bytes(32))
@@ -469,6 +462,24 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		$this->remove_subscriptions($remove_subscriptions);
+	}
+
+	/**
+	 * Get the total number of pushed notifications
+	 *
+	 * @param string|int $user_id
+	 * @return int
+	 */
+	protected function pushed_notifications_count($user_id)
+	{
+		$sql = 'SELECT COUNT(item_id) AS unread_count
+			FROM ' . $this->notification_webpush_table . '
+			WHERE user_id = ' . (int) $user_id;
+		$result = $this->db->sql_query($sql);
+		$unread_count = (int) $this->db->sql_fetchfield('unread_count');
+		$this->db->sql_freeresult($result);
+
+		return $unread_count;
 	}
 
 	/**

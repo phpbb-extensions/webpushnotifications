@@ -32,12 +32,12 @@
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_DROPDOWN_SUBSCRIBE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN') }}</span></dt>
 			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_dropdown_subscribe]" value="1" {% if S_WEBPUSH_DROPDOWN_SUBSCRIBE %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="config[wpn_webpush_dropdown_subscribe]" value="0"{% if not S_WEBPUSH_DROPDOWN_SUBSCRIBE %} checked="checked"{% endif %}> {{ lang('NO') }}</label>
+				<label><input type="radio" class="radio" name="config[wpn_webpush_dropdown_subscribe]" value="0"{% if not S_WEBPUSH_DROPDOWN_SUBSCRIBE %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_METHOD_ENABLED') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_METHOD_ENABLED_EXPLAIN') }}</span></dt>
 			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_method_enabled]" value="1" {% if S_WEBPUSH_METHOD_ENABLED %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="config[wpn_webpush_method_enabled]" value="0"{% if not S_WEBPUSH_METHOD_ENABLED %} checked="checked"{% endif %}> {{ lang('NO') }}</label>
+				<label><input type="radio" class="radio" name="config[wpn_webpush_method_enabled]" value="0"{% if not S_WEBPUSH_METHOD_ENABLED %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
 	</fieldset>
 	<fieldset class="submit-buttons">

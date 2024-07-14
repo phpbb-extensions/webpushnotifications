@@ -28,7 +28,7 @@
         "minishlink/web-push": "^7.0"
     },
     "require-dev": {
-        "phing/phing": "2.4.*"
+        "phing/phing": "~2.4"
     },
 	"config": {
 		"allow-plugins": {

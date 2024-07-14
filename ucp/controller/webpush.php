@@ -248,7 +248,7 @@ class webpush
 		}
 
 		// Subscribe should only be available for logged-in "normal" users
-		if (!$this->request->is_ajax() || $this->user->id() == ANONYMOUS || $this->user->data['is_bot']
+		if (!$this->request->is_ajax() || $this->user->id() === ANONYMOUS || $this->user->data['is_bot']
 			|| $this->user->data['user_type'] == USER_IGNORE || $this->user->data['user_type'] == USER_INACTIVE)
 		{
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');

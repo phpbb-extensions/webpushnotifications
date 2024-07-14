@@ -160,6 +160,13 @@ class webpush extends messenger_base implements extended_method_interface
 				$this->language->set_user_language($recipient_data['user_lang'], true);
 			}
 
+			// Load count of unread notifications for user being notified
+			$notifications = $this->notification_manager->load_notifications($this->get_type(), [
+				'user_id'		=> $notification->user_id,
+				'limit'			=> 0,
+				'count_unread'	=> true,
+			]);
+
 			$data += [
 				'push_data'		=> json_encode([
 					'heading'	=> $this->config['sitename'],
@@ -167,6 +174,7 @@ class webpush extends messenger_base implements extended_method_interface
 					'text'		=> strip_tags($notification->get_reference()),
 					'url'		=> htmlspecialchars_decode($notification->get_url()),
 					'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
+					'unread'	=> $notifications['unread_count'],
 				]),
 				'notification_time'		=> time(),
 				'push_token'			=> hash('sha256', random_bytes(32))

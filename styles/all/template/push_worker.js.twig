@@ -67,6 +67,15 @@ self.addEventListener('push', event => {
 				data: response,
 				icon: response.avatar.src,
 			};
+
+			// Update the app badge value
+			if ('setAppBadge' in navigator) {
+				const badgeValue = response.unread || 0;
+				navigator.setAppBadge(badgeValue).catch(error => {
+					console.error('Failed to set app badge:', error);
+				});
+			}
+
 			self.registration.showNotification(response.heading, options);
 		});
 });
@@ -78,5 +87,12 @@ self.addEventListener('notificationclick', event => {
 	event.notification.close();
 	if (typeof event.notification.data !== 'undefined') {
 		event.waitUntil(self.clients.openWindow(event.notification.data.url));
+	}
+
+	// Clear the app badge
+	if ('setAppBadge' in navigator) {
+		navigator.setAppBadge(0).catch(error => {
+			console.error('Failed to clear app badge:', error);
+		});
 	}
 });

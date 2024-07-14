@@ -69,6 +69,8 @@ class listener_test extends \phpbb_database_test_case
 		$user = new \phpbb\user($this->language, '\phpbb\datetime');
 		$this->user = $user;
 		$this->user->data['user_form_salt'] = '';
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
 		$user_loader = new \phpbb\user_loader($db, $phpbb_root_path, $phpEx, 'phpbb_users');
 
 		$this->controller_helper = $this->getMockBuilder('\phpbb\controller\helper')

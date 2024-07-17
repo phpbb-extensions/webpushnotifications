@@ -20,6 +20,7 @@ use phpbb\controller\helper as controller_helper;
 use phpbb\language\language;
 use phpbb\notification\manager;
 use phpbb\template\template;
+use phpbb\user;
 use phpbb\webpushnotifications\form\form_helper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -46,6 +47,9 @@ class listener implements EventSubscriberInterface
 	/* @var template */
 	protected $template;
 
+	/** @var user */
+	protected $user;
+
 	/* @var manager */
 	protected $phpbb_notifications;
 
@@ -61,10 +65,11 @@ class listener implements EventSubscriberInterface
 	 * @param form_helper $form_helper Form helper object
 	 * @param language $language Language object
 	 * @param template $template Template object
+	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
 	 * @param $root_path
 	 */
-	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, manager $phpbb_notifications, $root_path)
+	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path)
 	{
 		$this->config = $config;
 		$this->controller_helper = $controller_helper;
@@ -72,6 +77,7 @@ class listener implements EventSubscriberInterface
 		$this->form_helper = $form_helper;
 		$this->language = $language;
 		$this->template = $template;
+		$this->user = $user;
 		$this->phpbb_notifications = $phpbb_notifications;
 		$this->root_path = $root_path;
 	}
@@ -92,19 +98,26 @@ class listener implements EventSubscriberInterface
 	 */
 	public function load_template_data()
 	{
+		if (!$this->can_use_notifications())
+		{
+			return;
+		}
+
 		$methods = $this->phpbb_notifications->get_subscription_methods();
 		$webpush_method = $methods['notification.method.phpbb.wpn.webpush'] ?? null;
 
-		if ($webpush_method !== null)
+		if ($webpush_method === null)
 		{
-			if (!$this->language->is_set('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'))
-			{
-				$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
-			}
-
-			$template_ary = $webpush_method['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
-			$this->template->assign_vars($template_ary);
+			return;
 		}
+
+		if (!$this->language->is_set('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'))
+		{
+			$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+		}
+
+		$template_ary = $webpush_method['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);
+		$this->template->assign_vars($template_ary);
 	}
 
 	/**
@@ -216,5 +229,19 @@ class listener implements EventSubscriberInterface
 		$error = $event['error'];
 		$error[] = $this->language->lang($error_key, $param);
 		$event['error'] = $error;
+	}
+
+	/**
+	 * Can notifications be used by the user?
+	 *
+	 * @return bool
+	 */
+	protected function can_use_notifications()
+	{
+		return $this->config['load_notifications']
+			&& $this->config['allow_board_notifications']
+			&& $this->config['wpn_webpush_enable']
+			&& $this->user->id() !== ANONYMOUS
+			&& (int) $this->user->data['user_type'] !== USER_IGNORE;
 	}
 }

@@ -81,7 +81,11 @@ class listener_test extends \phpbb_database_test_case
 				return $route . '#' . serialize($params);
 			});
 
-		$this->config = new \phpbb\config\config([]);
+		$this->config = new \phpbb\config\config([
+			'load_notifications' => true,
+			'allow_board_notifications' => true,
+			'wpn_webpush_enable' => true,
+		]);
 
 		$this->form_helper = new \phpbb\webpushnotifications\form\form_helper(
 			$this->config,
@@ -127,6 +131,7 @@ class listener_test extends \phpbb_database_test_case
 			$this->form_helper,
 			$this->language,
 			$this->template,
+			$this->user,
 			$this->notifications,
 			$this->root_path
 		);

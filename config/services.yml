@@ -18,6 +18,7 @@ services:
             - '@phpbb.wpn.form_helper'
             - '@language'
             - '@template'
+            - '@user'
             - '@notification_manager'
             - '%core.root_path%'
         tags:

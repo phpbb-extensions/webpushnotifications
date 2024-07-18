@@ -171,7 +171,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->notification_method_webpush = new webpush(
 			$phpbb_container->get('config'),
 			$phpbb_container->get('dbal.conn'),
-			$phpbb_container->get('language'),
 			$phpbb_container->get('log'),
 			$phpbb_container->get('user_loader'),
 			$phpbb_container->get('user'),

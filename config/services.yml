@@ -30,7 +30,6 @@ services:
         arguments:
             - '@config'
             - '@dbal.conn'
-            - '@language'
             - '@log'
             - '@user_loader'
             - '@user'

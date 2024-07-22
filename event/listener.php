@@ -87,7 +87,7 @@ class listener implements EventSubscriberInterface
 		return [
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
-			'core.page_header_after'			=> 'load_template_data',
+			'core.page_header_after'			=> [['load_template_data'], ['pwa_manifest']],
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
 			'core.validate_config_variable'		=> 'validate_pwa_options',
 		];
@@ -134,6 +134,19 @@ class listener implements EventSubscriberInterface
 	public function compatibility_notice()
 	{
 		$this->template->assign_var('S_WPN_COMPATIBILITY_NOTICE', phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='));
+	}
+
+	/**
+	 * Assign template data for web manifest support
+	 *
+	 * @return void
+	 */
+	public function pwa_manifest()
+	{
+		$this->template->assign_vars([
+			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
+			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'],
+		]);
 	}
 
 	/**

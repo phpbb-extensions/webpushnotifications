@@ -10,10 +10,6 @@
 
 namespace phpbb\webpushnotifications\event;
 
-/**
- * @ignore
- */
-
 use FastImageSize\FastImageSize;
 use phpbb\config\config;
 use phpbb\controller\helper as controller_helper;

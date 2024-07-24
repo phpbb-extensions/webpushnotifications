@@ -109,7 +109,7 @@ class listener implements EventSubscriberInterface
 
 		if (!$this->language->is_set('NOTIFICATION_METHOD_PHPBB_WPN_WEBPUSH'))
 		{
-			$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+			$this->load_language();
 		}
 
 		$template_ary = $webpush_method['method']->get_ucp_template_data($this->controller_helper, $this->form_helper);

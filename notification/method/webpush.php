@@ -103,7 +103,7 @@ class webpush extends messenger_base implements extended_method_interface
 	*/
 	public function is_available(type_interface $notification_type = null): bool
 	{
-		return parent::is_available($notification_type) && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_enable']
+		return parent::is_available($notification_type) && $this->config['wpn_webpush_enable']
 			&& !empty($this->config['wpn_webpush_vapid_public']) && !empty($this->config['wpn_webpush_vapid_private']);
 	}
 
@@ -378,7 +378,7 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		return [
-			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> $this->config['wpn_webpush_dropdown_subscribe'] || stripos($this->user->page['page'], 'notification_options'),
+			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> ($this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe']) || stripos($this->user->page['page'], 'notification_options'),
 			'U_WEBPUSH_SUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 			'U_WEBPUSH_UNSUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 			'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],

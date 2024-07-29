@@ -247,8 +247,7 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function can_use_notifications()
 	{
-		return $this->config['load_notifications']
-			&& $this->config['allow_board_notifications']
+		return $this->config['allow_board_notifications']
 			&& $this->config['wpn_webpush_enable']
 			&& $this->user->id() !== ANONYMOUS
 			&& (int) $this->user->data['user_type'] !== USER_IGNORE;

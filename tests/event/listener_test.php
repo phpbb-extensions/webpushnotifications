@@ -82,7 +82,6 @@ class listener_test extends \phpbb_database_test_case
 			});
 
 		$this->config = new \phpbb\config\config([
-			'load_notifications' => true,
 			'allow_board_notifications' => true,
 			'wpn_webpush_enable' => true,
 		]);

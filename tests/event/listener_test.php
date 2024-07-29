@@ -145,9 +145,9 @@ class listener_test extends \phpbb_database_test_case
 	public function test_getSubscribedEvents()
 	{
 		self::assertEquals([
+			'core.page_header_after',
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
-			'core.page_header_after',
 			'core.acp_board_config_edit_add',
 			'core.validate_config_variable',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
@@ -228,7 +228,7 @@ class listener_test extends \phpbb_database_test_case
 	/**
 	 * @dataProvider get_ucp_template_data_data
 	 */
-	public function test_get_ucp_template_data($user_id, $method_data, $subscriptions, $expected)
+	public function test_load_template_data($user_id, $method_data, $subscriptions, $expected)
 	{
 		$this->config['wpn_webpush_dropdown_subscribe'] = true;
 		$this->user->data['user_id'] = $user_id;

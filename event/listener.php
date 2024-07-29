@@ -81,9 +81,9 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
+			'core.page_header_after'			=> [['load_template_data'], ['pwa_manifest']],
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
-			'core.page_header_after'			=> [['load_template_data'], ['pwa_manifest']],
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
 			'core.validate_config_variable'		=> 'validate_pwa_options',
 		];
@@ -117,7 +117,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Load language file
+	 * Load language file (this is required for the UCP)
 	 */
 	public function load_language()
 	{

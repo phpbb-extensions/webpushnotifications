@@ -810,7 +810,8 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 				'item_parent_id'		=> ['ULINT', 0],
 				'user_id'				=> ['ULINT', 0],
 				'push_data'				=> ['MTEXT', ''],
-				'notification_time'		=> ['TIMESTAMP', 0]
+				'notification_time'		=> ['TIMESTAMP', 0],
+				'push_token'			=> ['VCHAR', ''],
 			],
 			'PRIMARY_KEY' => ['notification_type_id', 'item_id', 'item_parent_id', 'user_id'],
 		];

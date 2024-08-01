@@ -81,7 +81,11 @@ class listener_test extends \phpbb_database_test_case
 				return $route . '#' . serialize($params);
 			});
 
-		$this->config = new \phpbb\config\config([]);
+		$this->config = new \phpbb\config\config([
+			'load_notifications' => true,
+			'allow_board_notifications' => true,
+			'wpn_webpush_enable' => true,
+		]);
 
 		$this->form_helper = new \phpbb\webpushnotifications\form\form_helper(
 			$this->config,
@@ -127,6 +131,7 @@ class listener_test extends \phpbb_database_test_case
 			$this->form_helper,
 			$this->language,
 			$this->template,
+			$this->user,
 			$this->notifications,
 			$this->root_path
 		);
@@ -141,9 +146,9 @@ class listener_test extends \phpbb_database_test_case
 	public function test_getSubscribedEvents()
 	{
 		self::assertEquals([
+			'core.page_header_after',
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
-			'core.page_header_after',
 			'core.acp_board_config_edit_add',
 			'core.validate_config_variable',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
@@ -224,7 +229,7 @@ class listener_test extends \phpbb_database_test_case
 	/**
 	 * @dataProvider get_ucp_template_data_data
 	 */
-	public function test_get_ucp_template_data($user_id, $method_data, $subscriptions, $expected)
+	public function test_load_template_data($user_id, $method_data, $subscriptions, $expected)
 	{
 		$this->config['wpn_webpush_dropdown_subscribe'] = true;
 		$this->user->data['user_id'] = $user_id;
@@ -238,8 +243,6 @@ class listener_test extends \phpbb_database_test_case
 				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 				'SUBSCRIPTIONS'					=> $subscriptions,
 				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
-				'U_MANIFEST_URL'				=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
-				'U_TOUCH_ICON'					=> '',
 			]
 		);
 
@@ -254,6 +257,24 @@ class listener_test extends \phpbb_database_test_case
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.page_header_after', [$this->listener, 'load_template_data']);
 		$dispatcher->trigger_event('core.page_header_after');
+	}
+
+	public function test_pwa_manifest()
+	{
+		$this->config['pwa_icon_small'] = 'icon-192x192.png';
+
+		$this->set_listener();
+
+		$this->template->expects(self::once())
+			->method('assign_vars')
+			->with([
+				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
+				'U_TOUCH_ICON'		=> 'icon-192x192.png',
+			]);
+
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.acp_main_notice', [$this->listener, 'pwa_manifest']);
+		$dispatcher->trigger_event('core.acp_main_notice');
 	}
 
 	public function acp_pwa_options_data()

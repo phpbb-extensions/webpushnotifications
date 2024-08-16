@@ -29,7 +29,10 @@ class ext extends \phpbb\extension\base
 	 */
 	public function is_enableable()
 	{
-		return $this->check_phpbb_version()->check_php_version()->result();
+		return $this->check_phpbb_version()
+			->check_php_version()
+			->check_php_requirements()
+			->result();
 	}
 
 	/**
@@ -68,6 +71,24 @@ class ext extends \phpbb\extension\base
 	}
 
 	/**
+	 * Check the installed PHP extensions meet this extension's requirements.
+	 *
+	 * @return \phpbb\webpushnotifications\ext
+	 */
+	protected function check_php_requirements()
+	{
+		foreach (['curl', 'mbstring', 'openssl'] as $extension)
+		{
+			if (!extension_loaded($extension))
+			{
+				$this->errors[] = ['PHP_EXT_MISSING', $extension];
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Return the is_enableable result. Either true, or the best enable failed
 	 * response for the current phpBB environment: array of error messages
 	 * in phpBB 3.3 or newer, false otherwise.
@@ -85,7 +106,9 @@ class ext extends \phpbb\extension\base
 		{
 			$language = $this->container->get('language');
 			$language->add_lang('install', 'phpbb/webpushnotifications');
-			return array_map([$language, 'lang'], $this->errors);
+			return array_map(static function($error) use ($language) {
+				return call_user_func_array([$language, 'lang'], (array) $error);
+			}, $this->errors);
 		}
 
 		return false;

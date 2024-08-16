@@ -38,7 +38,8 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'PHPBB_VERSION_MAX_ERROR'	=> 'This extension can not be installed on your board. You are using phpBB 4, which already contains the features in this extension.',
-	'PHPBB_VERSION_MIN_ERROR'	=> 'This extension is not compatible with your board. You must be using phpBB 3.3.12 or newer.',
-	'PHP_VERSION_ERROR'	=> 'This extension is not compatible with your server. Your server must be running PHP 7.3 or newer.',
+	'PHPBB_VERSION_MAX_ERROR'	=> 'This extension can not be installed on this board. This is a phpBB 4 board, which already contains the features in this extension.',
+	'PHPBB_VERSION_MIN_ERROR'	=> 'phpBB 3.3.12 or newer is required.',
+	'PHP_VERSION_ERROR'			=> 'PHP 7.3 or newer is required.',
+	'PHP_EXT_MISSING'			=> 'The “%s” extension for PHP must be installed on this server.',
 ]);

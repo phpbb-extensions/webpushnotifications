@@ -24,26 +24,33 @@
     ],
     "require": {
         "php": ">=7.3",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
         "composer/installers": "~1.0",
         "minishlink/web-push": "^7.0"
     },
     "require-dev": {
         "phing/phing": "~2.4"
     },
-	"config": {
-		"allow-plugins": {
-			"composer/installers": true
-		}
-	},
-	"extra": {
+    "suggest": {
+        "ext-gmp": "Optional but better for performance"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    },
+    "extra": {
         "display-name": "phpBB Browser Push Notifications",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.12,<4.0.0@dev"
-		},
-		"version-check": {
-			"host": "imattpro.github.io",
-			"directory": "/version",
-			"filename": "webpushnotifications.json"
+        },
+        "version-check": {
+            "host": "imattpro.github.io",
+            "directory": "/version",
+            "filename": "webpushnotifications.json"
         }
     }
 }

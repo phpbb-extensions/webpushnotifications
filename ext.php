@@ -16,16 +16,27 @@ namespace phpbb\webpushnotifications;
 class ext extends \phpbb\extension\base
 {
 	/**
+	 * Require phpBB 3.3.12 due to new template and core events.
+	 */
+	public const PHPBB_MIN_VERSION = '3.3.12';
+
+	/**
+	 * Should not be installed in phpBB 4 because it already has push notifications.
+	 */
+	public const PHPBB_MAX_VERSION = '4.0.0-dev';
+
+	/**
+	 * Require PHP 7.3 due to 3rd party libraries included.
+	 */
+	public const PHP_MIN_VERSION = '7.3';
+
+	/**
 	 * @var array An array of installation error messages
 	 */
 	protected $errors = [];
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * Requires phpBB 3.3.12 due to new template and core events.
-	 * Should not be installed in phpBB 4.0.0-a1 because it already has push notifications.
-	 * Requires PHP 7.3 due to 3rd party libraries included.
 	 */
 	public function is_enableable()
 	{
@@ -42,12 +53,12 @@ class ext extends \phpbb\extension\base
 	 */
 	protected function check_phpbb_version()
 	{
-		if (phpbb_version_compare(PHPBB_VERSION, '3.3.12', '<'))
+		if (phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MIN_VERSION, '<'))
 		{
 			$this->errors[] = 'PHPBB_VERSION_MIN_ERROR';
 		}
 
-		if (phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '>='))
+		if (phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MAX_VERSION, '>='))
 		{
 			$this->errors[] = 'PHPBB_VERSION_MAX_ERROR';
 		}

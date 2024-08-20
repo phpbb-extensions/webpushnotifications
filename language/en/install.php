@@ -39,7 +39,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'PHPBB_VERSION_MAX_ERROR'	=> 'This extension can not be installed on this board. This is a phpBB 4 board, which already contains the features in this extension.',
-	'PHPBB_VERSION_MIN_ERROR'	=> 'phpBB 3.3.12 or newer is required.',
-	'PHP_VERSION_ERROR'			=> 'PHP 7.3 or newer is required.',
+	'PHPBB_VERSION_MIN_ERROR'	=> 'phpBB ' . \phpbb\webpushnotifications\ext::PHPBB_MIN_VERSION . ' or newer is required.',
+	'PHP_VERSION_ERROR'			=> 'PHP ' . \phpbb\webpushnotifications\ext::PHP_MIN_VERSION . ' or newer is required.',
 	'PHP_EXT_MISSING'			=> 'The “%s” extension for PHP must be installed on this server.',
 ]);

@@ -41,4 +41,5 @@ $lang = array_merge($lang, [
 	'PHPBB_VERSION_MAX_ERROR'	=> 'Данное расширение несовместимо с установленной версией конференции. Вы используете версию phpBB 4, которая уже содержит соответствующие функции.',
 	'PHPBB_VERSION_MIN_ERROR'	=> 'Данное расширение несовместимо с установленной версией конференции. Необходима версия phpBB ' . \phpbb\webpushnotifications\ext::PHPBB_MIN_VERSION . ' или выше.',
 	'PHP_VERSION_ERROR'			=> 'Данное расширение несовместимо с установленной на сервере версией PHP. Необходима версия PHP ' . \phpbb\webpushnotifications\ext::PHP_MIN_VERSION . ' или выше.',
+	'PHP_EXT_MISSING'			=> 'На этом сервере должно быть установлено расширение «%s» для PHP.',
 ]);

@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.0 - 2024-07-01
+
+- First official release.
+
 ### 1.0.0-RC10 - 2024-07-01
 
 - Apple mobile devices are now supported through the implementation of progressive web app capabilities.

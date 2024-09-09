@@ -142,6 +142,7 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_vars([
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'],
+			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: substr($this->config['sitename'], 0, 12),
 		]);
 	}
 

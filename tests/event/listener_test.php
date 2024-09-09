@@ -262,6 +262,7 @@ class listener_test extends \phpbb_database_test_case
 	public function test_pwa_manifest()
 	{
 		$this->config['pwa_icon_small'] = 'icon-192x192.png';
+		$this->config['pwa_short_name'] = 'Test';
 
 		$this->set_listener();
 
@@ -270,6 +271,7 @@ class listener_test extends \phpbb_database_test_case
 			->with([
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> 'icon-192x192.png',
+				'SHORT_SITE_NAME'	=> 'Test',
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();

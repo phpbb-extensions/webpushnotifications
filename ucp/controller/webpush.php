@@ -103,14 +103,7 @@ class webpush
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');
 		}
 
-		if ($this->user->id() !== ANONYMOUS)
-		{
-			$notification_data = $this->get_user_notifications();
-		}
-		else
-		{
-			$notification_data = $this->get_anonymous_notifications();
-		}
+		$notification_data = $this->get_user_notifications();
 
 		// Decode and return data if everything is fine
 		$data = json_decode($notification_data, true);
@@ -126,6 +119,11 @@ class webpush
 	 */
 	private function get_user_notifications(): string
 	{
+		if ($this->user->id() === ANONYMOUS)
+		{
+			return $this->get_anonymous_notifications();
+		}
+
 		// Subscribe should only be available for logged-in "normal" users
 		if ($this->user->data['user_type'] == USER_IGNORE)
 		{

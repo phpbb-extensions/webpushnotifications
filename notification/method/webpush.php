@@ -378,15 +378,13 @@ class webpush extends messenger_base implements extended_method_interface
 		}
 
 		return [
-			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> $this->allowed_user() && ($this->config['wpn_webpush_dropdown_subscribe'] || stripos($this->user->page['page'], 'notification_options')),
+			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> ($this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe']) || stripos($this->user->page['page'], 'notification_options'),
 			'U_WEBPUSH_SUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 			'U_WEBPUSH_UNSUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 			'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
 			'U_WEBPUSH_WORKER_URL'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 			'SUBSCRIPTIONS'					=> $subscriptions,
 			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
-			'U_MANIFEST_URL'				=> $controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
-			'U_TOUCH_ICON'					=> $this->config['pwa_icon_small'],
 		];
 	}
 
@@ -551,18 +549,5 @@ class webpush extends messenger_base implements extended_method_interface
 		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
 
 		return $notify_users;
-	}
-
-	/**
-	 * User is allowed to use web push notifications
-	 *
-	 * @return bool
-	 */
-	protected function allowed_user()
-	{
-		return $this->user->id() !== ANONYMOUS
-			&& !$this->user->data['is_bot']
-			&& (int) $this->user->data['user_type'] !== USER_IGNORE
-			&& (int) $this->user->data['user_type'] !== USER_INACTIVE;
 	}
 }

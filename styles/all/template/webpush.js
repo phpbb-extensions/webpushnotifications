@@ -51,8 +51,7 @@ function PhpbbWebpush() {
 
 		// Service workers are only supported in secure context
 		if (window.isSecureContext !== true) {
-			subscribeButton.disabled = true;
-			handleDisabledState();
+			setDisabledState();
 			return;
 		}
 
@@ -67,12 +66,11 @@ function PhpbbWebpush() {
 				.catch(error => {
 					console.info(error);
 					// Service worker could not be registered
-					subscribeButton.disabled = true;
+					setDisabledState();
 				});
 		} else {
-			subscribeButton.disabled = true;
+			setDisabledState();
 		}
-		handleDisabledState();
 	};
 
 	/**
@@ -80,17 +78,18 @@ function PhpbbWebpush() {
 	 *
 	 * @return void
 	 */
-	function handleDisabledState() {
-		if (subscribeButton.disabled) {
-			const notificationList = document.getElementById('notification_list');
-			const footer = notificationList.querySelector('.wpn-notification-dropdown-footer');
-			if (footer) {
-				footer.style.display = 'none';
-			}
+	function setDisabledState() {
+		subscribeButton.disabled = true;
 
-			if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
-				subscribeButton.value = subscribeButton.getAttribute('data-disabled-msg');
-			}
+		const notificationList = document.getElementById('notification_list');
+		const subscribeToggle = notificationList.querySelector('.wpn-notification-dropdown-footer');
+
+		if (subscribeToggle) {
+			subscribeToggle.style.display = 'none';
+		}
+
+		if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
+			subscribeButton.value = subscribeButton.getAttribute('data-disabled-msg');
 		}
 	}
 

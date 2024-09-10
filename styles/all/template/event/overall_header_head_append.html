@@ -1,8 +1,22 @@
+<!-- Ensure the app can be added to the home screen on iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- Ensure the app can be added to the home screen on Chrome -->
 <meta name="mobile-web-app-capable" content="yes">
+
+<!-- Sets the status bar style when the app is launched from the home screen on iOS -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- The name of your app when saved to the iOS home screen -->
+<meta name="apple-mobile-web-app-title" content="{{ SHORT_SITE_NAME }}">
+
+<!-- The name of your app when saved to other browsers and platforms -->
 <meta name="application-name" content="{{ SHORT_SITE_NAME }}">
+
+<!-- Link to app's configuration manifest -->
 <link rel="manifest" href="{{ U_MANIFEST_URL }}">
+
+<!-- App icon for iOS, a fallback to icons defined in the manifest -->
 {% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ T_ICONS_PATH ~ U_TOUCH_ICON }}">{% endif %}
 
 {% if NOTIFICATIONS_WEBPUSH_ENABLE %}

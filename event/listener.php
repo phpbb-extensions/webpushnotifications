@@ -142,7 +142,7 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_vars([
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'],
-			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: substr($this->config['sitename'], 0, 12),
+			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->get_shortname($this->config['sitename']),
 		]);
 	}
 
@@ -251,5 +251,16 @@ class listener implements EventSubscriberInterface
 		return $this->config['wpn_webpush_enable']
 			&& ANONYMOUS !== $this->user->id()
 			&& USER_IGNORE !== (int) $this->user->data['user_type'];
+	}
+
+	/**
+	 * Get short name from a string (strip out multibyte characters and trim to 12 characters)
+	 *
+	 * @param string $name
+	 * @return string 12 max characters string
+	 */
+	protected function get_shortname($name)
+	{
+		return utf8_substr(preg_replace('/[^\x20-\x7E]/', '', $name), 0, 12);
 	}
 }

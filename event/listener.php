@@ -160,7 +160,7 @@ class listener implements EventSubscriberInterface
 
 			$my_config_vars = [
 				'legend_pwa_settings'=> 'PWA_SETTINGS',
-				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'string', 'type' => 'text:40:12', 'explain' => true],
+				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'string', 'type' => 'custom', 'function' => [$this, 'pwa_short_sitename'], 'explain' => true],
 				'pwa_icon_small'	=> ['lang' => 'PWA_ICON_SMALL', 'validate' => 'pwa_options', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
 				'pwa_icon_large'	=> ['lang' => 'PWA_ICON_LARGE', 'validate' => 'pwa_options', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
 			];
@@ -179,6 +179,20 @@ class listener implements EventSubscriberInterface
 	public function pwa_icon_name($value, $key)
 	{
 		return $this->config['icons_path'] . '/<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '">';
+	}
+
+	/**
+	 * Return HTML for PWA short site name setting
+	 *
+	 * @param string $value Value of config
+	 * @param string $key Name of config
+	 * @return string
+	 */
+	public function pwa_short_sitename($value, $key)
+	{
+		$placeholder = $this->get_shortname($this->config['sitename']);
+
+		return '<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
 
 	/**

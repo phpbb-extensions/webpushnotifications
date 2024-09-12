@@ -160,9 +160,9 @@ class listener implements EventSubscriberInterface
 
 			$my_config_vars = [
 				'legend_pwa_settings'=> 'PWA_SETTINGS',
-				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'string', 'type' => 'custom', 'function' => [$this, 'pwa_short_sitename'], 'explain' => true],
-				'pwa_icon_small'	=> ['lang' => 'PWA_ICON_SMALL', 'validate' => 'pwa_options', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
-				'pwa_icon_large'	=> ['lang' => 'PWA_ICON_LARGE', 'validate' => 'pwa_options', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
+				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'pwa_options:string', 'type' => 'custom', 'function' => [$this, 'pwa_short_sitename'], 'explain' => true],
+				'pwa_icon_small'	=> ['lang' => 'PWA_ICON_SMALL', 'validate' => 'pwa_options:icons', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
+				'pwa_icon_large'	=> ['lang' => 'PWA_ICON_LARGE', 'validate' => 'pwa_options:icons', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
 			];
 
 			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend4']));
@@ -203,40 +203,79 @@ class listener implements EventSubscriberInterface
 	 */
 	public function validate_pwa_options($event)
 	{
-		// Ignore validation if icon fields are empty
-		if ($event['config_definition']['validate'] !== 'pwa_options' || (empty($event['cfg_array']['pwa_icon_small']) && empty($event['cfg_array']['pwa_icon_large'])))
+		$type	= 0;
+		$mode	= 1;
+
+		$validator = explode(':', $event['config_definition']['validate']);
+
+		if ($validator[$type] !== 'pwa_options')
 		{
 			return;
 		}
 
-		$value = $event['cfg_array'][$event['config_name']];
-
-		// Don't allow empty values, if one icon is set, both must be set.
-		if (empty($value))
+		switch ($validator[$mode])
 		{
-			$this->add_error($event, 'PWA_IMAGE_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
-			return;
-		}
+			case 'string':
+				// Ignore validation if icon fields are empty
+				if (empty($event['cfg_array']['pwa_short_name']))
+				{
+					return;
+				}
 
-		// Check if image is valid
-		$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
-		$image_info = $this->imagesize->getImageSize($image);
-		if ($image_info !== false)
-		{
-			if (($event['config_name'] === 'pwa_icon_small' && $image_info['width'] !== 192 && $image_info['height'] !== 192) ||
-				($event['config_name'] === 'pwa_icon_large' && $image_info['width'] !== 512 && $image_info['height'] !== 512))
-			{
-				$this->add_error($event, 'PWA_ICON_SIZE_INVALID', $value);
-			}
+				$short_name = $event['cfg_array']['pwa_short_name'];
 
-			if ($image_info['type'] !== IMAGETYPE_PNG)
-			{
-				$this->add_error($event, 'PWA_ICON_MIME_INVALID', $value);
-			}
-		}
-		else
-		{
-			$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
+				// Do not allow multibyte characters or emoji
+				if (strlen($short_name) !== mb_strlen($short_name, 'UTF-8'))
+				{
+					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
+					return;
+				}
+
+				// Do not allow strings longer than 12 characters
+				if (strlen($short_name) > 12)
+				{
+					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
+					return;
+				}
+			break;
+
+			case 'icons':
+				// Ignore validation if icon fields are empty
+				if (empty($event['cfg_array']['pwa_icon_small']) && empty($event['cfg_array']['pwa_icon_large']))
+				{
+					return;
+				}
+
+				$value = $event['cfg_array'][$event['config_name']];
+
+				// Don't allow empty values, if one icon is set, both must be set.
+				if (empty($value))
+				{
+					$this->add_error($event, 'PWA_IMAGE_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
+					return;
+				}
+
+				// Check if image is valid
+				$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
+				$image_info = $this->imagesize->getImageSize($image);
+				if ($image_info !== false)
+				{
+					if (($event['config_name'] === 'pwa_icon_small' && $image_info['width'] !== 192 && $image_info['height'] !== 192) ||
+						($event['config_name'] === 'pwa_icon_large' && $image_info['width'] !== 512 && $image_info['height'] !== 512))
+					{
+						$this->add_error($event, 'PWA_ICON_SIZE_INVALID', $value);
+					}
+
+					if ($image_info['type'] !== IMAGETYPE_PNG)
+					{
+						$this->add_error($event, 'PWA_ICON_MIME_INVALID', $value);
+					}
+				}
+				else
+				{
+					$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
+				}
+			break;
 		}
 	}
 

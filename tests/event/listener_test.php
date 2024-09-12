@@ -334,24 +334,49 @@ class listener_test extends \phpbb_database_test_case
 	{
 		return [
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '192.png', 'pwa_icon_large' => '512.png'],
 				[],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '512.png'],
 				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '12.png'],
 				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '192.jpg', 'pwa_icon_large' => '512.gif'],
 				['PWA_ICON_MIME_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '', 'pwa_icon_large' => ''],
 				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'foo'],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => ''],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'foo❤️'],
+				['PWA_SHORT_NAME_INVALID'],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => str_repeat('a', 50)],
+				['PWA_SHORT_NAME_INVALID'],
 			],
 		];
 	}
@@ -359,18 +384,18 @@ class listener_test extends \phpbb_database_test_case
 	/**
 	 * @dataProvider validate_pwa_options_data
 	 */
-	public function test_validate_pwa_options($cfg_array, $expected_error)
+	public function test_validate_pwa_options($validate, $cfg_array, $expected_error)
 	{
 		$this->config['icons_path'] = 'images/icons';
 		$config_name = key($cfg_array);
-		$config_definition = ['validate' => 'pwa_options'];
-		$small_image = $cfg_array['pwa_icon_small'] ? explode('.', $cfg_array['pwa_icon_small']) : ['', ''];
-		$large_image = $cfg_array['pwa_icon_large'] ? explode('.', $cfg_array['pwa_icon_large']) : ['', ''];
+		$config_definition = ['validate' => $validate];
+		$small_image = isset($cfg_array['pwa_icon_small']) ? explode('.', $cfg_array['pwa_icon_small']) : ['', ''];
+		$large_image = isset($cfg_array['pwa_icon_large']) ? explode('.', $cfg_array['pwa_icon_large']) : ['', ''];
 		$error = [];
 
 		$this->set_listener();
 
-		$this->imagesize->expects(self::any())
+		$this->imagesize->expects(!empty($cfg_array['pwa_icon_small']) || !empty($cfg_array['pwa_icon_large']) ? self::once() : self::never())
 			->method('getImageSize')
 			->willReturnMap([
 				[$this->root_path . $this->config['icons_path'] . '/', '', false],

@@ -192,7 +192,7 @@ class listener implements EventSubscriberInterface
 	{
 		$placeholder = $this->get_shortname($this->config['sitename']);
 
-		return '<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
+		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
 
 	/**

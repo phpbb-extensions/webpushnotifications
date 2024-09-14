@@ -262,6 +262,7 @@ class listener_test extends \phpbb_database_test_case
 	public function test_pwa_manifest()
 	{
 		$this->config['pwa_icon_small'] = 'icon-192x192.png';
+		$this->config['pwa_short_name'] = 'Test';
 
 		$this->set_listener();
 
@@ -270,6 +271,7 @@ class listener_test extends \phpbb_database_test_case
 			->with([
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> 'icon-192x192.png',
+				'SHORT_SITE_NAME'	=> 'Test',
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
@@ -332,24 +334,49 @@ class listener_test extends \phpbb_database_test_case
 	{
 		return [
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '192.png', 'pwa_icon_large' => '512.png'],
 				[],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '512.png'],
 				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '12.png'],
 				['PWA_ICON_SIZE_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '192.jpg', 'pwa_icon_large' => '512.gif'],
 				['PWA_ICON_MIME_INVALID'],
 			],
 			[
+				'pwa_options:icons',
 				['pwa_icon_small' => '', 'pwa_icon_large' => ''],
 				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'foo'],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => ''],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'foo❤️'],
+				['PWA_SHORT_NAME_INVALID'],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => str_repeat('a', 50)],
+				['PWA_SHORT_NAME_INVALID'],
 			],
 		];
 	}
@@ -357,23 +384,28 @@ class listener_test extends \phpbb_database_test_case
 	/**
 	 * @dataProvider validate_pwa_options_data
 	 */
-	public function test_validate_pwa_options($cfg_array, $expected_error)
+	public function test_validate_pwa_options($validate, $cfg_array, $expected_error)
 	{
 		$this->config['icons_path'] = 'images/icons';
 		$config_name = key($cfg_array);
-		$config_definition = ['validate' => 'pwa_options'];
-		$small_image = $cfg_array['pwa_icon_small'] ? explode('.', $cfg_array['pwa_icon_small']) : ['', ''];
-		$large_image = $cfg_array['pwa_icon_large'] ? explode('.', $cfg_array['pwa_icon_large']) : ['', ''];
+		$config_definition = ['validate' => $validate];
+
+		$pwa_icon_small = isset($cfg_array['pwa_icon_small']) ? $cfg_array['pwa_icon_small'] : '';
+		$pwa_icon_large = isset($cfg_array['pwa_icon_large']) ? $cfg_array['pwa_icon_large'] : '';
+
+		[$small_image_name, $small_image_ext] = $pwa_icon_small ? explode('.', $pwa_icon_small, 2) : ['', ''];
+		[$large_image_name, $large_image_ext] = $pwa_icon_large ? explode('.', $pwa_icon_large, 2) : ['', ''];
+
 		$error = [];
 
 		$this->set_listener();
 
-		$this->imagesize->expects(self::any())
+		$this->imagesize->expects($pwa_icon_small && $pwa_icon_large ? self::once() : self::never())
 			->method('getImageSize')
 			->willReturnMap([
 				[$this->root_path . $this->config['icons_path'] . '/', '', false],
-				[$this->root_path . $this->config['icons_path'] . '/' . $cfg_array['pwa_icon_small'], '', ['width' => (int) $small_image[0], 'height' => (int) $small_image[0], 'type' => $small_image[1] === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
-				[$this->root_path . $this->config['icons_path'] . '/' . $cfg_array['pwa_icon_large'], '', ['width' => (int) $large_image[0], 'height' => (int) $large_image[0], 'type' => $large_image[1] === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+				[$this->root_path . $this->config['icons_path'] . '/' . $pwa_icon_small, '', ['width' => (int) $small_image_name, 'height' => (int) $small_image_name, 'type' => $small_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+				[$this->root_path . $this->config['icons_path'] . '/' . $pwa_icon_large, '', ['width' => (int) $large_image_name, 'height' => (int) $large_image_name, 'type' => $large_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();

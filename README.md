@@ -50,7 +50,7 @@ Testing push notifications necessitates user-to-user interactions to observe the
 
 4. **Caveats for Local Testing**
     - Local testing of Push Notifications only works from a `localhost` address or if your local server has a secure SSL certificate.
-    - Depending on your local server's setup, system operating system, and browser versions, it is still possible that push notifications may not work (for example, in macOS, Safari will not show notifications in a local environment, but Chrome will while or when it is open).
+    - Depending on your local server's setup, operating system, and browser versions, it is still possible that testing push notifications may not work (for example, in a local environment running on macOS, only Chrome will show notifications while it is open or after it has been launched).
 
 ## License
 

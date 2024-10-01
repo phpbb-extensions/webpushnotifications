@@ -37,10 +37,10 @@ Testing push notifications necessitates user-to-user interactions to observe the
 
 1. **User Account Setup:**
 	- Create at least two distinct board user accounts for testing purposes.
-    - Using Google Chrome, visit `UCP -> Board Preferences -> Edit notification options` for _**User Account 1**_ and enable Push Notifications (and enable all web push notification types if necessary). Your browser may ask you to allow notifications, which you should accept.
+    - Using Google Chrome, visit `UCP -> Board Preferences -> Edit notification options` for _**User Account 1**_ and enable Push Notifications (and enable all web push notification types if necessary). Your browser may ask you to allow notifications, which you should accept. Leave Chrome open and running the background.
 
 2. **Message, Quote, or Reply Interaction:**
-	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_ in separate browser such as Firefox/Edge/Safari:
+	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_ in separate browser such as Firefox, Edge or Safari:
 		- **Private Message:** Send a direct message from _**User Account 2**_ to _**User Account 1**_.
 		- **Quote:** Quote a post or message authored by _**User Account 1**_ using _**User Account 2**_.
 		- **Reply:** Respond to a post or message authored by _**User Account 1**_ using _**User Account 2**_.
@@ -49,8 +49,8 @@ Testing push notifications necessitates user-to-user interactions to observe the
 	- Once the interaction is performed from _**User Account 2**_ to engage with _**User Account 1**_, you promptly should see a notification from Google Chrome for _**User Account 1**_.
 
 4. **Caveats for Local Testing**
-    - Local testing of Push Notifications only works from a `localhost` address or if your local server has a secure SSL certificate.
-    - Depending on your local server's setup, operating system, and browser versions, it is still possible that testing push notifications may not work (for example, in a local environment running on macOS, only Chrome will show notifications while it is open or after it has been launched).
+    - Local testing of Push Notifications only works from a `http://localhost` address or if your local test server has a secure SSL certificate, e.g.: `https://local.phpbb.board`.
+    - Depending on your local server's setup, operating system, and browsers, it is still possible that testing push notifications may not work (for example, in a local environment running on macOS, only Chrome will show notifications).
 
 ## License
 

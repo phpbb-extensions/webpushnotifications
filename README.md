@@ -33,7 +33,7 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 
 ## Testing Push Notifications
 
-Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications (the browser recommendations are what we have seen work for sure in local environments):
+Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications (the browser recommendations are what we have seen work in local environments):
 
 1. **User Account Setup:**
 	- Create at least two distinct board user accounts for testing purposes.

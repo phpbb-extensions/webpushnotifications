@@ -233,6 +233,15 @@ class listener_test extends \phpbb_database_test_case
 	{
 		$this->config['wpn_webpush_dropdown_subscribe'] = true;
 		$this->user->data['user_id'] = $user_id;
+
+		$this->set_listener();
+
+		$method_data['method'] = $this->notification_method_webpush;
+
+		$this->notifications->expects(self::once())
+			->method('get_subscription_methods')
+			->willReturn([$method_data['id'] => $method_data]);
+
 		$this->template->expects($expected ? self::once() : self::never())
 			->method('assign_vars')
 			->with([
@@ -243,16 +252,7 @@ class listener_test extends \phpbb_database_test_case
 				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 				'SUBSCRIPTIONS'					=> $subscriptions,
 				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
-			]
-		);
-
-		$this->set_listener();
-
-		$method_data['method'] = $this->notification_method_webpush;
-
-		$this->notifications->expects(self::once())
-			->method('get_subscription_methods')
-			->willReturn([$method_data['id'] => $method_data]);
+			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.page_header_after', [$this->listener, 'load_template_data']);

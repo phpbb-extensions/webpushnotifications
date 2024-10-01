@@ -105,9 +105,10 @@ class webpush
 
 		$notification_data = $this->get_user_notifications();
 
-		// Decode and return data if everything is fine
+		// Decode and return data if everything is fine; update url paths and decode message emoji
 		$data = json_decode($notification_data, true);
 		$data['url'] = isset($data['url']) ? $this->path_helper->update_web_root_path($data['url']) : '';
+		$data['text'] = isset($data['text']) ? html_entity_decode($data['text'], ENT_NOQUOTES, 'UTF-8') : '';
 
 		return new JsonResponse($data);
 	}

@@ -22,6 +22,7 @@ use phpbb\path_helper;
 use phpbb\request\request_interface;
 use phpbb\symfony_request;
 use phpbb\user;
+use phpbb\user_loader;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -58,6 +59,9 @@ class webpush
 	/** @var request_interface */
 	protected $request;
 
+	/** @var user_loader */
+	protected $user_loader;
+
 	/** @var user */
 	protected $user;
 
@@ -81,13 +85,14 @@ class webpush
 	 * @param manager $notification_manager
 	 * @param path_helper $path_helper
 	 * @param request_interface $request
+	 * @param user_loader $user_loader
 	 * @param user $user
 	 * @param Environment $template
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
 	public function __construct(config $config, controller_helper $controller_helper, driver_interface $db, form_helper $form_helper, language $language, manager $notification_manager,
-								path_helper $path_helper, request_interface $request, user $user, Environment $template, string $notification_webpush_table, string $push_subscriptions_table)
+								path_helper $path_helper, request_interface $request, user_loader $user_loader, user $user, Environment $template, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		$this->config = $config;
 		$this->controller_helper = $controller_helper;
@@ -97,6 +102,7 @@ class webpush
 		$this->notification_manager = $notification_manager;
 		$this->path_helper = $path_helper;
 		$this->request = $request;
+		$this->user_loader = $user_loader;
 		$this->user = $user;
 		$this->template = $template;
 		$this->notification_webpush_table = $notification_webpush_table;
@@ -222,6 +228,9 @@ class webpush
 
 		// Get notification from row_data
 		$notification = $this->notification_manager->get_item_type_class($row_data['notification_type_name'], $row_data);
+
+		// Load users for notification
+		$this->user_loader->load_users($notification->users_to_query());
 
 		return json_encode([
 			'heading'	=> $this->config['sitename'],

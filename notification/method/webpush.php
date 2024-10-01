@@ -188,7 +188,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 		// Load all the users we need
 		$notify_users = array_diff($user_ids, $banned_users);
-		$this->user_loader->load_users($notify_users, array(USER_IGNORE));
+		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
 
 		// Get subscriptions for users
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);

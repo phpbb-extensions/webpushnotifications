@@ -229,7 +229,7 @@ class webpush
 		$notification = $this->notification_manager->get_item_type_class($row_data['notification_type_name'], $row_data);
 
 		// Load users for notification
-		$this->user_loader->load_users($notification->users_to_query());
+		$this->user_loader->load_users($notification->users_to_query(), [USER_IGNORE]);
 
 		return json_encode([
 			'heading'	=> $this->config['sitename'],

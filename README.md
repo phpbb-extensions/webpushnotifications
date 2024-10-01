@@ -33,24 +33,24 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 
 ## Testing Push Notifications
 
-Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications:
+Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications (the browser recommendations are what we have seen work for sure in local environments):
 
 1. **User Account Setup:**
-	- Create at least two distinct user accounts for testing purposes.
-    - In the notifications preferences for _**User Account 1**_, subscribe to receive Push Notifications (and assign web push notification types if necessary).
+	- Create at least two distinct board user accounts for testing purposes.
+    - Using Google Chrome, visit `UCP -> Board Preferences -> Edit notification options` for _**User Account 1**_ and enable Push Notifications (and enable all web push notification types if necessary). Your browser may ask you to allow notifications, which you should accept.
 
 2. **Message, Quote, or Reply Interaction:**
-	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_:
+	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_ in separate browser such as Firefox/Edge/Safari.:
 		- **Private Message:** Send a direct message from _**User Account 2**_ to _**User Account 1**_.
 		- **Quote:** Quote a post or message authored by _**User Account 1**_ using _**User Account 2**_.
 		- **Reply:** Respond to a post or message authored by _**User Account 1**_ using _**User Account 2**_.
 
 3. **Observing Push Notifications:**
-	- Once the interaction is performed from _**User Account 2**_ to engage with _**User Account 1**_, you promptly should see a notification for _**User Account 1**_.
+	- Once the interaction is performed from _**User Account 2**_ to engage with _**User Account 1**_, you promptly should see a notification from Google Chrome for _**User Account 1**_.
 
 4. **Caveats for Local Testing**
     - Local testing of Push Notifications only works from a `localhost` address or if your local server has a secure SSL certificate.
-    - We have seen success on Windows using manually installed PHP, Apache and MySQL. However, for reasons not yet known we do not see success on Mac using MAMP.
+    - Depending on your local server's setup, system operating system, and browser versions, it is still possible that push notifications may not work (for example, in macOS, Safari will not show notifications in a local environment, but Chrome will while or when it is open).
 
 ## License
 

@@ -123,10 +123,9 @@ class webpush
 
 		$notification_data = $this->get_user_notifications();
 
-		// Decode and return data if everything is fine; update url paths and decode message emoji
+		// Decode and return data if everything is fine
 		$data = json_decode($notification_data, true);
 		$data['url'] = isset($data['url']) ? $this->path_helper->update_web_root_path($data['url']) : '';
-		$data['text'] = isset($data['text']) ? html_entity_decode($data['text'], ENT_NOQUOTES, 'UTF-8') : '';
 
 		return new JsonResponse($data);
 	}
@@ -234,8 +233,8 @@ class webpush
 
 		return json_encode([
 			'heading'	=> $this->config['sitename'],
-			'title'		=> strip_tags($notification->get_title()),
-			'text'		=> strip_tags($notification->get_reference()),
+			'title'		=> strip_tags(html_entity_decode($notification->get_title(), ENT_NOQUOTES, 'UTF-8')),
+			'text'		=> strip_tags(html_entity_decode($notification->get_reference(), ENT_NOQUOTES, 'UTF-8')),
 			'url'		=> htmlspecialchars_decode($notification->get_url()),
 			'avatar'	=> $notification->get_avatar(),
 		]);

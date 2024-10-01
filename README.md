@@ -40,7 +40,7 @@ Testing push notifications necessitates user-to-user interactions to observe the
     - Using Google Chrome, visit `UCP -> Board Preferences -> Edit notification options` for _**User Account 1**_ and enable Push Notifications (and enable all web push notification types if necessary). Your browser may ask you to allow notifications, which you should accept.
 
 2. **Message, Quote, or Reply Interaction:**
-	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_ in separate browser such as Firefox/Edge/Safari.:
+	- Initiate a user-to-user interaction by performing one of the following actions using _**User Account 2**_ in separate browser such as Firefox/Edge/Safari:
 		- **Private Message:** Send a direct message from _**User Account 2**_ to _**User Account 1**_.
 		- **Quote:** Quote a post or message authored by _**User Account 1**_ using _**User Account 2**_.
 		- **Reply:** Respond to a post or message authored by _**User Account 1**_ using _**User Account 2**_.

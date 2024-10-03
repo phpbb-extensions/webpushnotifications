@@ -14,7 +14,6 @@ use Minishlink\WebPush\Subscription;
 use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
-use phpbb\language\language;
 use phpbb\log\log_interface;
 use phpbb\notification\method\messenger_base;
 use phpbb\notification\type\type_interface;
@@ -35,9 +34,6 @@ class webpush extends messenger_base implements extended_method_interface
 
 	/** @var driver_interface */
 	protected $db;
-
-	/** @var language */
-	protected $language;
 
 	/** @var log_interface */
 	protected $log;
@@ -65,7 +61,6 @@ class webpush extends messenger_base implements extended_method_interface
 	 *
 	 * @param config $config
 	 * @param driver_interface $db
-	 * @param language $language
 	 * @param log_interface $log
 	 * @param user_loader $user_loader
 	 * @param user $user
@@ -75,14 +70,13 @@ class webpush extends messenger_base implements extended_method_interface
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, language $language, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
+	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
 								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
 
 		$this->config = $config;
 		$this->db = $db;
-		$this->language = $language;
 		$this->log = $log;
 		$this->user = $user;
 		$this->path_helper = $path_helper;
@@ -145,29 +139,15 @@ class webpush extends messenger_base implements extended_method_interface
 	{
 		$insert_buffer = new \phpbb\db\sql_insert_buffer($this->db, $this->notification_webpush_table);
 
-		// Load all users data we want to notify
-		$notify_users = $this->load_recipients_data();
-
 		/** @var type_interface $notification */
 		foreach ($this->queue as $notification)
 		{
 			$data = $notification->get_insert_array();
-
-			// Change notification language if needed only
-			$recipient_data = $this->user_loader->get_user($notification->user_id);
-			if ($this->language->get_used_language() !== $recipient_data['user_lang'])
-			{
-				$this->language->set_user_language($recipient_data['user_lang'], true);
-			}
-
 			$data += [
-				'push_data'		=> json_encode([
-					'heading'	=> $this->config['sitename'],
-					'title'		=> strip_tags($notification->get_title()),
-					'text'		=> strip_tags($notification->get_reference()),
-					'url'		=> htmlspecialchars_decode($notification->get_url()),
-					'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
-				]),
+				'push_data'				=> json_encode(array_merge(
+					$data,
+					['notification_type_name' => $notification->get_type()]
+				)),
 				'notification_time'		=> time(),
 				'push_token'			=> hash('sha256', random_bytes(32))
 			];
@@ -178,13 +158,7 @@ class webpush extends messenger_base implements extended_method_interface
 
 		$insert_buffer->flush();
 
-		// Restore current user's language if needed only
-		if ($this->language->get_used_language() !== $this->user->data['user_lang'])
-		{
-			$this->language->set_user_language($this->user->data['user_lang'], true);
-		}
-
-		$this->notify_using_webpush($notify_users);
+		$this->notify_using_webpush();
 
 		return false;
 	}
@@ -192,15 +166,32 @@ class webpush extends messenger_base implements extended_method_interface
 	/**
 	 * Notify using Web Push
 	 *
-	 * @param array	$notify_users	Array of user ids to notify
 	 * @return void
 	 */
-	protected function notify_using_webpush($notify_users = []): void
+	protected function notify_using_webpush(): void
 	{
 		if (empty($this->queue))
 		{
 			return;
 		}
+
+		// Load all users we want to notify
+		$user_ids = [];
+		foreach ($this->queue as $notification)
+		{
+			$user_ids[] = $notification->user_id;
+		}
+
+		// Do not send push notifications to banned users
+		if (!function_exists('phpbb_get_banned_user_ids'))
+		{
+			include($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
+		}
+		$banned_users = phpbb_get_banned_user_ids($user_ids);
+
+		// Load all the users we need
+		$notify_users = array_diff($user_ids, $banned_users);
+		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
 
 		// Get subscriptions for users
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);
@@ -361,6 +352,14 @@ class webpush extends messenger_base implements extended_method_interface
 		return array_intersect_key($data, $row);
 	}
 
+	/**
+	 * Get template data for the UCP
+	 *
+	 * @param helper $controller_helper
+	 * @param form_helper $form_helper
+	 *
+	 * @return array
+	 */
 	public function get_ucp_template_data(helper $controller_helper, form_helper $form_helper): array
 	{
 		$subscription_map = $this->get_user_subscription_map([$this->user->id()]);
@@ -462,46 +461,6 @@ class webpush extends messenger_base implements extended_method_interface
 	}
 
 	/**
-	 * Takes an avatar string (usually in full html format already) and extracts the url.
-	 * If the avatar url is a relative path, it's converted to an absolute path.
-	 *
-	 * Converts:
-	 *    <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
-	 * or <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
-	 * into https://myboard.url/path/to/avatar=123456789.gif
-	 *
-	 * @param string $avatar
-	 * @return array 'src' => Absolute path to avatar image
-	 */
-	protected function prepare_avatar($avatar): array
-	{
-		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
-
-		preg_match_all($pattern, $avatar, $matches);
-
-		$path = !empty($matches[1]) ? end($matches[1]) : $avatar;
-
-		return ['src' => preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1)];
-	}
-
-	/**
-	 * Returns the board url (and caches it in the function)
-	 *
-	 * @return string the generated board url
-	 */
-	protected function get_board_url()
-	{
-		static $board_url;
-
-		if (empty($board_url))
-		{
-			$board_url = generate_board_url() . '/';
-		}
-
-		return $board_url;
-	}
-
-	/**
 	 * Set web push padding for endpoint
 	 *
 	 * @param \Minishlink\WebPush\WebPush $web_push
@@ -522,32 +481,5 @@ class webpush extends messenger_base implements extended_method_interface
 				// This shouldn't happen since we won't pass padding length outside limits
 			}
 		}
-	}
-
-	/**
-	 * Load all users data to send notifications
-	 *
-	 * @return array	Array of user ids to notify
-	 */
-	protected function load_recipients_data(): array
-	{
-		$notify_users = $user_ids = [];
-		foreach ($this->queue as $notification)
-		{
-			$user_ids[] = $notification->user_id;
-		}
-
-		// Do not send push notifications to banned users
-		if (!function_exists('phpbb_get_banned_user_ids'))
-		{
-			include($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
-		}
-		$banned_users = phpbb_get_banned_user_ids($user_ids);
-
-		// Load all the users we need
-		$notify_users = array_diff($user_ids, $banned_users);
-		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
-
-		return $notify_users;
 	}
 }

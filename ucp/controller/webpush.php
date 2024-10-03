@@ -243,7 +243,7 @@ class webpush
 			'title'		=> strip_tags(html_entity_decode($notification->get_title(), ENT_NOQUOTES, 'UTF-8')),
 			'text'		=> strip_tags(html_entity_decode($notification->get_reference(), ENT_NOQUOTES, 'UTF-8')),
 			'url'		=> htmlspecialchars_decode($notification->get_url()),
-			'avatar'	=> $notification->get_avatar(),
+			'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 		]);
 	}
 
@@ -345,5 +345,45 @@ class webpush
 			'success'		=> true,
 			'form_tokens'	=> $this->form_helper->get_form_tokens(self::FORM_TOKEN_UCP),
 		]);
+	}
+
+	/**
+	 * Takes an avatar string (usually in full html format already) and extracts the url.
+	 * If the avatar url is a relative path, it's converted to an absolute path.
+	 *
+	 * Converts:
+	 *    <img class="avatar" src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * or <img class="avatar" src="./styles/prosilver/theme/images/no_avatar.gif" data-src="./path/to/avatar=123456789.gif" width="123" height="123" alt="User avatar" />
+	 * into https://myboard.url/path/to/avatar=123456789.gif
+	 *
+	 * @param string $avatar
+	 * @return array 'src' => Absolute path to avatar image
+	 */
+	protected function prepare_avatar($avatar): array
+	{
+		$pattern = '/src=["\']?([^"\'>]+)["\']?/';
+
+		preg_match_all($pattern, $avatar, $matches);
+
+		$path = !empty($matches[1]) ? end($matches[1]) : $avatar;
+
+		return ['src' => preg_replace('#^' . preg_quote($this->path_helper->get_web_root_path(), '#') . '#', $this->get_board_url(), $path, 1)];
+	}
+
+	/**
+	 * Returns the board url (and caches it in the function)
+	 *
+	 * @return string the generated board url
+	 */
+	protected function get_board_url()
+	{
+		static $board_url;
+
+		if (empty($board_url))
+		{
+			$board_url = generate_board_url() . '/';
+		}
+
+		return $board_url;
 	}
 }

@@ -31,6 +31,25 @@ To run this extension from the repo (and not from a pre-built package) on a loca
   php bin/phpbbcli.php extension:enable phpbb/webpushnotifications # install the extension
   ```
 
+## Browser Support
+
+| Web Browser         | Platform      | Web Push Notification Support | Background Notification Support (When Browser Closed) |
+|---------------------|---------------|-------------------------------|-------------------------------------------------------|
+| **Google Chrome**   | macOS/Windows | ✅ Yes                        | ✅ Yes (on Windows), ❌ No (on macOS)                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ✅ Yes                                                |
+| **Safari**          | macOS         | ✅ Yes                        | ✅ Yes (only for macOS)                               |
+|                     | iOS           | ✅ Yes                        | ✅ Yes (using iOS system notifications)               |
+| **Microsoft Edge**  | Windows/macOS | ✅ Yes                        | ✅ Yes (on Windows), ❌ No (on macOS)                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ✅ Yes                                                |
+| **Mozilla Firefox** | macOS/Windows | ✅ Yes                        | ❌ No                                                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ❌ No                                                 |
+| **Opera**           | macOS/Windows | ✅ Yes                        | ❌ No                                                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ❌ No                                                 |
+
 ## Testing Push Notifications
 
 Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications (the browser recommendations are what we have seen work in local environments):

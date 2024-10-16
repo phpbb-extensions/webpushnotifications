@@ -35,18 +35,22 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 
 | Web Browser         | Platform      | Web Push Notification Support | Background Notification Support (When Browser Closed) |
 |---------------------|---------------|-------------------------------|-------------------------------------------------------|
-| **Google Chrome**   | macOS/Windows | ✅ Yes                        | ✅ Yes (on Windows), ❌ No (on macOS)                 |
+| **Google Chrome**   | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ✅ Yes                                                |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ✅ Yes                                                |
-| **Safari**          | macOS         | ✅ Yes                        | ✅ Yes (only for macOS)                               |
+| **Safari**          | macOS         | ✅ Yes                        | ✅ Yes                                                |
 |                     | iOS           | ✅ Yes                        | ✅ Yes (using iOS system notifications)               |
-| **Microsoft Edge**  | Windows/macOS | ✅ Yes                        | ✅ Yes (on Windows), ❌ No (on macOS)                 |
+| **Microsoft Edge**  | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ✅ Yes                                                |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ✅ Yes                                                |
-| **Mozilla Firefox** | macOS/Windows | ✅ Yes                        | ❌ No                                                 |
+| **Mozilla Firefox** | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ❌ No                                                 |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ❌ No                                                 |
-| **Opera**           | macOS/Windows | ✅ Yes                        | ❌ No                                                 |
+| **Opera**           | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ❌ No                                                 |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ❌ No                                                 |
 

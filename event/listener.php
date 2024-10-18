@@ -314,7 +314,7 @@ class listener implements EventSubscriberInterface
 					'FAQ_ANSWER'   => $this->language->lang($answer),
 				];
 			}
-					
+
 			$this->template->assign_block_vars_array('faq_block.faq_row', $faq_rows);
 		}
 	}

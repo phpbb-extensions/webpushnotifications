@@ -86,7 +86,7 @@ class listener implements EventSubscriberInterface
 			'core.acp_main_notice'				=> 'compatibility_notice',
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
 			'core.validate_config_variable'		=> 'validate_pwa_options',
-			'core.help_manager_add_block_before'=> 'wpn_faq',
+			'core.help_manager_add_block_after'	=> 'wpn_faq',
 		];
 	}
 
@@ -288,7 +288,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function wpn_faq($event)
 	{
-		if ($event['block_name'] === 'HELP_FAQ_BLOCK_ATTACHMENTS')
+		if ($event['block_name'] === 'HELP_FAQ_BLOCK_BOOKMARKS')
 		{
 			$this->language->add_lang('webpushnotifications_faq', 'phpbb/webpushnotifications');
 

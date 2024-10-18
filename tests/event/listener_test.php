@@ -150,6 +150,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.acp_main_notice',
 			'core.acp_board_config_edit_add',
 			'core.validate_config_variable',
+			'core.help_manager_add_block_after',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 

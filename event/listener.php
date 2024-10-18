@@ -86,6 +86,7 @@ class listener implements EventSubscriberInterface
 			'core.acp_main_notice'				=> 'compatibility_notice',
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
 			'core.validate_config_variable'		=> 'validate_pwa_options',
+			'core.help_manager_add_block_after'	=> 'wpn_faq',
 		];
 	}
 
@@ -276,6 +277,45 @@ class listener implements EventSubscriberInterface
 					$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
 				}
 			break;
+		}
+	}
+
+	/**
+	 * Add Web Push info to the phpBB FAQ
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function wpn_faq($event)
+	{
+		if ($event['block_name'] === 'HELP_FAQ_BLOCK_BOOKMARKS')
+		{
+			$this->language->add_lang('webpushnotifications_faq', 'phpbb/webpushnotifications');
+
+			$this->template->assign_block_vars('faq_block', [
+				'BLOCK_TITLE'	=> $this->language->lang('HELP_FAQ_WPN'),
+				'SWITCH_COLUMN'	=> false,
+			]);
+
+			$questions = [
+				'HELP_FAQ_WPN_WHAT_QUESTION'    => 'HELP_FAQ_WPN_WHAT_ANSWER',
+				'HELP_FAQ_WPN_HOW_QUESTION'     => 'HELP_FAQ_WPN_HOW_ANSWER',
+				'HELP_FAQ_WPN_IOS_QUESTION'     => 'HELP_FAQ_WPN_IOS_ANSWER',
+				'HELP_FAQ_WPN_SESSION_QUESTION' => 'HELP_FAQ_WPN_SESSION_ANSWER',
+				'HELP_FAQ_WPN_SUBBING_QUESTION' => 'HELP_FAQ_WPN_SUBBING_ANSWER',
+				'HELP_FAQ_WPN_GENERAL_QUESTION' => 'HELP_FAQ_WPN_GENERAL_ANSWER',
+			];
+
+			$faq_rows = [];
+			foreach ($questions as $question => $answer)
+			{
+				$faq_rows[] = [
+					'FAQ_QUESTION' => $this->language->lang($question),
+					'FAQ_ANSWER'   => $this->language->lang($answer),
+				];
+			}
+
+			$this->template->assign_block_vars_array('faq_block.faq_row', $faq_rows);
 		}
 	}
 

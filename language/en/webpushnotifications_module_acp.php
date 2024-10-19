@@ -40,7 +40,7 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, [
 	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To enable push notifications on Apple mobile devices, your site needs to function as a Progressive Web Application (PWA). This requires users to add your site to their device’s home screen. For an improved user experience, you can find additional PWA settings under <strong>Board settings</strong>, where you can configure an optional app name and app icons for how your site will appear on users’ home screens.',
 	'WEBPUSH_ENABLE'				=> 'Enable Web Push',
-	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow users to receive notifications in their browser or device via Web Push. To utilize Web Push, you must input or generate valid VAPID identification keys.',
+	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow users to receive notifications in their browser or device via Web Push. To utilise Web Push, you must input or generate valid VAPID identification keys.',
 	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Generate Identification keys',
 	'WEBPUSH_VAPID_PUBLIC'			=> 'Server identification public key',
 	'WEBPUSH_VAPID_PUBLIC_EXPLAIN'	=> 'The Voluntary Application Server Identification (VAPID) public key is shared to authenticate push messages from your site.<br><em><strong>Caution:</strong> Modifying the VAPID public key will automatically render all Web Push subscriptions invalid.</em>',

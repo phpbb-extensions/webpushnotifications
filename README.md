@@ -35,14 +35,14 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 
 | Web Browser         | Platform      | Web Push Notification Support | Background Notification Support (When Browser Closed) |
 |---------------------|---------------|-------------------------------|-------------------------------------------------------|
-| **Google Chrome**   | macOS         | ✅ Yes                        | ❌ No (unless running in the background, not fully quit) |
-|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background, not fully quit) |
+| **Google Chrome**   | macOS         | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background)              |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ✅ Yes                                                |
 | **Safari**          | macOS         | ✅ Yes                        | ✅ Yes                                                |
 |                     | iOS           | ✅ Yes                        | ✅ Yes (site must be added to Home Screen first)      |
-| **Microsoft Edge**  | macOS         | ✅ Yes                        | ❌ No (unless running in the background, not fully quit) |
-|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background, not fully quit) |
+| **Microsoft Edge**  | macOS         | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background)              |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ✅ Yes                                                |
 | **Mozilla Firefox** | macOS         | ✅ Yes                        | ❌ No                                                 |
@@ -53,6 +53,8 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 |                     | Windows       | ✅ Yes                        | ❌ No                                                 |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ❌ No                                                 |
+
+*(unless running in the background)* means the browsers have background processes running (they’re not fully quit).
 
 More info here https://caniuse.com/push-api
 

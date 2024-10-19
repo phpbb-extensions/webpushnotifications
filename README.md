@@ -40,7 +40,7 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ✅ Yes                                                |
 | **Safari**          | macOS         | ✅ Yes                        | ✅ Yes                                                |
-|                     | iOS           | ✅ Yes                        | ✅ Yes (using iOS system notifications)               |
+|                     | iOS           | ✅ Yes                        | ✅ Yes (site must be added to Home Screen first)      |
 | **Microsoft Edge**  | macOS         | ✅ Yes                        | ❌ No                                                 |
 |                     | Windows       | ✅ Yes                        | ✅ Yes                                                |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
@@ -53,6 +53,8 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 |                     | Windows       | ✅ Yes                        | ❌ No                                                 |
 |                     | iOS           | ❌ No                         | ❌ No                                                 |
 |                     | Android       | ✅ Yes                        | ❌ No                                                 |
+
+More info here https://caniuse.com/push-api
 
 ## Testing Push Notifications
 

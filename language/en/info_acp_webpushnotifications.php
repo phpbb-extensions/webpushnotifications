@@ -39,8 +39,8 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'ACP_WEBPUSH_EXT_SETTINGS'			=> 'Web Push settings',
-	'ACP_WEBPUSH_REMOVE_WARNING'		=> 'Web Push Notifications are now built-in to phpBB',
-	'ACP_WEBPUSH_REMOVE_NOTICE'			=> 'The extension “phpBB Browser Push Notifications” is no longer needed and should be uninstalled and removed.<br>All settings and user preferences associated with the extension will be migrated into phpBB‘s built-in push notifications when you uninstall the extension.',
+	'ACP_WEBPUSH_REMOVE_WARNING'		=> 'Web Push Notifications are now built into phpBB',
+	'ACP_WEBPUSH_REMOVE_NOTICE'			=> 'The extension “phpBB Browser Push Notifications” is no longer needed and should be uninstalled and removed.<br>All settings and user preferences associated with the extension will be migrated into phpBB’s built-in push notifications when you uninstall the extension.',
 	'LOG_CONFIG_WEBPUSH'				=> '<strong>Altered Web Push settings</strong>',
 	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Web Push message could not be sent:</strong> %s',
 	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Removed Web Push subscription:</strong>» %s',

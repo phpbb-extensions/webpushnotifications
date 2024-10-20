@@ -150,6 +150,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.acp_main_notice',
 			'core.acp_board_config_edit_add',
 			'core.validate_config_variable',
+			'core.help_manager_add_block_after',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 
@@ -420,5 +421,43 @@ class listener_test extends \phpbb_database_test_case
 		extract($event_data_after, EXTR_OVERWRITE);
 
 		self::assertEquals($expected_error, $error);
+	}
+
+	public function test_wpn_faq()
+	{
+		$this->language->add_lang('webpushnotifications_faq', 'phpbb/webpushnotifications');
+
+		$this->template->expects(self::once())
+			->method('assign_block_vars')
+			->withConsecutive(
+				['faq_block', [
+					'BLOCK_TITLE'	=> $this->lang('HELP_FAQ_WPN'),
+					'SWITCH_COLUMN'	=> false
+				]]
+			);
+
+		$this->template->expects(self::once())
+			->method('assign_block_vars_array')
+			->with('faq_block.faq_row', [
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_WHAT_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_WHAT_ANSWER')],
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_HOW_QUESTION'),		'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_HOW_ANSWER')],
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_IOS_QUESTION'),		'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_IOS_ANSWER')],
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_SESSION_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_SESSION_ANSWER')],
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_SUBBING_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_SUBBING_ANSWER')],
+					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_GENERAL_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_GENERAL_ANSWER')],
+				]
+			);
+
+		$event = new \phpbb\event\data([
+			'block_name' => 'HELP_FAQ_BLOCK_BOOKMARKS',
+		]);
+
+		$this->set_listener();
+		$this->listener->wpn_faq($event);
+	}
+
+	private function lang($string)
+	{
+		return $this->language->lang($string);
 	}
 }

@@ -441,7 +441,6 @@ class listener_test extends \phpbb_database_test_case
 			->with('faq_block.faq_row', [
 					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_WHAT_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_WHAT_ANSWER')],
 					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_HOW_QUESTION'),		'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_HOW_ANSWER')],
-					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_IOS_QUESTION'),		'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_IOS_ANSWER')],
 					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_SESSION_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_SESSION_ANSWER')],
 					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_SUBBING_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_SUBBING_ANSWER')],
 					['FAQ_QUESTION' => $this->lang('HELP_FAQ_WPN_GENERAL_QUESTION'),	'FAQ_ANSWER' => $this->lang('HELP_FAQ_WPN_GENERAL_ANSWER')],

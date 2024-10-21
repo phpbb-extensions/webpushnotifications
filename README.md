@@ -31,6 +31,33 @@ To run this extension from the repo (and not from a pre-built package) on a loca
   php bin/phpbbcli.php extension:enable phpbb/webpushnotifications # install the extension
   ```
 
+## Browser Support
+
+| Web Browser         | Platform      | Web Push Notification Support | Background Notification Support (When Browser Closed) |
+|---------------------|---------------|-------------------------------|-------------------------------------------------------|
+| **Google Chrome**   | macOS         | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ✅ Yes                                                |
+| **Safari**          | macOS         | ✅ Yes                        | ✅ Yes                                                |
+|                     | iOS           | ✅ Yes                        | ✅ Yes (site must be added to Home Screen first)      |
+| **Microsoft Edge**  | macOS         | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | Windows       | ✅ Yes                        | ❌ No (unless running in the background)              |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ✅ Yes                                                |
+| **Mozilla Firefox** | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ❌ No                                                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ❌ No                                                 |
+| **Opera**           | macOS         | ✅ Yes                        | ❌ No                                                 |
+|                     | Windows       | ✅ Yes                        | ❌ No                                                 |
+|                     | iOS           | ❌ No                         | ❌ No                                                 |
+|                     | Android       | ✅ Yes                        | ❌ No                                                 |
+
+*(unless running in the background)* means the browsers have background processes running (they’re not fully quit).
+
+More info here https://caniuse.com/push-api
+
 ## Testing Push Notifications
 
 Testing push notifications necessitates user-to-user interactions to observe the notification behavior accurately. Follow the steps outlined below to effectively test push notifications (the browser recommendations are what we have seen work in local environments):

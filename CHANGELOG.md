@@ -2,6 +2,7 @@
 
 ### 1.0.1 - 2024-09-30
 
+- Added FAQ section to phpBB's FAQ page to answer any questions users may have about web push notifications.
 - Fixed issues with Emoji not appearing correctly in push notifications.
 - Fixed possible issues with the URLs linking to PWA icons for the Web Manifest.
 - Fixed issues causing logged-out users to see console errors in their browsers.

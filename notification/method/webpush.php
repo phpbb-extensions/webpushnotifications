@@ -371,7 +371,7 @@ class webpush extends messenger_base implements extended_method_interface
 			{
 				$subscriptions[] = [
 					'endpoint'			=> $subscription['endpoint'],
-					'expirationTime'	=> $subscription['expiration_time'],
+					'expirationTime'	=> (int) $subscription['expiration_time'],
 				];
 			}
 		}

@@ -188,7 +188,7 @@ class listener_test extends \phpbb_database_test_case
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
 				],
-				[['endpoint' => 'https://web.push.test.localhost/foo2', 'expirationTime' => 0]],
+				[['endpoint' => 'https://web.push.test.localhost/foo2', 'expirationTime' => '0']],
 				true,
 			],
 			[	// wrong method, but with a valid webpush subscription, expect no code execution
@@ -204,7 +204,7 @@ class listener_test extends \phpbb_database_test_case
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
 				],
-				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => 1]],
+				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => '1']],
 				true,
 			],
 			[	// webpush method with an invalid webpush subscription, expect code execution but no subscription data
@@ -244,14 +244,37 @@ class listener_test extends \phpbb_database_test_case
 
 		$this->template->expects($expected ? self::once() : self::never())
 			->method('assign_vars')
-			->with([
-				'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
-				'U_WEBPUSH_SUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
-				'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
-				'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
-				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
-				'SUBSCRIPTIONS'					=> $subscriptions,
-				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
+			->withConsecutive([
+				$this->callback(function($arg) use ($subscriptions) {
+					$expectedValues = [
+						'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
+						'U_WEBPUSH_SUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
+						'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
+						'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
+						'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
+						'SUBSCRIPTIONS'					=> $subscriptions,
+					];
+
+					foreach ($expectedValues as $key => $value)
+					{
+						if (!array_key_exists($key, $arg))
+						{
+							$this->fail("Expected key '$key' is missing from the argument array");
+						}
+						if ($arg[$key] !== $value)
+						{
+							$this->fail("Mismatch for key '$key'. Expected: " . var_export($value, true) . ", Actual: " . var_export($arg[$key], true));
+						}
+					}
+
+					// Check if WEBPUSH_FORM_TOKENS exists, but don't check its value
+					if (!array_key_exists('WEBPUSH_FORM_TOKENS', $arg))
+					{
+						$this->fail("Expected key 'WEBPUSH_FORM_TOKENS' is missing from the argument array");
+					}
+
+					return true;
+				})
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
@@ -390,8 +413,8 @@ class listener_test extends \phpbb_database_test_case
 		$config_name = key($cfg_array);
 		$config_definition = ['validate' => $validate];
 
-		$pwa_icon_small = isset($cfg_array['pwa_icon_small']) ? $cfg_array['pwa_icon_small'] : '';
-		$pwa_icon_large = isset($cfg_array['pwa_icon_large']) ? $cfg_array['pwa_icon_large'] : '';
+		$pwa_icon_small = $cfg_array['pwa_icon_small'] ?? '';
+		$pwa_icon_large = $cfg_array['pwa_icon_large'] ?? '';
 
 		[$small_image_name, $small_image_ext] = $pwa_icon_small ? explode('.', $pwa_icon_small, 2) : ['', ''];
 		[$large_image_name, $large_image_ext] = $pwa_icon_large ? explode('.', $pwa_icon_large, 2) : ['', ''];

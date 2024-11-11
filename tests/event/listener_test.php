@@ -253,24 +253,50 @@ class listener_test extends \phpbb_database_test_case
 						'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
 						'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 						'SUBSCRIPTIONS'					=> $subscriptions,
+						'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
 					];
 
-					foreach ($expectedValues as $key => $value)
+					// Check all required keys exist first
+					$missingKeys = array_diff(array_keys($expectedValues), array_keys($arg));
+					if (!empty($missingKeys))
 					{
-						if (!array_key_exists($key, $arg))
-						{
-							$this->fail("Expected key '$key' is missing from the argument array");
-						}
-						if ($arg[$key] !== $value)
-						{
-							$this->fail("Mismatch for key '$key'. Expected: " . var_export($value, true) . ", Actual: " . var_export($arg[$key], true));
-						}
+						$this->fail("Expected key(s) '" . implode("', '", $missingKeys) . "' missing from argument array");
 					}
 
-					// Check if WEBPUSH_FORM_TOKENS exists, but don't check its value
-					if (!array_key_exists('WEBPUSH_FORM_TOKENS', $arg))
+					// Handle WEBPUSH_FORM_TOKENS separately
+					if (isset($arg['WEBPUSH_FORM_TOKENS']))
 					{
-						$this->fail("Expected key 'WEBPUSH_FORM_TOKENS' is missing from the argument array");
+						$tokenArg = $arg['WEBPUSH_FORM_TOKENS'];
+						$tokenExpected = $expectedValues['WEBPUSH_FORM_TOKENS'];
+
+						// Check creation_time separately, allow for 1 second discrepancies during test run
+						$timeDiff = abs($tokenArg['creation_time'] - $tokenExpected['creation_time']);
+						if ($timeDiff > 1)
+						{
+							$this->fail(sprintf(
+								"Creation time difference too large. Expected: %d, Actual: %d",
+								$tokenExpected['creation_time'],
+								$tokenArg['creation_time']
+							));
+						}
+						// Remove creation_time after checking to allow other fields comparison
+						unset($tokenArg['creation_time'], $tokenExpected['creation_time']);
+						$arg['WEBPUSH_FORM_TOKENS'] = $tokenArg;
+						$expectedValues['WEBPUSH_FORM_TOKENS'] = $tokenExpected;
+					}
+
+					// Compare values individually
+					foreach ($expectedValues as $key => $value)
+					{
+						if ($arg[$key] !== $value)
+						{
+							$this->fail(sprintf(
+								"Mismatch for key '%s'. Expected: %s, Actual: %s",
+								$key,
+								var_export($value, true),
+								var_export($arg[$key], true)
+							));
+						}
 					}
 
 					return true;

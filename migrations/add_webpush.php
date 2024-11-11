@@ -74,6 +74,7 @@ class add_webpush extends migration
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
 				'module_langname'	=> 'ACP_WEBPUSH_EXT_SETTINGS',
 				'module_mode'		=> 'webpush',
+				//'module_auth'		=> 'ext_phpbb/webpushnotifications && acl_a_server', //Accidentally omitted this, fix is in another migration
 				'after'				=> 'ACP_JABBER_SETTINGS',
 			]]],
 		];

@@ -244,14 +244,63 @@ class listener_test extends \phpbb_database_test_case
 
 		$this->template->expects($expected ? self::once() : self::never())
 			->method('assign_vars')
-			->with([
-				'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
-				'U_WEBPUSH_SUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
-				'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
-				'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
-				'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
-				'SUBSCRIPTIONS'					=> $subscriptions,
-				'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
+			->withConsecutive([
+				$this->callback(function($arg) use ($subscriptions) {
+					$expectedValues = [
+						'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
+						'U_WEBPUSH_SUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
+						'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
+						'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
+						'U_WEBPUSH_WORKER_URL'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
+						'SUBSCRIPTIONS'					=> $subscriptions,
+						'WEBPUSH_FORM_TOKENS'			=> $this->form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
+					];
+
+					// Check all required keys exist first
+					$missingKeys = array_diff(array_keys($expectedValues), array_keys($arg));
+					if (!empty($missingKeys))
+					{
+						$this->fail("Expected key(s) '" . implode("', '", $missingKeys) . "' missing from argument array");
+					}
+
+					// Handle WEBPUSH_FORM_TOKENS separately
+					if (isset($arg['WEBPUSH_FORM_TOKENS']))
+					{
+						$tokenArg = $arg['WEBPUSH_FORM_TOKENS'];
+						$tokenExpected = $expectedValues['WEBPUSH_FORM_TOKENS'];
+
+						// Check creation_time separately, allow for 1 second discrepancies during test run
+						$timeDiff = abs($tokenArg['creation_time'] - $tokenExpected['creation_time']);
+						if ($timeDiff > 1)
+						{
+							$this->fail(sprintf(
+								"Creation time difference too large. Expected: %d, Actual: %d",
+								$tokenExpected['creation_time'],
+								$tokenArg['creation_time']
+							));
+						}
+						// Remove creation_time after checking to allow other fields comparison
+						unset($tokenArg['creation_time'], $tokenExpected['creation_time']);
+						$arg['WEBPUSH_FORM_TOKENS'] = $tokenArg;
+						$expectedValues['WEBPUSH_FORM_TOKENS'] = $tokenExpected;
+					}
+
+					// Compare values individually
+					foreach ($expectedValues as $key => $value)
+					{
+						if ($arg[$key] !== $value)
+						{
+							$this->fail(sprintf(
+								"Mismatch for key '%s'. Expected: %s, Actual: %s",
+								$key,
+								var_export($value, true),
+								var_export($arg[$key], true)
+							));
+						}
+					}
+
+					return true;
+				})
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
@@ -390,8 +439,8 @@ class listener_test extends \phpbb_database_test_case
 		$config_name = key($cfg_array);
 		$config_definition = ['validate' => $validate];
 
-		$pwa_icon_small = isset($cfg_array['pwa_icon_small']) ? $cfg_array['pwa_icon_small'] : '';
-		$pwa_icon_large = isset($cfg_array['pwa_icon_large']) ? $cfg_array['pwa_icon_large'] : '';
+		$pwa_icon_small = $cfg_array['pwa_icon_small'] ?? '';
+		$pwa_icon_large = $cfg_array['pwa_icon_large'] ?? '';
 
 		[$small_image_name, $small_image_ext] = $pwa_icon_small ? explode('.', $pwa_icon_small, 2) : ['', ''];
 		[$large_image_name, $large_image_ext] = $pwa_icon_large ? explode('.', $pwa_icon_large, 2) : ['', ''];

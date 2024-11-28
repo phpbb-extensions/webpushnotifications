@@ -97,7 +97,7 @@ class webpush extends messenger_base implements extended_method_interface
 	*/
 	public function is_available(type_interface $notification_type = null): bool
 	{
-		return parent::is_available($notification_type) && $this->config['wpn_webpush_enable']
+		return $this->config['wpn_webpush_enable']
 			&& !empty($this->config['wpn_webpush_vapid_public']) && !empty($this->config['wpn_webpush_vapid_private']);
 	}
 

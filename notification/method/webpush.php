@@ -15,6 +15,7 @@ use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
 use phpbb\log\log_interface;
+use phpbb\notification\method\base;
 use phpbb\notification\type\type_interface;
 use phpbb\path_helper;
 use phpbb\user;
@@ -26,7 +27,7 @@ use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 * Web Push notification method class
 * This class handles sending push messages for notifications
 */
-class webpush extends \phpbb\notification\method\base implements extended_method_interface
+class webpush extends base implements extended_method_interface
 {
 	/** @var config */
 	protected $config;
@@ -72,8 +73,6 @@ class webpush extends \phpbb\notification\method\base implements extended_method
 	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
 								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
-		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
-
 		$this->config = $config;
 		$this->db = $db;
 		$this->log = $log;

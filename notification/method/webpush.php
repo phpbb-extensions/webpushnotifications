@@ -98,9 +98,9 @@ class webpush extends base implements extended_method_interface
 	*/
 	public function is_available(type_interface $notification_type = null): bool
 	{
-		return $this->config['wpn_webpush_enable']
-			&& $this->config['wpn_webpush_vapid_public']
-			&& $this->config['wpn_webpush_vapid_private'];
+		return $this->config->offsetGet('wpn_webpush_enable')
+			&& $this->config->offsetGet('wpn_webpush_vapid_public')
+			&& $this->config->offsetGet('wpn_webpush_vapid_private');
 	}
 
 	/**

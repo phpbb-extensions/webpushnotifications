@@ -15,7 +15,7 @@ use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
 use phpbb\log\log_interface;
-use phpbb\notification\method\messenger_base;
+use phpbb\notification\method\base;
 use phpbb\notification\type\type_interface;
 use phpbb\path_helper;
 use phpbb\user;
@@ -27,7 +27,7 @@ use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 * Web Push notification method class
 * This class handles sending push messages for notifications
 */
-class webpush extends messenger_base implements extended_method_interface
+class webpush extends base implements extended_method_interface
 {
 	/** @var config */
 	protected $config;
@@ -38,11 +38,20 @@ class webpush extends messenger_base implements extended_method_interface
 	/** @var log_interface */
 	protected $log;
 
+	/** @var user_loader */
+	protected $user_loader;
+
 	/** @var user */
 	protected $user;
 
 	/** @var path_helper */
 	protected $path_helper;
+
+	/** @var string */
+	protected $phpbb_root_path;
+
+	/** @var string */
+	protected $php_ext;
 
 	/** @var string Notification Web Push table */
 	protected $notification_webpush_table;
@@ -73,13 +82,14 @@ class webpush extends messenger_base implements extended_method_interface
 	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
 								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
-		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
-
 		$this->config = $config;
 		$this->db = $db;
 		$this->log = $log;
+		$this->user_loader = $user_loader;
 		$this->user = $user;
 		$this->path_helper = $path_helper;
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->php_ext = $php_ext;
 		$this->notification_webpush_table = $notification_webpush_table;
 		$this->push_subscriptions_table = $push_subscriptions_table;
 	}
@@ -97,8 +107,9 @@ class webpush extends messenger_base implements extended_method_interface
 	*/
 	public function is_available(type_interface $notification_type = null): bool
 	{
-		return parent::is_available($notification_type) && $this->config['wpn_webpush_enable']
-			&& !empty($this->config['wpn_webpush_vapid_public']) && !empty($this->config['wpn_webpush_vapid_private']);
+		return $this->config->offsetGet('wpn_webpush_enable')
+			&& $this->config->offsetGet('wpn_webpush_vapid_public')
+			&& $this->config->offsetGet('wpn_webpush_vapid_private');
 	}
 
 	/**

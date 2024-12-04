@@ -63,9 +63,13 @@ class manifest
 		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
 		$board_url = generate_board_url();
 
+		// Emoji fixer-uppers
+		$sitename = html_entity_decode($this->config['sitename'], ENT_QUOTES, 'UTF-8');
+		$pwa_short_name = html_entity_decode($this->config['pwa_short_name'], ENT_QUOTES, 'UTF-8');
+
 		$manifest = [
-			'name'			=> $this->config['sitename'],
-			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(html_entity_decode($this->config['sitename'], ENT_QUOTES, 'UTF-8'), 0, 12),
+			'name'			=> $sitename,
+			'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),

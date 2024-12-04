@@ -144,7 +144,7 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_vars([
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'],
-			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->get_shortname($this->config['sitename']),
+			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
 		]);
 	}
 
@@ -210,7 +210,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function pwa_short_sitename($value, $key)
 	{
-		$placeholder = $this->get_shortname($this->config['sitename']);
+		$placeholder = $this->trim_shortname($this->config['sitename']);
 
 		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
@@ -358,12 +358,12 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Get short name from a string (decode any entities and trim to 12 characters)
+	 * Trim short name from a string to 12 characters
 	 *
 	 * @param string $name
 	 * @return string 12 max characters string
 	 */
-	protected function get_shortname($name)
+	protected function trim_shortname($name)
 	{
 		return utf8_substr(html_entity_decode($name, ENT_QUOTES, 'UTF-8'), 0, 12);
 	}

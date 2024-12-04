@@ -51,4 +51,19 @@ class sanitizer
 		$data = json_decode($json, true);
 		return !empty($data) ? self::sanitize($data) : [];
 	}
+
+	/**
+	 * Remove emoji from a string
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	public static function strip_emoji(string $string) : string
+	{
+		return preg_replace(
+			'/[\x{1F000}-\x{1F9FF}]|[\x{2600}-\x{27FF}]/u',
+			'',
+			html_entity_decode($string, ENT_QUOTES, 'UTF-8')
+		);
+	}
 }

@@ -18,6 +18,7 @@ use phpbb\notification\manager;
 use phpbb\template\template;
 use phpbb\user;
 use phpbb\webpushnotifications\form\form_helper;
+use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -353,6 +354,6 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function get_shortname($name)
 	{
-		return utf8_substr(preg_replace('/[^\x20-\x7E]/', '', $name), 0, 12);
+		return utf8_substr(preg_replace('/\s+/', '', json_sanitizer::strip_emoji($name)), 0, 12);
 	}
 }

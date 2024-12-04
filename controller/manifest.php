@@ -15,6 +15,7 @@ use phpbb\exception\http_exception;
 use phpbb\language\language;
 use phpbb\path_helper;
 use phpbb\user;
+use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -65,7 +66,7 @@ class manifest
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
-			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(preg_replace('/[^\x21-\x7E]/', '', html_entity_decode($this->config['sitename'], ENT_QUOTES, 'UTF-8')), 0, 12),
+			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(preg_replace('/\s+/', '', json_sanitizer::strip_emoji($this->config['sitename'])), 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),

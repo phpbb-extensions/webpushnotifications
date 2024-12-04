@@ -18,7 +18,6 @@ use phpbb\notification\manager;
 use phpbb\template\template;
 use phpbb\user;
 use phpbb\webpushnotifications\form\form_helper;
-use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -226,13 +225,6 @@ class listener implements EventSubscriberInterface
 
 				$short_name = $event['cfg_array']['pwa_short_name'];
 
-				// Do not allow emoji
-				if (preg_match(json_sanitizer::EMOJI_REGEX, $short_name))
-				{
-					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
-					return;
-				}
-
 				// Do not allow strings longer than 12 characters
 				if (mb_strlen($short_name, 'UTF-8') > 12)
 				{
@@ -354,6 +346,6 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function get_shortname($name)
 	{
-		return utf8_substr(preg_replace('/\s+/', '', json_sanitizer::strip_emoji($name)), 0, 12);
+		return utf8_substr(html_entity_decode($name, ENT_QUOTES, 'UTF-8'), 0, 12);
 	}
 }

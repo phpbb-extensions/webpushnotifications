@@ -51,30 +51,4 @@ class sanitizer
 		$data = json_decode($json, true);
 		return !empty($data) ? self::sanitize($data) : [];
 	}
-
-	/**
-	 * regex for emoji
-	 * Basic emoji (U+1F000 to U+1F9FF)
-	 * Transport and map symbols (U+1F680 to U+1F6FF)
-	 * Miscellaneous symbols and pictographs (U+1F300 to U+1F5FF)
-	 * Additional emoji symbols (U+1F600 to U+1F64F)
-	 *
-	 * @var string
-	 */
-	public const EMOJI_REGEX = '/[\x{1F000}-\x{1F9FF}]|[\x{2600}-\x{27FF}]|[\x{1F300}-\x{1F64F}]|[\x{1F680}-\x{1F6FF}]|[\x{1F600}-\x{1F64F}]/u';
-
-	/**
-	 * Remove emoji from a string
-	 *
-	 * @param string $string
-	 * @return string
-	 */
-	public static function strip_emoji(string $string) : string
-	{
-		return preg_replace(
-			self::EMOJI_REGEX,
-			'',
-			html_entity_decode($string, ENT_QUOTES, 'UTF-8')
-		);
-	}
 }

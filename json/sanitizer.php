@@ -54,6 +54,10 @@ class sanitizer
 
 	/**
 	 * Remove emoji from a string
+	 * Basic emoji (U+1F300 to U+1F64F)
+	 * Transport and map symbols (U+1F680 to U+1F6FF)
+	 * Miscellaneous symbols and pictographs (U+1F300 to U+1F5FF)
+	 * Additional emoji symbols (U+1F600 to U+1F64F)
 	 *
 	 * @param string $string
 	 * @return string
@@ -61,7 +65,7 @@ class sanitizer
 	public static function strip_emoji(string $string) : string
 	{
 		return preg_replace(
-			'/[\x{1F000}-\x{1F9FF}]|[\x{2600}-\x{27FF}]/u',
+			'/[\x{1F000}-\x{1F9FF}]|[\x{2600}-\x{27FF}]|[\x{1F300}-\x{1F64F}]|[\x{1F680}-\x{1F6FF}]/u',
 			'',
 			html_entity_decode($string, ENT_QUOTES, 'UTF-8')
 		);

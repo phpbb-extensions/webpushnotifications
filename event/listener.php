@@ -227,7 +227,7 @@ class listener implements EventSubscriberInterface
 				$short_name = $event['cfg_array']['pwa_short_name'];
 
 				// Do not allow emoji
-				if (preg_match('/[\x{1F000}-\x{1F9FF}]|[\x{2600}-\x{27FF}]|[\x{1F300}-\x{1F64F}]|[\x{1F680}-\x{1F6FF}]|[\x{2700}-\x{27BF}]|[\x{FE00}-\x{FE0F}]/u', $short_name))
+				if (preg_match(json_sanitizer::EMOJI_REGEX, $short_name))
 				{
 					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
 					return;

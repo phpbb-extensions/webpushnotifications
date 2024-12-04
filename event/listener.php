@@ -85,6 +85,7 @@ class listener implements EventSubscriberInterface
 			'core.ucp_display_module_before'	=> 'load_language',
 			'core.acp_main_notice'				=> 'compatibility_notice',
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
+			'core.acp_board_config_emoji_enabled'=> 'acp_pwa_allow_emoji',
 			'core.validate_config_variable'		=> 'validate_pwa_options',
 			'core.help_manager_add_block_after'	=> 'wpn_faq',
 		];
@@ -171,6 +172,24 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Allow PWA short name ACP field to accept emoji characters
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return void
+	 */
+	public function acp_pwa_allow_emoji($event)
+	{
+		if (in_array('pwa_short_name', $event['config_name_ary'], true))
+		{
+			return;
+		}
+
+		$config_name_ary = $event['config_name_ary'];
+		$config_name_ary[] = 'pwa_short_name';
+		$event['config_name_ary'] = $config_name_ary;
+	}
+
+	/**
 	 * Return HTML for PWA icon name settings
 	 *
 	 * @param string $value Value of config
@@ -223,7 +242,7 @@ class listener implements EventSubscriberInterface
 					return;
 				}
 
-				$short_name = $event['cfg_array']['pwa_short_name'];
+				$short_name = html_entity_decode($event['cfg_array']['pwa_short_name'], ENT_QUOTES, 'UTF-8');
 
 				// Do not allow strings longer than 12 characters
 				if (mb_strlen($short_name, 'UTF-8') > 12)
@@ -339,7 +358,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Get short name from a string (strip out multibyte characters and trim to 12 characters)
+	 * Get short name from a string (decode any entities and trim to 12 characters)
 	 *
 	 * @param string $name
 	 * @return string 12 max characters string

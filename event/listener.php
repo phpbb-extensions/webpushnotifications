@@ -210,7 +210,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function pwa_short_sitename($value, $key)
 	{
-		$placeholder = $this->trim_shortname($this->config['sitename']);
+		$placeholder = $this->trim_shortname($this->decode_entities($this->config['sitename']));
 
 		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
@@ -242,7 +242,7 @@ class listener implements EventSubscriberInterface
 					return;
 				}
 
-				$short_name = html_entity_decode($event['cfg_array']['pwa_short_name'], ENT_QUOTES, 'UTF-8');
+				$short_name = $this->decode_entities($event['cfg_array']['pwa_short_name']);
 
 				// Do not allow strings longer than 12 characters
 				if (mb_strlen($short_name, 'UTF-8') > 12)
@@ -365,6 +365,17 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function trim_shortname($name)
 	{
-		return utf8_substr(html_entity_decode($name, ENT_QUOTES, 'UTF-8'), 0, 12);
+		return utf8_substr($name, 0, 12);
+	}
+
+	/**
+	 * Decode entities, used primarily to fix emoji for display
+	 *
+	 * @param $text
+	 * @return string Decoded string
+	 */
+	protected function decode_entities($text)
+	{
+		return html_entity_decode($text, ENT_QUOTES, 'UTF-8');
 	}
 }

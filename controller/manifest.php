@@ -65,7 +65,7 @@ class manifest
 
 		$manifest = [
 			'name'			=> $this->config['sitename'],
-			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(preg_replace('/[^\x20-\x7E]/', '', $this->config['sitename']), 0, 12),
+			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(preg_replace('/[^\x21-\x7E]/', '', html_entity_decode($this->config['sitename'], ENT_QUOTES, 'UTF-8')), 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),

@@ -17,6 +17,7 @@ use phpbb\language\language;
 use phpbb\notification\manager;
 use phpbb\template\template;
 use phpbb\user;
+use phpbb\webpushnotifications\ext;
 use phpbb\webpushnotifications\form\form_helper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -210,7 +211,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function pwa_short_sitename($value, $key)
 	{
-		$placeholder = $this->trim_shortname($this->decode_entities($this->config['sitename']));
+		$placeholder = $this->trim_shortname(ext::decode_entities($this->config['sitename']));
 
 		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
@@ -242,7 +243,7 @@ class listener implements EventSubscriberInterface
 					return;
 				}
 
-				$short_name = $this->decode_entities($event['cfg_array']['pwa_short_name']);
+				$short_name = ext::decode_entities($event['cfg_array']['pwa_short_name'], ENT_QUOTES);
 
 				// Do not allow strings longer than 12 characters
 				if (utf8_strlen($short_name) > 12)
@@ -366,16 +367,5 @@ class listener implements EventSubscriberInterface
 	protected function trim_shortname($name)
 	{
 		return utf8_substr($name, 0, 12);
-	}
-
-	/**
-	 * Decode entities, used primarily to fix emoji for display
-	 *
-	 * @param $text
-	 * @return string Decoded string
-	 */
-	protected function decode_entities($text)
-	{
-		return html_entity_decode($text, ENT_QUOTES, 'UTF-8');
 	}
 }

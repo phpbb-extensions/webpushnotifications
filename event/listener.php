@@ -245,7 +245,7 @@ class listener implements EventSubscriberInterface
 				$short_name = $this->decode_entities($event['cfg_array']['pwa_short_name']);
 
 				// Do not allow strings longer than 12 characters
-				if (mb_strlen($short_name, 'UTF-8') > 12)
+				if (utf8_strlen($short_name) > 12)
 				{
 					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
 					return;

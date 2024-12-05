@@ -169,6 +169,8 @@ class listener implements EventSubscriberInterface
 			];
 
 			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend4']));
+
+			$this->template->assign_var('S_PWA_OPTIONS', true);
 		}
 	}
 

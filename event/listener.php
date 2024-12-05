@@ -169,6 +169,8 @@ class listener implements EventSubscriberInterface
 			];
 
 			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend4']));
+
+			$this->template->assign_var('S_PWA_OPTIONS', true);
 		}
 	}
 
@@ -213,7 +215,7 @@ class listener implements EventSubscriberInterface
 	{
 		$placeholder = $this->trim_shortname($this->config['sitename']);
 
-		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
+		return '<input id="' . $key . '" type="text" size="40" maxlength="24" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
 
 	/**

@@ -124,4 +124,17 @@ class ext extends \phpbb\extension\base
 
 		return false;
 	}
+
+	/**
+	 * Decode entities, used primarily to fix emoji for display
+	 *
+	 * @param string $text
+	 * @param int $flags Uses ENT_NOQUOTES to leave single and double quotes encoded by default
+	 * @param string $encoding
+	 * @return string Decoded string
+	 */
+	public static function decode_entities($text, $flags = ENT_NOQUOTES, $encoding = 'UTF-8')
+	{
+		return html_entity_decode($text, $flags, $encoding);
+	}
 }

@@ -15,6 +15,7 @@ use phpbb\exception\http_exception;
 use phpbb\language\language;
 use phpbb\path_helper;
 use phpbb\user;
+use phpbb\webpushnotifications\ext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,9 +64,13 @@ class manifest
 		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
 		$board_url = generate_board_url();
 
+		// Emoji fixer-uppers
+		$sitename = ext::decode_entities($this->config['sitename'], ENT_QUOTES);
+		$pwa_short_name = ext::decode_entities($this->config['pwa_short_name'], ENT_QUOTES);
+
 		$manifest = [
-			'name'			=> $this->config['sitename'],
-			'short_name'	=> $this->config['pwa_short_name'] ?: utf8_substr(preg_replace('/[^\x21-\x7E]/', '', html_entity_decode($this->config['sitename'], ENT_QUOTES, 'UTF-8')), 0, 12),
+			'name'			=> $sitename,
+			'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> $this->language->lang('DIRECTION'),

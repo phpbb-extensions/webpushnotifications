@@ -16,6 +16,7 @@ use phpbb\db\driver\driver_interface;
 use phpbb\exception\http_exception;
 use phpbb\language\language;
 use phpbb\notification\manager;
+use phpbb\webpushnotifications\ext;
 use phpbb\webpushnotifications\form\form_helper;
 use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
 use phpbb\path_helper;
@@ -240,8 +241,8 @@ class webpush
 
 		return json_encode([
 			'heading'	=> $this->config['sitename'],
-			'title'		=> strip_tags(html_entity_decode($notification->get_title(), ENT_NOQUOTES, 'UTF-8')),
-			'text'		=> strip_tags(html_entity_decode($notification->get_reference(), ENT_NOQUOTES, 'UTF-8')),
+			'title'		=> strip_tags(ext::decode_entities($notification->get_title())),
+			'text'		=> strip_tags(ext::decode_entities($notification->get_reference())),
 			'url'		=> htmlspecialchars_decode($notification->get_url()),
 			'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 		]);

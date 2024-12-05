@@ -149,6 +149,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
 			'core.acp_board_config_edit_add',
+			'core.acp_board_config_emoji_enabled',
 			'core.validate_config_variable',
 			'core.help_manager_add_block_after',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
@@ -376,7 +377,6 @@ class listener_test extends \phpbb_database_test_case
 		$keys = array_keys($display_vars['vars']);
 
 		self::assertEquals($expected_keys, $keys);
-
 	}
 
 	public function validate_pwa_options_data()
@@ -420,6 +420,21 @@ class listener_test extends \phpbb_database_test_case
 			[
 				'pwa_options:string',
 				['pwa_short_name' => 'foo❤️'],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'Фаны phpBB'],
+				[],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'Фаны phpBB Board'],
+				['PWA_SHORT_NAME_INVALID'],
+			],
+			[
+				'pwa_options:string',
+				['pwa_short_name' => 'foo❤️bar foo bar'],
 				['PWA_SHORT_NAME_INVALID'],
 			],
 			[
@@ -470,6 +485,24 @@ class listener_test extends \phpbb_database_test_case
 		extract($event_data_after, EXTR_OVERWRITE);
 
 		self::assertEquals($expected_error, $error);
+	}
+
+	public function test_acp_pwa_allow_emoji()
+	{
+		$config_name_ary = ['foo'];
+		$expected = ['foo', 'pwa_short_name'];
+
+		$this->set_listener();
+
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.acp_board_config_emoji_enabled', [$this->listener, 'acp_pwa_allow_emoji']);
+
+		$event_data = ['config_name_ary'];
+		$event_data_after = $dispatcher->trigger_event('core.acp_board_config_emoji_enabled', compact($event_data));
+
+		extract($event_data_after, EXTR_OVERWRITE);
+
+		self::assertEquals($expected, $config_name_ary);
 	}
 
 	public function test_wpn_faq()

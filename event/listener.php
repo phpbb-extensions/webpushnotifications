@@ -211,7 +211,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function pwa_short_sitename($value, $key)
 	{
-		$placeholder = $this->trim_shortname(ext::decode_entities($this->config['sitename']));
+		$placeholder = $this->trim_shortname($this->config['sitename']);
 
 		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
 	}
@@ -366,6 +366,6 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function trim_shortname($name)
 	{
-		return utf8_substr($name, 0, 12);
+		return htmlspecialchars(utf8_substr(ext::decode_entities($name, ENT_QUOTES), 0, 12), ENT_QUOTES, 'UTF-8');
 	}
 }

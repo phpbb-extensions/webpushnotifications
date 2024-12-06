@@ -14,6 +14,7 @@ use phpbb\config\config;
 use phpbb\language\language;
 use phpbb\log\log;
 use phpbb\request\request;
+use phpbb\symfony_request;
 use phpbb\template\template;
 use phpbb\user;
 
@@ -34,6 +35,9 @@ class wpn_acp_module
 
 	/** @var request $request */
 	protected $request;
+
+	/** @var symfony_request $symfony_request */
+	private $symfony_request;
 
 	/** @var template $template */
 	protected $template;

@@ -1,7 +1,9 @@
 {% if S_PWA_OPTIONS %}
 <script>
 	const input = document.getElementById('pwa_short_name');
-	const maxLength = 12;
+	const maxLength = input.maxLength || 12;
+
+	input.maxLength = maxLength * 2;
 
 	input.addEventListener('input', () => {
 		// Use Array.from to count characters correctly

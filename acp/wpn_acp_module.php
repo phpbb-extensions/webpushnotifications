@@ -62,6 +62,7 @@ class wpn_acp_module
 		$this->lang = $phpbb_container->get('language');
 		$this->log = $phpbb_container->get('log');
 		$this->request = $phpbb_container->get('request');
+		$this->symfony_request = $phpbb_container->get('symfony_request');
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
 
@@ -106,7 +107,7 @@ class wpn_acp_module
 			'U_ACTION'						=> $this->u_action,
 		]);
 
-		if (!$this->request->server('HTTPS', false) && $this->request->server('SERVER_NAME') !== 'localhost')
+		if (!$this->symfony_request->isSecure() && $this->request->server('SERVER_NAME') !== 'localhost')
 		{
 			$this->errors[] = $this->lang->lang('WEBPUSH_INSECURE_SERVER_ERROR');
 		}

@@ -42,6 +42,9 @@ $lang = array_merge($lang, [
 	'ACP_WEBPUSH_REMOVE_WARNING'		=> 'Web Push Notifications are now built into phpBB',
 	'ACP_WEBPUSH_REMOVE_NOTICE'			=> 'The extension “phpBB Browser Push Notifications” is no longer needed and should be uninstalled and removed.<br>All settings and user preferences associated with the extension will be migrated into phpBB’s built-in push notifications when you uninstall the extension.',
 	'LOG_CONFIG_WEBPUSH'				=> '<strong>Altered Web Push settings</strong>',
-	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Web Push message could not be sent:</strong> %s',
-	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Removed Web Push subscription:</strong>» %s',
+	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Web Push message could not be sent:</strong><br>» %s',
+	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Removed Web Push subscription:</strong><br>» %s',
+	'LOG_WEBPUSH_ICON_DIR_FAIL'			=> '<strong>Webpush Notifications could not migrate the following item in phpBB’s images directory:</strong><br>» %1$s » %2$s',
+	'LOG_WEBPUSH_ICON_DIR_SUCCESS'		=> '<strong>Webpush Notifications added the following directory:</strong><br>» <samp>%s</samp>',
+	'LOG_WEBPUSH_ICON_COPY_SUCCESS'		=> '<strong>Webpush Notifications copied existing PWA touch icons to:</strong><br>» <samp>%s</samp>',
 ]);

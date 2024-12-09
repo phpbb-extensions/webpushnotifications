@@ -82,12 +82,12 @@ class manifest
 		{
 			$manifest['icons'] = [
 				[
-					'src' => $board_url . '/' . $this->config['icons_path'] . '/' . $this->config['pwa_icon_small'],
+					'src' => $board_url . '/' . ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'],
 					'sizes' => '192x192',
 					'type' => 'image/png'
 				],
 				[
-					'src' => $board_url . '/' . $this->config['icons_path'] . '/' . $this->config['pwa_icon_large'],
+					'src' => $board_url . '/' . ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_large'],
 					'sizes' => '512x512',
 					'type' => 'image/png'
 				]

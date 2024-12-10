@@ -16,8 +16,10 @@
 <!-- Link to app's configuration manifest -->
 <link rel="manifest" href="{{ U_MANIFEST_URL }}">
 
+{% if U_TOUCH_ICON %}
 <!-- App icon for iOS, a fallback to icons defined in the manifest -->
-{% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ T_ICONS_PATH ~ U_TOUCH_ICON }}">{% endif %}
+<link rel="apple-touch-icon" href="{{ ROOT_PATH ~ U_TOUCH_ICON }}">
+{% endif %}
 
 {% if NOTIFICATIONS_WEBPUSH_ENABLE %}
 	{% include '@phpbb_webpushnotifications/ucp_notifications_webpush.html' %}

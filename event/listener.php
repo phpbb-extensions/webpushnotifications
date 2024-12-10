@@ -64,7 +64,7 @@ class listener implements EventSubscriberInterface
 	 * @param template $template Template object
 	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
-	 * @param $root_path
+	 * @param string $root_path
 	 */
 	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path)
 	{

@@ -14,7 +14,7 @@ use phpbb\db\migration\container_aware_migration;
 use phpbb\filesystem\exception\filesystem_exception;
 use phpbb\filesystem\filesystem;
 
-class move_site_icons extends container_aware_migration
+class setup_site_icons extends container_aware_migration
 {
 	private const NEW_ICON_DIR = 'images/site_icons';
 	private const OLD_ICON_DIR = 'images/icons';

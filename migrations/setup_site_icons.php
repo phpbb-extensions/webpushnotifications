@@ -50,7 +50,7 @@ class setup_site_icons extends container_aware_migration
 		$filesystem = $this->get_filesystem();
 		$root_path = $this->container->getParameter('core.root_path');
 		$user = $this->container->get('user');
-		$logger = $this->container->get('log');
+		$log = $this->container->get('log');
 
 		// Prepare paths once
 		$new_icon_path = $root_path . self::NEW_ICON_DIR;
@@ -86,16 +86,21 @@ class setup_site_icons extends container_aware_migration
 			}
 
 			// Set up a log message result
-			$message = $copied ? 'LOG_WEBPUSH_ICON_COPY_SUCCESS' : 'LOG_WEBPUSH_ICON_DIR_SUCCESS';
-			$result = [$message => [self::NEW_ICON_DIR]];
+			$result = [
+				'lang_key'	=> $copied ? 'LOG_WEBPUSH_ICON_COPY_SUCCESS' : 'LOG_WEBPUSH_ICON_DIR_SUCCESS',
+				'params'	=> [$new_icon_path],
+			];
 		}
 		catch (filesystem_exception $e)
 		{
-			$result = ['LOG_WEBPUSH_ICON_DIR_FAIL' => [$e->get_filename(), $e->getMessage()]];
+			$result = [
+				'lang_key'	=> 'LOG_WEBPUSH_ICON_DIR_FAIL',
+				'params'	=> [$e->get_filename(), $e->getMessage()]
+			];
 		}
 
 		// Log result
-		$logger->add('admin', $user->data['user_id'], $user->ip, key($result), false, current($result));
+		$log->add('admin', $user->data['user_id'], $user->ip, $result['lang_key'], false, $result['params']);
 	}
 
 	/**

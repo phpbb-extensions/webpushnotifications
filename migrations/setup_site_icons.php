@@ -88,7 +88,7 @@ class setup_site_icons extends container_aware_migration
 			// Set up a log message result
 			$result = [
 				'lang_key'	=> $copied ? 'LOG_WEBPUSH_ICON_COPY_SUCCESS' : 'LOG_WEBPUSH_ICON_DIR_SUCCESS',
-				'params'	=> [$new_icon_path],
+				'params'	=> [self::NEW_ICON_DIR],
 			];
 		}
 		catch (filesystem_exception $e)

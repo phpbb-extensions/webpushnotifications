@@ -267,7 +267,7 @@ class listener implements EventSubscriberInterface
 				// Don't allow empty values, if one icon is set, both must be set.
 				if (empty($value))
 				{
-					$this->add_error($event, 'PWA_IMAGE_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
+					$this->add_error($event, 'PWA_ICON_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
 					return;
 				}
 
@@ -289,7 +289,7 @@ class listener implements EventSubscriberInterface
 				}
 				else
 				{
-					$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
+					$this->add_error($event, 'PWA_ICON_INVALID', $value);
 				}
 			break;
 		}

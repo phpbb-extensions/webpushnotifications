@@ -16,6 +16,11 @@ namespace phpbb\webpushnotifications;
 class ext extends \phpbb\extension\base
 {
 	/**
+	 * Location for storing PWA touch/app icons.
+	 */
+	public const PWA_ICON_DIR = 'images/site_icons';
+
+	/**
 	 * Require phpBB 3.3.12 due to new template and core events.
 	 */
 	public const PHPBB_MIN_VERSION = '3.3.12';

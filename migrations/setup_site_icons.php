@@ -67,7 +67,7 @@ class setup_site_icons extends container_aware_migration
 			// Create directory only if needed (give an empty index.htm too)
 			if (!$filesystem->exists($new_icon_path))
 			{
-				$filesystem->mkdir($new_icon_path);
+				$filesystem->mkdir($new_icon_path, 0755);
 				$filesystem->touch($new_icon_path . '/index.htm');
 			}
 

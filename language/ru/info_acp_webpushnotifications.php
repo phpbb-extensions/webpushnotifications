@@ -44,7 +44,7 @@ $lang = array_merge($lang, [
 	'LOG_CONFIG_WEBPUSH'				=> '<strong>Изменены настройки браузерных push—уведомлений</strong>',
 	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Не удалось отправить браузерное push—уведомление:</strong><br>» %s',
 	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Удалена подписка на браузерные push—уведомления:</strong><br>» %s',
-	'LOG_WEBPUSH_ICON_DIR_FAIL'			=> '<strong>Webpush Notifications could not migrate the following item in phpBB’s images directory:</strong><br>» %1$s » %2$s',
-	'LOG_WEBPUSH_ICON_DIR_SUCCESS'		=> '<strong>Webpush Notifications added the following directory:</strong><br>» <samp>%s</samp>',
-	'LOG_WEBPUSH_ICON_COPY_SUCCESS'		=> '<strong>Webpush Notifications copied existing PWA touch icons to:</strong><br>» <samp>%s</samp>',
+	'LOG_WEBPUSH_ICON_DIR_FAIL'			=> '<strong>Не удалось перенести в папку изображений файл значка прогрессивного веб—приложения (PWA):</strong><br>» %1$s » %2$s',
+	'LOG_WEBPUSH_ICON_DIR_SUCCESS'		=> '<strong>Папка изображений прогрессивного веб—приложения (PWA) успешно создана:</strong><br>» <samp>%s</samp>',
+	'LOG_WEBPUSH_ICON_COPY_SUCCESS'		=> '<strong>Файлы значков прогрессивного веб—приложения (PWA) успешно скопированы в папку:</strong><br>» <samp>%s</samp>',
 ]);

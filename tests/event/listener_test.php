@@ -10,6 +10,8 @@
 
 namespace phpbb\webpushnotifications\tests\event;
 
+use phpbb\webpushnotifications\ext;
+
 require_once __DIR__ . '/../../../../../includes/functions_acp.php';
 
 class listener_test extends \phpbb_database_test_case
@@ -320,7 +322,7 @@ class listener_test extends \phpbb_database_test_case
 			->method('assign_vars')
 			->with([
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
-				'U_TOUCH_ICON'		=> 'icon-192x192.png',
+				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
 			]);
 
@@ -450,7 +452,6 @@ class listener_test extends \phpbb_database_test_case
 	 */
 	public function test_validate_pwa_options($validate, $cfg_array, $expected_error)
 	{
-		$this->config['icons_path'] = 'images/icons';
 		$config_name = key($cfg_array);
 		$config_definition = ['validate' => $validate];
 
@@ -467,9 +468,9 @@ class listener_test extends \phpbb_database_test_case
 		$this->imagesize->expects($pwa_icon_small && $pwa_icon_large ? self::once() : self::never())
 			->method('getImageSize')
 			->willReturnMap([
-				[$this->root_path . $this->config['icons_path'] . '/', '', false],
-				[$this->root_path . $this->config['icons_path'] . '/' . $pwa_icon_small, '', ['width' => (int) $small_image_name, 'height' => (int) $small_image_name, 'type' => $small_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
-				[$this->root_path . $this->config['icons_path'] . '/' . $pwa_icon_large, '', ['width' => (int) $large_image_name, 'height' => (int) $large_image_name, 'type' => $large_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+				[$this->root_path . ext::PWA_ICON_DIR . '/', '', false],
+				[$this->root_path . ext::PWA_ICON_DIR . '/' . $pwa_icon_small, '', ['width' => (int) $small_image_name, 'height' => (int) $small_image_name, 'type' => $small_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
+				[$this->root_path . ext::PWA_ICON_DIR . '/' . $pwa_icon_large, '', ['width' => (int) $large_image_name, 'height' => (int) $large_image_name, 'type' => $large_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();

@@ -42,6 +42,9 @@ $lang = array_merge($lang, [
 	'ACP_WEBPUSH_REMOVE_WARNING'		=> 'Браузерные push—уведомления теперь встроены в phpBB',
 	'ACP_WEBPUSH_REMOVE_NOTICE'			=> 'Расширение «phpBB Browser Push Notifications» больше не требуется и должно быть удалено.<br>Все системные и пользовательские настройки, связанные с данным расширением, будут перенесены в соответствующие настройки браузерных push—уведомлений конференции автоматически при удалении данного расширения.',
 	'LOG_CONFIG_WEBPUSH'				=> '<strong>Изменены настройки браузерных push—уведомлений</strong>',
-	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Не удалось отправить браузерное push—уведомление:</strong> %s',
-	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Удалена подписка на браузерные push—уведомления:</strong>» %s',
+	'LOG_WEBPUSH_MESSAGE_FAIL'			=> '<strong>Не удалось отправить браузерное push—уведомление:</strong><br>» %s',
+	'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'	=> '<strong>Удалена подписка на браузерные push—уведомления:</strong><br>» %s',
+	'LOG_WEBPUSH_ICON_DIR_FAIL'			=> '<strong>Не удалось перенести в папку изображений файл значка прогрессивного веб—приложения (PWA):</strong><br>» %1$s » %2$s',
+	'LOG_WEBPUSH_ICON_DIR_SUCCESS'		=> '<strong>Папка изображений прогрессивного веб—приложения (PWA) успешно создана:</strong><br>» <samp>%s</samp>',
+	'LOG_WEBPUSH_ICON_COPY_SUCCESS'		=> '<strong>Файлы значков прогрессивного веб—приложения (PWA) успешно скопированы в папку:</strong><br>» <samp>%s</samp>',
 ]);

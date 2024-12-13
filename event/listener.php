@@ -64,7 +64,7 @@ class listener implements EventSubscriberInterface
 	 * @param template $template Template object
 	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
-	 * @param $root_path
+	 * @param string $root_path
 	 */
 	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path)
 	{
@@ -144,7 +144,7 @@ class listener implements EventSubscriberInterface
 	{
 		$this->template->assign_vars([
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
-			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'],
+			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
 		]);
 	}
@@ -201,7 +201,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function pwa_icon_name($value, $key)
 	{
-		return $this->config['icons_path'] . '/<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '">';
+		return ext::PWA_ICON_DIR . '/<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '">';
 	}
 
 	/**
@@ -267,12 +267,12 @@ class listener implements EventSubscriberInterface
 				// Don't allow empty values, if one icon is set, both must be set.
 				if (empty($value))
 				{
-					$this->add_error($event, 'PWA_IMAGE_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
+					$this->add_error($event, 'PWA_ICON_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
 					return;
 				}
 
 				// Check if image is valid
-				$image = $this->root_path . $this->config['icons_path'] . '/' . $value;
+				$image = $this->root_path . ext::PWA_ICON_DIR . '/' . $value;
 				$image_info = $this->imagesize->getImageSize($image);
 				if ($image_info !== false)
 				{
@@ -289,7 +289,7 @@ class listener implements EventSubscriberInterface
 				}
 				else
 				{
-					$this->add_error($event, 'PWA_IMAGE_INVALID', $value);
+					$this->add_error($event, 'PWA_ICON_INVALID', $value);
 				}
 			break;
 		}

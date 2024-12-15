@@ -240,7 +240,7 @@ class webpush
 		$this->user_loader->load_users($notification->users_to_query());
 
 		return json_encode([
-			'heading'	=> $this->config['sitename'],
+			'heading'	=> ext::decode_entities($this->config['sitename'], ENT_QUOTES),
 			'title'		=> strip_tags(ext::decode_entities($notification->get_title())),
 			'text'		=> strip_tags(ext::decode_entities($notification->get_reference())),
 			'url'		=> htmlspecialchars_decode($notification->get_url()),

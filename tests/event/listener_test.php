@@ -43,6 +43,9 @@ class listener_test extends \phpbb_database_test_case
 	/** @var string */
 	protected $root_path;
 
+	/** @var string */
+	protected $php_ext;
+
 	protected static function setup_extensions()
 	{
 		return ['phpbb/webpushnotifications'];
@@ -121,6 +124,7 @@ class listener_test extends \phpbb_database_test_case
 		);
 
 		$this->root_path = $phpbb_root_path;
+		$this->php_ext = $phpEx;
 	}
 
 	protected function set_listener()
@@ -134,7 +138,8 @@ class listener_test extends \phpbb_database_test_case
 			$this->template,
 			$this->user,
 			$this->notifications,
-			$this->root_path
+			$this->root_path,
+			$this->php_ext
 		);
 	}
 

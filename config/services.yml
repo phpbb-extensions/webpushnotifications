@@ -21,6 +21,7 @@ services:
             - '@user'
             - '@notification_manager'
             - '%core.root_path%'
+            - '%core.php_ext%'
         tags:
             - { name: event.listener }
 

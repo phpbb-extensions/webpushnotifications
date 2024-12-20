@@ -53,6 +53,9 @@ class listener implements EventSubscriberInterface
 	/** @var string */
 	protected $root_path;
 
+	/** @var string */
+	protected $php_ext;
+
 	/**
 	 * Constructor
 	 *
@@ -65,8 +68,9 @@ class listener implements EventSubscriberInterface
 	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
 	 * @param string $root_path
+	 * @param string $php_ext
 	 */
-	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path)
+	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path, $php_ext)
 	{
 		$this->config = $config;
 		$this->controller_helper = $controller_helper;
@@ -77,6 +81,7 @@ class listener implements EventSubscriberInterface
 		$this->user = $user;
 		$this->phpbb_notifications = $phpbb_notifications;
 		$this->root_path = $root_path;
+		$this->php_ext = $php_ext;
 	}
 
 	public static function getSubscribedEvents()
@@ -143,7 +148,7 @@ class listener implements EventSubscriberInterface
 	public function pwa_manifest()
 	{
 		$this->template->assign_vars([
-			'U_MANIFEST_URL'	=> 'ext/phpbb/webpushnotifications/manifest.php',
+			'U_MANIFEST_URL'	=> 'ext/phpbb/webpushnotifications/manifest.' . $this->php_ext,
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
 		]);

@@ -19,10 +19,6 @@ $phpbb_root_path = ((defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './') . '..
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 
-/** @var \phpbb\path_helper $path_helper */
-$path_helper = $phpbb_container->get('path_helper');
-
-$board_path = $config['force_server_vars'] ? $config['script_path'] : $path_helper->get_web_root_path();
 $board_url = generate_board_url();
 
 // Emoji fixer-uppers
@@ -35,8 +31,8 @@ $manifest = [
 	'display'		=> 'standalone',
 	'orientation'	=> 'portrait',
 	'dir'			=> $language->lang('DIRECTION'),
-	'start_url'		=> $board_path,
-	'scope'			=> $board_path,
+	'start_url'		=> $board_url,
+	'scope'			=> $board_url . '/',
 ];
 
 if (!empty($config['pwa_icon_small']) && !empty($config['pwa_icon_large']))

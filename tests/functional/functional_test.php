@@ -121,8 +121,8 @@ class functional_test extends \phpbb_functional_test_case
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
 			'dir'			=> 'ltr',
-			'start_url'		=> '/',
-			'scope'			=> '/',
+			'start_url'		=> rtrim(self::$root_url, '/'),
+			'scope'			=> self::$root_url,
 		];
 
 		$this->login();
@@ -137,7 +137,7 @@ class functional_test extends \phpbb_functional_test_case
 		$crawler = self::submit($form);
 		$this->assertStringContainsString($this->lang('CONFIG_UPDATED'), $crawler->filter('.successbox')->text());
 
-		self::request('GET', 'app.php/manifest', [], false);
+		self::request('GET', 'ext/phpbb/webpushnotifications/manifest.php', [], false);
 		$this->assertEquals(json_encode($expected), self::get_content());
 	}
 

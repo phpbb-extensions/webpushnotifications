@@ -326,7 +326,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->template->expects(self::once())
 			->method('assign_vars')
 			->with([
-				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
+				'U_MANIFEST_URL'	=> 'ext/phpbb/webpushnotifications/manifest.' . $this->php_ext,
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
 			]);

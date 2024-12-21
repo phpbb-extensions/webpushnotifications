@@ -87,6 +87,10 @@ class manifest
 			];
 		}
 
-		return new JsonResponse($manifest);
+		$response = new JsonResponse($manifest);
+		$response->setPublic();
+		$response->setMaxAge(3600);
+		$response->headers->addCacheControlDirective('must-revalidate', true);
+		return $response;
 	}
 }

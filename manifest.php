@@ -30,7 +30,6 @@ $manifest = [
 	'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
 	'display'		=> 'standalone',
 	'orientation'	=> 'portrait',
-	'dir'			=> $language->lang('DIRECTION'),
 	'start_url'		=> $board_url,
 	'scope'			=> $board_url . '/',
 ];

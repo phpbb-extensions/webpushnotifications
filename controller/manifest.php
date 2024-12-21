@@ -11,12 +11,10 @@
 namespace phpbb\webpushnotifications\controller;
 
 use phpbb\config\config;
-use phpbb\exception\http_exception;
 use phpbb\path_helper;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class manifest
 {
@@ -50,11 +48,6 @@ class manifest
 	 */
 	public function handle(): JsonResponse
 	{
-		if ($this->user->data['is_bot'])
-		{
-			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');
-		}
-
 		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
 		$board_url = generate_board_url();
 
@@ -91,6 +84,13 @@ class manifest
 		$response->setPublic();
 		$response->setMaxAge(3600);
 		$response->headers->addCacheControlDirective('must-revalidate', true);
+
+		if (!empty($this->user->data['is_bot']))
+		{
+			// Let reverse proxies know we detected a bot.
+			$response->headers->set('X-PHPBB-IS-BOT', 'yes');
+		}
+
 		return $response;
 	}
 }

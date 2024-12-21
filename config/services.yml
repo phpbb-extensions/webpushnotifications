@@ -62,6 +62,5 @@ services:
         class: phpbb\webpushnotifications\controller\manifest
         arguments:
             - '@config'
-            - '@language'
             - '@path_helper'
             - '@user'

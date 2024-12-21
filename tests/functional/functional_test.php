@@ -120,7 +120,6 @@ class functional_test extends \phpbb_functional_test_case
 			'short_name'	=> 'yourdomain',
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
-			'dir'			=> 'ltr',
 			'start_url'		=> '/',
 			'scope'			=> '/',
 		];

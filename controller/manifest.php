@@ -12,7 +12,6 @@ namespace phpbb\webpushnotifications\controller;
 
 use phpbb\config\config;
 use phpbb\exception\http_exception;
-use phpbb\language\language;
 use phpbb\path_helper;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
@@ -23,9 +22,6 @@ class manifest
 {
 	/** @var config */
 	protected $config;
-
-	/** @var language */
-	protected $language;
 
 	/** @var path_helper */
 	protected $path_helper;
@@ -38,14 +34,12 @@ class manifest
 	 *
 	 * @param config $config
 	 * @param path_helper $path_helper
-	 * @param language $language
 	 * @param user $user
 	 */
-	public function __construct(config $config, language $language, path_helper $path_helper, user $user)
+	public function __construct(config $config, path_helper $path_helper, user $user)
 	{
 		$this->config = $config;
 		$this->path_helper = $path_helper;
-		$this->language = $language;
 		$this->user = $user;
 	}
 
@@ -73,7 +67,6 @@ class manifest
 			'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
-			'dir'			=> $this->language->lang('DIRECTION'),
 			'start_url'		=> $board_path,
 			'scope'			=> $board_path,
 		];

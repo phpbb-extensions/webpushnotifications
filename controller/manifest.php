@@ -11,21 +11,15 @@
 namespace phpbb\webpushnotifications\controller;
 
 use phpbb\config\config;
-use phpbb\exception\http_exception;
-use phpbb\language\language;
 use phpbb\path_helper;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class manifest
 {
 	/** @var config */
 	protected $config;
-
-	/** @var language */
-	protected $language;
 
 	/** @var path_helper */
 	protected $path_helper;
@@ -38,14 +32,12 @@ class manifest
 	 *
 	 * @param config $config
 	 * @param path_helper $path_helper
-	 * @param language $language
 	 * @param user $user
 	 */
-	public function __construct(config $config, language $language, path_helper $path_helper, user $user)
+	public function __construct(config $config, path_helper $path_helper, user $user)
 	{
 		$this->config = $config;
 		$this->path_helper = $path_helper;
-		$this->language = $language;
 		$this->user = $user;
 	}
 
@@ -56,11 +48,6 @@ class manifest
 	 */
 	public function handle(): JsonResponse
 	{
-		if ($this->user->data['is_bot'])
-		{
-			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');
-		}
-
 		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
 		$board_url = generate_board_url();
 
@@ -73,7 +60,6 @@ class manifest
 			'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
-			'dir'			=> $this->language->lang('DIRECTION'),
 			'start_url'		=> $board_path,
 			'scope'			=> $board_path,
 		];
@@ -94,6 +80,17 @@ class manifest
 			];
 		}
 
-		return new JsonResponse($manifest);
+		$response = new JsonResponse($manifest);
+		$response->setPublic();
+		$response->setMaxAge(3600);
+		$response->headers->addCacheControlDirective('must-revalidate', true);
+
+		if (!empty($this->user->data['is_bot']))
+		{
+			// Let reverse proxies know we detected a bot.
+			$response->headers->set('X-PHPBB-IS-BOT', 'yes');
+		}
+
+		return $response;
 	}
 }

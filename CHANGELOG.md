@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.0.2 - 2025-01-04
+
+- Instead of blocking all bots, we now let reverse proxies know we detected a bot.
+- Browser-based caching of the manifest.json to reduce repeated attempts at loading it.
+- Fixed emoji issues inside the notifications.
+- Moved where web application icons are stored from `images` to `images/site_icons`.
+- Improved handling of Emoji and multibyte characters in site names when using Progressive Web App features (e.g., storing a forum’s site on a device’s home screen).
+- Fixed an issue where notifications created by another extension could not be enabled or disabled as Web Push notifications in the UCP options.
+- Improved server compatibility checks.
+
 ### 1.0.1 - 2024-09-30
 
 - Added FAQ section to phpBB's FAQ page to answer any questions users may have about web push notifications.

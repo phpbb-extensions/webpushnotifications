@@ -16,7 +16,9 @@ use phpbb\request\request_interface;
 use phpbb\webpushnotifications\ucp\controller\webpush;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class controller_webpush_test extends \phpbb_database_test_case
 {
@@ -94,6 +96,59 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'phpbb_wpn_notification_push',
 			'phpbb_wpn_push_subscriptions'
 		);
+	}
+
+	private function setupCommonMocks(): void
+	{
+		global $cache;
+		$cache = $this->createMock(\phpbb\cache\service::class);
+		$cache->method('obtain_word_list')->willReturn([]);
+
+		$this->auth->method('acl_get')->willReturn(true);
+
+		$this->notification_manager->method('get_item_type_class')
+			->willReturnCallback($this->getNotificationTypeCallback());
+	}
+
+	private function getNotificationTypeCallback(): callable
+	{
+		return function(string $type_name, array $row_data) {
+			$notification_type = new quote(
+				$this->db,
+				$this->language,
+				$this->user,
+				$this->auth,
+				$this->phpbb_root_path,
+				$this->php_ext,
+				'phpbb_notifications'
+			);
+
+			$notification_type->set_user_loader($this->user_loader);
+			$notification_type->set_initial_data($row_data);
+
+			return $notification_type;
+		};
+	}
+
+	private function setupUserData(int $user_id): void
+	{
+		$this->user->data = [
+			'is_bot'        => false,
+			'user_type'     => USER_NORMAL,
+			'user_id'       => $user_id,
+			'user_options'  => 230271,
+		];
+	}
+
+	private function getExpectedResponse(): array
+	{
+		return [
+			'heading' => 'yourdomain.com',
+			'title' => 'Quoted by Guest in:',
+			'text' => '"Welcome to phpBB3"',
+			'url' => 'phpBB/viewtopic.php?p=1#p1',
+			'avatar' => ['src' => ''],
+		];
 	}
 
 	public function data_notification_exceptions(): array
@@ -181,29 +236,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 	public function test_get_user_notification()
 	{
-		global $cache;
-		$cache = $this->createMock(\phpbb\cache\service::class);
-		$cache->method('obtain_word_list')->willReturn([]);
-
-		$this->auth->method('acl_get')->willReturn(true);
-
-		$this->notification_manager->method('get_item_type_class')
-			->willReturnCallback(function(string $type_name, array $row_data) {
-				$notification_type = new quote(
-					$this->db,
-					$this->language,
-					$this->user,
-					$this->auth,
-					$this->phpbb_root_path,
-					$this->php_ext,
-					'phpbb_notifications'
-				);
-
-				$notification_type->set_user_loader($this->user_loader);
-				$notification_type->set_initial_data($row_data);
-
-				return $notification_type;
-			});
+		$this->setupCommonMocks();
 
 		$this->request->method('is_ajax')->willReturn(true);
 		$this->request->method('variable')
@@ -212,54 +245,18 @@ class controller_webpush_test extends \phpbb_database_test_case
 				['item_id', 0, false, request_interface::REQUEST, 1],
 				['type_id', 0, false, request_interface::REQUEST, 4],
 			]);
-		$this->user->data = [
-			'is_bot'		=> false,
-			'user_type'		=> USER_NORMAL,
-			'user_id'		=> 2,
-			'user_options'	=> 230271,
-		];
-		$this->user->lang = [
-			'GUEST'		=> 'Guest',
-		];
+		$this->setupUserData(2);
 
 		$json_response = $this->controller->notification();
 
 		$response_data = json_decode($json_response->getContent(), true);
 
-		$this->assertEquals([
-			'heading' => 'yourdomain.com',
-			'title' => 'Quoted by Guest in:',
-			'text' => '"Welcome to phpBB3"',
-			'url' => 'phpBB/viewtopic.php?p=1#p1',
-			'avatar' => ['src' => ''],
-		], $response_data);
+		$this->assertEquals($this->getExpectedResponse(), $response_data);
 	}
 
 	public function test_get_user_notification_anonymous()
 	{
-		global $cache;
-		$cache = $this->createMock(\phpbb\cache\service::class);
-		$cache->method('obtain_word_list')->willReturn([]);
-
-		$this->auth->method('acl_get')->willReturn(true);
-
-		$this->notification_manager->method('get_item_type_class')
-			->willReturnCallback(function(string $type_name, array $row_data) {
-				$notification_type = new quote(
-					$this->db,
-					$this->language,
-					$this->user,
-					$this->auth,
-					$this->phpbb_root_path,
-					$this->php_ext,
-					'phpbb_notifications'
-				);
-
-				$notification_type->set_user_loader($this->user_loader);
-				$notification_type->set_initial_data($row_data);
-
-				return $notification_type;
-			});
+		$this->setupCommonMocks();
 
 		$this->request->method('is_ajax')->willReturn(true);
 		$this->request->method('variable')
@@ -269,54 +266,18 @@ class controller_webpush_test extends \phpbb_database_test_case
 				['type_id', 0, false, request_interface::REQUEST, 4],
 				['user_id', 0, false, request_interface::REQUEST, 2],
 			]);
-		$this->user->data = [
-			'is_bot'		=> false,
-			'user_type'		=> USER_NORMAL,
-			'user_id'		=> ANONYMOUS,
-			'user_options'	=> 230271,
-		];
-		$this->user->lang = [
-			'GUEST'		=> 'Guest',
-		];
+		$this->setupUserData(ANONYMOUS);
 
 		$json_response = $this->controller->notification();
 
 		$response_data = json_decode($json_response->getContent(), true);
 
-		$this->assertEquals([
-			'heading' => 'yourdomain.com',
-			'title' => 'Quoted by Guest in:',
-			'text' => '"Welcome to phpBB3"',
-			'url' => 'phpBB/viewtopic.php?p=1#p1',
-			'avatar' => ['src' => ''],
-		], $response_data);
+		$this->assertEquals($this->getExpectedResponse(), $response_data);
 	}
 
 	public function test_get_user_notification_anonymous_invalid_token()
 	{
-		global $cache;
-		$cache = $this->createMock(\phpbb\cache\service::class);
-		$cache->method('obtain_word_list')->willReturn([]);
-
-		$this->auth->method('acl_get')->willReturn(true);
-
-		$this->notification_manager->method('get_item_type_class')
-			->willReturnCallback(function(string $type_name, array $row_data) {
-				$notification_type = new quote(
-					$this->db,
-					$this->language,
-					$this->user,
-					$this->auth,
-					$this->phpbb_root_path,
-					$this->php_ext,
-					'phpbb_notifications'
-				);
-
-				$notification_type->set_user_loader($this->user_loader);
-				$notification_type->set_initial_data($row_data);
-
-				return $notification_type;
-			});
+		$this->setupCommonMocks();
 
 		$this->request->method('is_ajax')->willReturn(true);
 		$this->request->method('variable')
@@ -326,15 +287,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 				['type_id', 0, false, request_interface::REQUEST, 4],
 				['user_id', 0, false, request_interface::REQUEST, 2],
 			]);
-		$this->user->data = [
-			'is_bot'		=> false,
-			'user_type'		=> USER_NORMAL,
-			'user_id'		=> ANONYMOUS,
-			'user_options'	=> 230271,
-		];
-		$this->user->lang = [
-			'GUEST'		=> 'Guest',
-		];
+		$this->setupUserData(ANONYMOUS);
 
 		$this->expectException(http_exception::class);
 		$this->expectExceptionMessage('NO_AUTH_OPERATION');
@@ -344,29 +297,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 	public function test_get_user_notification_legacy()
 	{
-		global $cache;
-		$cache = $this->createMock(\phpbb\cache\service::class);
-		$cache->method('obtain_word_list')->willReturn([]);
-
-		$this->auth->method('acl_get')->willReturn(true);
-
-		$this->notification_manager->method('get_item_type_class')
-			->willReturnCallback(function(string $type_name, array $row_data) {
-				$notification_type = new quote(
-					$this->db,
-					$this->language,
-					$this->user,
-					$this->auth,
-					$this->phpbb_root_path,
-					$this->php_ext,
-					'phpbb_notifications'
-				);
-
-				$notification_type->set_user_loader($this->user_loader);
-				$notification_type->set_initial_data($row_data);
-
-				return $notification_type;
-			});
+		$this->setupCommonMocks();
 
 		$this->request->method('is_ajax')->willReturn(true);
 		$this->request->method('variable')
@@ -375,29 +306,20 @@ class controller_webpush_test extends \phpbb_database_test_case
 				['item_id', 0, false, request_interface::REQUEST, 2],
 				['type_id', 0, false, request_interface::REQUEST, 4],
 			]);
-		$this->user->data = [
-			'is_bot'		=> false,
-			'user_type'		=> USER_NORMAL,
-			'user_id'		=> 2,
-			'user_options'	=> 230271,
-		];
-		$this->user->lang = [
-			'GUEST'		=> 'Guest',
-		];
+		$this->setupUserData(2);
 
 		$json_response = $this->controller->notification();
 
 		$response_data = json_decode($json_response->getContent(), true);
 
-		$this->assertEquals([
-			'heading' => 'yourdomain.com',
-			'title' => 'Quoted by Guest in:',
-			'text' => '"Welcome to phpBB3"',
-			'url' => 'phpBB/viewtopic.php?p=1#p1',
-			'avatar' => ['src' => ''],
-		], $response_data);
+		$this->assertEquals($this->getExpectedResponse(), $response_data);
 	}
 
+	/**
+	 * @throws SyntaxError
+	 * @throws RuntimeError
+	 * @throws LoaderError
+	 */
 	public function test_worker()
 	{
 		$this->template->method('render')->willReturn('rendered_content');
@@ -406,12 +328,16 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 		$response = $this->controller->worker();
 
-		$this->assertInstanceOf(Response::class, $response);
 		$this->assertEquals('text/javascript; charset=UTF-8', $response->headers->get('Content-Type'));
 		$this->assertEquals('rendered_content', $response->getContent());
 		$this->assertNull($response->headers->get('X-PHPBB-IS-BOT'));
 	}
 
+	/**
+	 * @throws RuntimeError
+	 * @throws SyntaxError
+	 * @throws LoaderError
+	 */
 	public function test_worker_bot()
 	{
 		$this->template->method('render')->willReturn('rendered_content');
@@ -424,6 +350,9 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals('yes', $response->headers->get('X-PHPBB-IS-BOT'));
 	}
 
+	/**
+	 * @throws \ReflectionException
+	 */
 	public function test_check_subscribe_requests_invalid_form_token()
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(false);
@@ -436,6 +365,9 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$check_subscribe_reflection->invoke($this->controller);
 	}
 
+	/**
+	 * @throws \ReflectionException
+	 */
 	public function test_check_subscribe_requests_anonymous_user()
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(true);
@@ -450,45 +382,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$check_subscribe_reflection->invoke($this->controller);
 	}
 
-	public function test_subscribe_success()
-	{
-		$this->form_helper->method('check_form_tokens')->willReturn(true);
-		$this->request->method('is_ajax')->willReturn(true);
-		$this->user->data['user_id'] = 2;
-		$this->user->data['is_bot'] = false;
-		$this->user->data['user_type'] = USER_NORMAL;
-
-		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
-		$symfony_request->method('get')->willReturn(json_encode([
-			'endpoint' => 'test_endpoint',
-			'expiration_time' => 0,
-			'keys' => ['p256dh' => 'test_p256dh', 'auth' => 'test_auth']
-		]));
-
-		$response = $this->controller->subscribe($symfony_request);
-
-		$this->assertInstanceOf(JsonResponse::class, $response);
-		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
-
-		// Get subscription data from database
-		$sql = 'SELECT *
-				FROM phpbb_wpn_push_subscriptions
-				WHERE user_id = 2';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-
-		$this->assertEquals([
-			'user_id' => '2',
-			'endpoint' => 'test_endpoint',
-			'p256dh' => 'test_p256dh',
-			'auth' => 'test_auth',
-			'expiration_time' => 0,
-			'subscription_id' => '1',
-		], $row);
-	}
-
-	public function test_unsubscribe_success()
+	public function test_sub_unsubscribe_success()
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(true);
 		$this->request->method('is_ajax')->willReturn(true);
@@ -533,8 +427,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 		// Get subscription data from database
 		$sql = 'SELECT *
-				FROM phpbb_wpn_push_subscriptions
-				WHERE user_id = 2';
+			FROM phpbb_wpn_push_subscriptions
+			WHERE user_id = 2';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);

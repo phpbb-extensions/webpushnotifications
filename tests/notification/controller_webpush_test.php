@@ -402,22 +402,14 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
 
-		// Get subscription data from database
-		$sql = 'SELECT *
-				FROM phpbb_wpn_push_subscriptions
-				WHERE user_id = 2';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-
 		$this->assertEquals([
 			'user_id' => '2',
 			'endpoint' => 'test_endpoint',
 			'p256dh' => 'test_p256dh',
 			'auth' => 'test_auth',
-			'expiration_time' => 0,
+			'expiration_time' => '0',
 			'subscription_id' => '1',
-		], $row);
+		], $this->get_subscription_data());
 
 		// Now unsubscribe
 		$response = $this->controller->unsubscribe($symfony_request);
@@ -425,14 +417,17 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
 
-		// Get subscription data from database
+		$this->assertEmpty($this->get_subscription_data());
+	}
+
+	private function get_subscription_data()
+	{
 		$sql = 'SELECT *
 			FROM phpbb_wpn_push_subscriptions
 			WHERE user_id = 2';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
-
-		$this->assertEmpty($row);
+		return $row;
 	}
 }

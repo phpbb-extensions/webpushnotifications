@@ -59,7 +59,7 @@ class listener_test extends \phpbb_database_test_case
 
 		global $phpbb_root_path, $phpEx, $user;
 
-		$db = $this->new_dbal();
+		$this->db = $this->new_dbal();
 
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$lang_loader->set_extension_manager(new \phpbb_mock_extension_manager($phpbb_root_path));
@@ -73,7 +73,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->user->data['user_form_salt'] = '';
 		$this->user->data['is_bot'] = false;
 		$this->user->data['user_type'] = USER_NORMAL;
-		$user_loader = new \phpbb\user_loader($db, $phpbb_root_path, $phpEx, 'phpbb_users');
+		$user_loader = new \phpbb\user_loader($this->db, $phpbb_root_path, $phpEx, 'phpbb_users');
 
 		$this->controller_helper = $this->getMockBuilder('\phpbb\controller\helper')
 			->disableOriginalConstructor()
@@ -109,7 +109,7 @@ class listener_test extends \phpbb_database_test_case
 
 		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
 			$this->config,
-			$db,
+			$this->db,
 			new \phpbb\log\dummy(),
 			$user_loader,
 			$this->user,
@@ -121,6 +121,29 @@ class listener_test extends \phpbb_database_test_case
 		);
 
 		$this->root_path = $phpbb_root_path;
+	}
+
+	/**
+	 * Remove entries from subscriptions table to avoid conflicts with other tests
+	 * that have fixtures with the same table name
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void
+	{
+		$sql_layer = $this->db->get_sql_layer();
+		$query = ($sql_layer === 'sqlite3')
+			? 'DELETE FROM phpbb_wpn_push_subscriptions'
+			: 'TRUNCATE TABLE phpbb_wpn_push_subscriptions';
+
+		$this->db->sql_query($query);
+
+		if ($sql_layer === 'postgres')
+		{
+			$this->db->sql_query('ALTER SEQUENCE phpbb_wpn_push_subscriptions_seq RESTART WITH 1');
+		}
+
+		parent::tearDown();
 	}
 
 	protected function set_listener()

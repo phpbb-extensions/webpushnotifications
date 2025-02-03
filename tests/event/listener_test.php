@@ -123,29 +123,6 @@ class listener_test extends \phpbb_database_test_case
 		$this->root_path = $phpbb_root_path;
 	}
 
-	/**
-	 * Remove entries from subscriptions table to avoid conflicts with other tests
-	 * that have fixtures with the same table name
-	 *
-	 * @return void
-	 */
-	protected function tearDown(): void
-	{
-		$sql_layer = $this->db->get_sql_layer();
-		$query = ($sql_layer === 'sqlite3')
-			? 'DELETE FROM phpbb_wpn_push_subscriptions'
-			: 'TRUNCATE TABLE phpbb_wpn_push_subscriptions';
-
-		$this->db->sql_query($query);
-
-		if ($sql_layer === 'postgres')
-		{
-			$this->db->sql_query('ALTER SEQUENCE phpbb_wpn_push_subscriptions_seq RESTART WITH 1');
-		}
-
-		parent::tearDown();
-	}
-
 	protected function set_listener()
 	{
 		$this->listener = new \phpbb\webpushnotifications\event\listener(

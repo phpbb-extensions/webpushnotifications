@@ -8,7 +8,7 @@
  *
  */
 
-namespace phpbb\webpushnotifications\tests\notification;
+namespace phpbb\webpushnotifications\tests\controller;
 
 use phpbb\exception\http_exception;
 use phpbb\notification\type\quote;

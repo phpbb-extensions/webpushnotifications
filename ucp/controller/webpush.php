@@ -122,13 +122,7 @@ class webpush
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');
 		}
 
-		$notification_data = $this->get_user_notifications();
-
-		// Decode and return data if everything is fine
-		$data = json_decode($notification_data, true);
-//		$data['url'] = isset($data['url']) ? $this->path_helper->update_web_root_path($data['url']) : '';
-
-		return new JsonResponse($data);
+		return new JsonResponse($this->get_user_notifications(), 200, [], true);
 	}
 
 	/**

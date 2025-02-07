@@ -122,13 +122,7 @@ class webpush
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'NO_AUTH_OPERATION');
 		}
 
-		$notification_data = $this->get_user_notifications();
-
-		// Decode and return data if everything is fine
-		$data = json_decode($notification_data, true);
-		$data['url'] = isset($data['url']) ? $this->path_helper->update_web_root_path($data['url']) : '';
-
-		return new JsonResponse($data);
+		return new JsonResponse($this->get_user_notifications(), 200, [], true);
 	}
 
 	/**
@@ -161,6 +155,11 @@ class webpush
 		$notification_data = $this->db->sql_fetchfield('push_data');
 		$this->db->sql_freeresult($result);
 
+		if (!$notification_data)
+		{
+			throw new http_exception(Response::HTTP_BAD_REQUEST, 'AJAX_ERROR_TEXT');
+		}
+
 		return $this->get_notification_data($notification_data);
 	}
 
@@ -187,6 +186,11 @@ class webpush
 			$result = $this->db->sql_query($sql);
 			$notification_row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
+
+			if (!isset($notification_row['push_data'], $notification_row['push_token']) || !$notification_row)
+			{
+				throw new http_exception(Response::HTTP_BAD_REQUEST, 'AJAX_ERROR_TEXT');
+			}
 
 			$notification_data = $notification_row['push_data'];
 			$push_token = $notification_row['push_token'];

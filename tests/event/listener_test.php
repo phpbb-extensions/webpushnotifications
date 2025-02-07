@@ -59,7 +59,7 @@ class listener_test extends \phpbb_database_test_case
 
 		global $phpbb_root_path, $phpEx, $user;
 
-		$db = $this->new_dbal();
+		$this->db = $this->new_dbal();
 
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$lang_loader->set_extension_manager(new \phpbb_mock_extension_manager($phpbb_root_path));
@@ -73,7 +73,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->user->data['user_form_salt'] = '';
 		$this->user->data['is_bot'] = false;
 		$this->user->data['user_type'] = USER_NORMAL;
-		$user_loader = new \phpbb\user_loader($db, $phpbb_root_path, $phpEx, 'phpbb_users');
+		$user_loader = new \phpbb\user_loader($this->db, $phpbb_root_path, $phpEx, 'phpbb_users');
 
 		$this->controller_helper = $this->getMockBuilder('\phpbb\controller\helper')
 			->disableOriginalConstructor()
@@ -109,7 +109,7 @@ class listener_test extends \phpbb_database_test_case
 
 		$this->notification_method_webpush = new \phpbb\webpushnotifications\notification\method\webpush(
 			$this->config,
-			$db,
+			$this->db,
 			new \phpbb\log\dummy(),
 			$user_loader,
 			$this->user,

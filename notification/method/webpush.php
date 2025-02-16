@@ -202,6 +202,11 @@ class webpush extends base implements extended_method_interface
 
 		// Load all the users we need
 		$notify_users = array_diff($user_ids, $banned_users);
+		if (empty($notify_users))
+		{
+			return;
+		}
+
 		$this->user_loader->load_users($notify_users, [USER_IGNORE]);
 
 		// Get subscriptions for users

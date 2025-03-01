@@ -328,9 +328,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],
@@ -379,9 +377,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],
@@ -425,9 +421,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],
@@ -477,9 +471,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],
@@ -534,7 +526,6 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		// Expire subscriptions for first user
 		if (count($expected_users))
 		{
-
 			$first_user_id = array_key_first($expected_users);
 			$first_user_subs = $subscription_info[$first_user_id];
 			unset($expected_delivered_users[$first_user_id]);
@@ -548,9 +539,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],
@@ -607,9 +596,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			'post_subject' => '',
 			'post_username' => '',
 			'forum_name' => '',
-		],
-
-			$post_data);
+		], $post_data);
 		$notification_options = [
 			'item_id'			=> $post_data['post_id'],
 			'item_parent_id'	=> $post_data['topic_id'],

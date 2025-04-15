@@ -351,12 +351,12 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "sqlite3"
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mcr.microsoft.com/mssql/server:2019-CU27-ubuntu-20.04"
                       db_alias: 'MSSQL 2019'
-                    - php: '7.2'
+                    - php: '7.3'
                       db: "mcr.microsoft.com/mssql/server:2022-CU13-ubuntu-22.04"
                       db_alias: 'MSSQL 2022'
 

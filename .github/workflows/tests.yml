@@ -202,11 +202,11 @@ jobs:
                   node-version: 20
             - name: Setup node dependencies
               run: npm ci
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup Extension
               run: composer install
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
@@ -328,11 +328,11 @@ jobs:
                   node-version: 20
             - name: Setup node dependencies
               run: npm ci
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup Extension
               run: composer install
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_
@@ -440,11 +440,11 @@ jobs:
                   node-version: 20
             - name: Setup node dependencies
               run: npm ci
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup Extension
               run: composer install
-              working-directory: ./phpBB3/phpBB/ext/phpbb/webpushnotifications
+              working-directory: ./phpBB3/phpBB/ext/$EXTNAME
 
             - name: Setup PHPUnit files
               run: mkdir -p phpBB/ext/$EXTNAME/.github && cp .github/phpunit* $_

@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.0.3 - 2025-05-20
+
+- Fixed issues where Safari would stop pushing notifications to a user after the first three.
+- Fixed attempts to notify banned users.
+- Fixed potential web root path issues in notification links.
+- Removed obsolete meta-tags for progressive web app functionality.
+
 ### 1.0.2 - 2025-01-04
 
 - Instead of blocking all bots, we now let reverse proxies know we detected a bot.
@@ -12,13 +19,13 @@
 
 ### 1.0.1 - 2024-09-30
 
-- Added FAQ section to phpBB's FAQ page to answer any questions users may have about web push notifications.
+- Added a FAQ section to phpBB's FAQ page to answer any questions users may have about web push notifications.
 - Fixed issues with Emoji not appearing correctly in push notifications.
 - Fixed possible issues with the URLs linking to PWA icons for the Web Manifest.
-- Fixed issues causing logged-out users to see console errors in their browsers.
-- Ensure short site name for PWA is valid and compatible with the Web Manifest.
+- Fixed the issues causing logged-out users to see console errors in their browsers.
+- Ensure the short site name for PWA is valid and compatible with the Web Manifest.
 - Will now check for required PHP modules during installation.
-- Various other under the hood improvements.
+- Various other under-the hood improvements.
 
 ### 1.0.0 - 2024-07-01
 
@@ -35,7 +42,7 @@
 
 ### 1.0.0-RC9 - 2024-06-16
 
-- The subscribe toggle in the notification dropdown has been optimized for better mobile usability.
+- The **subscribe** toggle in the notification dropdown has been optimized for better mobile usability.
 - Notifications missed by logged-out users will now be delivered once they log back in.
 - Users who are unable to subscribe due to previously denying notifications in their browser settings will now see an alert message.
 
@@ -53,7 +60,7 @@
 
 ### 1.0.0-RC6 - 2024-06-01
 
-- New: Added an enable push subscriptions toggle switch to the footer of the Notifications drop down.
+- New: Added an **enable push subscriptions** toggle switch to the footer of the Notifications drop down.
 - Fixed an issue where the Subscribe button was appearing on some UCP pages unexpectedly.
 - Fixed an issue where push notifications failed on Android devices using Firefox as their browser.
 - Requires phpBB 3.3.12 or newer.

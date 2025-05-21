@@ -1,7 +1,8 @@
 # Changelog
 
-### 1.0.3 - 2025-05-20
+### 1.0.3 - 2025-05-21
 
+- Fixed issues where opening an image attachment could lock you out of the UI while on a mobile device as a progressive web app.
 - Fixed issues where Safari would stop pushing notifications to a user after the first three.
 - Fixed attempts to notify banned users.
 - Fixed potential web root path issues in notification links.

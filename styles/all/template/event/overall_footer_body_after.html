@@ -1,0 +1,18 @@
+{# Disable opening attached images in Progressive Web Apps #}
+{% if S_VIEWTOPIC %}
+<script>
+	const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+		|| window.navigator.standalone === true;
+
+	if (isStandalone) {
+		document.querySelectorAll('a > img.postimage').forEach(img => {
+			const link = img.closest('a');
+			if (link) {
+				link.addEventListener('click', e => {
+					e.preventDefault();
+				});
+			}
+		});
+	}
+</script>
+{% endif %}

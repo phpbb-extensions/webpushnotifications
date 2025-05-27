@@ -145,7 +145,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		return [
 			'heading' => 'yourdomain.com',
 			'title' => 'Quoted by Guest in:',
-			'text' => '"Welcome to phpBB3"',
+			'text' => '"Welcome to phpBB"',
 			'url' => 'phpBB/viewtopic.php?p=1#p1',
 			'avatar' => ['src' => ''],
 		];

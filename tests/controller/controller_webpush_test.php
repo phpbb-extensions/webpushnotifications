@@ -242,7 +242,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->request->method('variable')
 			->willReturnMap([
 				['token', '', false, request_interface::REQUEST, 'foobar'],
-				['item_id', 0, false, request_interface::REQUEST, 1],
+				['item_id', 0, false, request_interface::REQUEST, 2],
 				['type_id', 0, false, request_interface::REQUEST, 4],
 			]);
 		$this->setupUserData(2);
@@ -262,7 +262,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->request->method('variable')
 			->willReturnMap([
 				['token', '', false, request_interface::REQUEST, '0ccf8fcd96a66297b77b66109cbe9870e1a6fa66e42b9bf36d1f2c7263240058'],
-				['item_id', 0, false, request_interface::REQUEST, 1],
+				['item_id', 0, false, request_interface::REQUEST, 2],
 				['type_id', 0, false, request_interface::REQUEST, 4],
 				['user_id', 0, false, request_interface::REQUEST, 2],
 			]);
@@ -283,7 +283,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->request->method('variable')
 			->willReturnMap([
 				['token', '', false, request_interface::REQUEST, '488c17afe4f18714c235b395e21b78df1c3d78bf1e13d0633ed9425d2eebf967'],
-				['item_id', 0, false, request_interface::REQUEST, 1],
+				['item_id', 0, false, request_interface::REQUEST, 2],
 				['type_id', 0, false, request_interface::REQUEST, 4],
 				['user_id', 0, false, request_interface::REQUEST, 2],
 			]);

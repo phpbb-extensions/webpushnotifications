@@ -15,14 +15,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class controller_manifest_test extends \phpbb_test_case
 {
 	protected $config;
-	protected $path_helper;
 	protected $user;
 	protected $manifest;
 
 	protected function setUp(): void
 	{
-		global $phpbb_root_path, $phpEx;
-		global $config, $user, $request, $symfony_request;
+		global $config, $user, $phpbb_root_path, $phpEx;
 
 		parent::setUp();
 
@@ -38,15 +36,8 @@ class controller_manifest_test extends \phpbb_test_case
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$language = new \phpbb\language\language($lang_loader);
 		$user = $this->user = new \phpbb\user($language, '\phpbb\datetime');
-		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
-		$request = $this->request = $this->createMock(\phpbb\request\request_interface::class);
-		$this->path_helper = new \phpbb\path_helper($symfony_request, new \phpbb\filesystem\filesystem(), $this->request, $phpbb_root_path, $phpEx);
 
-		$this->manifest = new \phpbb\webpushnotifications\controller\manifest(
-			$this->config,
-			$this->path_helper,
-			$this->user
-		);
+		$this->manifest = new \phpbb\webpushnotifications\controller\manifest($this->config, $this->user);
 	}
 
 	public function manifest_data()

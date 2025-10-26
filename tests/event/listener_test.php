@@ -95,11 +95,6 @@ class listener_test extends \phpbb_database_test_case
 			$this->user
 		);
 
-		$path_helper = $this->getMockBuilder('\phpbb\path_helper')
-			->disableOriginalConstructor()
-			->setMethods(array())
-			->getMock();
-
 		$this->notifications = $this->getMockBuilder('\phpbb\notification\manager')
 			->disableOriginalConstructor()
 			->getMock();
@@ -113,7 +108,6 @@ class listener_test extends \phpbb_database_test_case
 			new \phpbb\log\dummy(),
 			$user_loader,
 			$this->user,
-			$path_helper,
 			$phpbb_root_path,
 			$phpEx,
 			'phpbb_wpn_notification_push',

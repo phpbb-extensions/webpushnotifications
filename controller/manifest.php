@@ -11,7 +11,6 @@
 namespace phpbb\webpushnotifications\controller;
 
 use phpbb\config\config;
-use phpbb\path_helper;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,9 +20,6 @@ class manifest
 	/** @var config */
 	protected $config;
 
-	/** @var path_helper */
-	protected $path_helper;
-
 	/** @var user */
 	protected $user;
 
@@ -31,13 +27,11 @@ class manifest
 	 * Constructor for webpush controller
 	 *
 	 * @param config $config
-	 * @param path_helper $path_helper
 	 * @param user $user
 	 */
-	public function __construct(config $config, path_helper $path_helper, user $user)
+	public function __construct(config $config, user $user)
 	{
 		$this->config = $config;
-		$this->path_helper = $path_helper;
 		$this->user = $user;
 	}
 

@@ -33,7 +33,6 @@ services:
             - '@log'
             - '@user_loader'
             - '@user'
-            - '@path_helper'
             - '%core.root_path%'
             - '%core.php_ext%'
             - '%tables.phpbb.wpn.notification_push%'
@@ -62,5 +61,4 @@ services:
         class: phpbb\webpushnotifications\controller\manifest
         arguments:
             - '@config'
-            - '@path_helper'
             - '@user'

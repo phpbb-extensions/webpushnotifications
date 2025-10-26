@@ -52,26 +52,10 @@ class controller_manifest_test extends \phpbb_test_case
 	public function manifest_data()
 	{
 		return [
-			'using web root path' => [
+			'using board url root path' => [
 				[
 					'force_server_vars'	=> false,
 					'script_path'		=> '',
-					'sitename'			=> 'yourdomain.com',
-					'pwa_short_name'	=> 'yourdomain',
-				],
-				[
-					'name'		=> 'yourdomain.com',
-					'short_name'	=> 'yourdomain',
-					'display'		=> 'standalone',
-					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
-				],
-			],
-			'using script path' => [
-				[
-					'force_server_vars'	=> true,
-					'script_path'		=> '/',
 					'sitename'			=> 'yourdomain.com',
 					'pwa_short_name'	=> 'yourdomain',
 				],
@@ -84,6 +68,22 @@ class controller_manifest_test extends \phpbb_test_case
 					'scope'			=> '/',
 				],
 			],
+			'using script path' => [
+				[
+					'force_server_vars'	=> true,
+					'script_path'		=> '/foo/',
+					'sitename'			=> 'yourdomain.com',
+					'pwa_short_name'	=> 'yourdomain',
+				],
+				[
+					'name'		=> 'yourdomain.com',
+					'short_name'	=> 'yourdomain',
+					'display'		=> 'standalone',
+					'orientation'	=> 'portrait',
+					'start_url'		=> '/foo/',
+					'scope'			=> '/foo/',
+				],
+			],
 			'with shortname' => [
 				[
 					'sitename'			=> 'testdomain.com',
@@ -94,8 +94,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> 'testdomain',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 				],
 			],
 			'without shortname' => [
@@ -108,8 +108,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> 'testdomain.c',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 				],
 			],
 			'with icons' => [
@@ -124,8 +124,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> '',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 					'icons'			=> [
 						[
 							'src'	=> 'http://images/site_icons/foo_sm.png',

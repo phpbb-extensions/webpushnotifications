@@ -53,7 +53,7 @@ class manifest
 		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : (parse_url($board_url)['path'] ?? '');
 
 		// Ensure path ends with '/' for PWA scope
-		$scope = rtrim($board_path, '/') . '/';
+		$scope = rtrim($board_path, '/\\') . '/';
 		$start_url = $scope;
 
 		// Emoji fixer-uppers

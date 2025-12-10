@@ -130,6 +130,27 @@ function PhpbbWebpush() {
 			return;
 		}
 
+		// Check if this browser already has a subscription
+		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
+			.then(registration => {
+				if (typeof registration === 'undefined') {
+					showPopup(popup);
+					return;
+				}
+
+				registration.pushManager.getSubscription()
+					.then(subscription => {
+						if (!isValidSubscription(subscription)) {
+							showPopup(popup);
+						}
+					});
+			});
+	}
+
+	/**
+	 * Show popup with event handlers
+	 */
+	function showPopup(popup) {
 		setTimeout(() => {
 			popup.style.display = 'flex';
 		}, 1000);

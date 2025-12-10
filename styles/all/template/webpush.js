@@ -33,6 +33,9 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
+	/** @type {string} URL to decline popup */
+	let declinePopupUrl = '';
+
 	/**
 	 * Init function for phpBB Web Push
 	 * @type {array} options
@@ -41,6 +44,7 @@ function PhpbbWebpush() {
 		serviceWorkerUrl = options.serviceWorkerUrl;
 		subscribeUrl = options.subscribeUrl;
 		unsubscribeUrl = options.unsubscribeUrl;
+		declinePopupUrl = options.declinePopupUrl;
 		this.formTokens = options.formTokens;
 		subscriptions = options.subscriptions;
 		ajaxErrorTitle = options.ajaxErrorTitle;
@@ -62,6 +66,7 @@ function PhpbbWebpush() {
 					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
 
 					updateButtonState();
+					initPopupPrompt();
 				})
 				.catch(error => {
 					console.info(error);
@@ -114,6 +119,50 @@ function PhpbbWebpush() {
 						});
 				});
 		}
+	}
+
+	/**
+	 * Initialize popup prompt
+	 */
+	function initPopupPrompt() {
+		const popup = document.getElementById('wpn_popup_prompt');
+		if (!popup || Notification.permission === 'denied') {
+			return;
+		}
+
+		setTimeout(() => {
+			popup.style.display = 'flex';
+		}, 1000);
+
+		const allowBtn = document.getElementById('wpn_popup_allow');
+		const declineBtn = document.getElementById('wpn_popup_decline');
+
+		if (allowBtn) {
+			allowBtn.addEventListener('click', () => {
+				popup.style.display = 'none';
+				subscribeButtonHandler({ preventDefault: () => {} });
+			});
+		}
+
+		if (declineBtn) {
+			declineBtn.addEventListener('click', () => {
+				popup.style.display = 'none';
+				declinePopup();
+			});
+		}
+	}
+
+	/**
+	 * Send decline popup request
+	 */
+	function declinePopup() {
+		fetch(declinePopupUrl, {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+			},
+			body: getFormData({}),
+		}).catch(error => console.info(error));
 	}
 
 	/**
@@ -257,6 +306,10 @@ function PhpbbWebpush() {
 			setSubscriptionState(true);
 			if ('form_tokens' in response) {
 				updateFormTokens(response.form_tokens);
+			}
+			const popup = document.getElementById('wpn_popup_prompt');
+			if (popup) {
+				popup.style.display = 'none';
 			}
 		}
 	}

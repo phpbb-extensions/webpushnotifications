@@ -321,6 +321,11 @@ class webpush
 		]);
 		$this->db->sql_query($sql);
 
+		$sql = 'UPDATE ' . USERS_TABLE . '
+			SET user_wpn_popup_declined = 0
+			WHERE user_id = ' . (int) $this->user->id();
+		$this->db->sql_query($sql);
+
 		return new JsonResponse([
 			'success'		=> true,
 			'form_tokens'	=> $this->form_helper->get_form_tokens(self::FORM_TOKEN_UCP),
@@ -350,6 +355,23 @@ class webpush
 			'success'		=> true,
 			'form_tokens'	=> $this->form_helper->get_form_tokens(self::FORM_TOKEN_UCP),
 		]);
+	}
+
+	/**
+	 * Handle decline popup requests
+	 *
+	 * @return JsonResponse
+	 */
+	public function decline_popup(): JsonResponse
+	{
+		$this->check_subscribe_requests();
+
+		$sql = 'UPDATE ' . USERS_TABLE . '
+			SET user_wpn_popup_declined = 1
+			WHERE user_id = ' . (int) $this->user->id();
+		$this->db->sql_query($sql);
+
+		return new JsonResponse(['success' => true]);
 	}
 
 	/**

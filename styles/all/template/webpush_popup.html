@@ -1,0 +1,14 @@
+{% if S_WEBPUSH_POPUP_PROMPT %}
+<div id="wpn_popup_prompt" class="wpn-popup-overlay" style="display:none;">
+	<div class="wpn-popup-container">
+		<div class="wpn-popup-content">
+			<h3 class="wpn-popup-title">{{ lang('NOTIFY_WEBPUSH_POPUP_TITLE') }}</h3>
+			<p class="wpn-popup-message">{{ lang('NOTIFY_WEBPUSH_POPUP_MESSAGE') }}</p>
+			<div class="wpn-popup-buttons">
+				<button id="wpn_popup_allow" class="wpn-popup-btn wpn-popup-btn-allow">{{ lang('NOTIFY_WEBPUSH_POPUP_ALLOW') }}</button>
+				<button id="wpn_popup_decline" class="wpn-popup-btn wpn-popup-btn-decline">{{ lang('NOTIFY_WEBPUSH_POPUP_DECLINE') }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}

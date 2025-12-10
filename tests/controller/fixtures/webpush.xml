@@ -48,12 +48,14 @@
 		<column>user_permissions</column>
 		<column>user_sig</column>
 		<column>user_form_salt</column>
+		<column>user_wpn_popup_declined</column>
 		<row>
 			<value>1</value>
 			<value>Anonymous</value>
 			<value></value>
 			<value></value>
 			<value></value>
+			<value>0</value>
 		</row>
 		<row>
 			<value>2</value>
@@ -61,6 +63,7 @@
 			<value></value>
 			<value></value>
 			<value>sua0m6f0ektt1g9z</value>
+			<value>0</value>
 		</row>
 		<row>
 			<value>3</value>
@@ -68,6 +71,7 @@
 			<value></value>
 			<value></value>
 			<value>abcdef</value>
+			<value>0</value>
 		</row>
 	</table>
 </dataset>

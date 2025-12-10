@@ -49,4 +49,8 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Visit notifications settings to set your preferred push notifications.',
 	'NOTIFY_WEBPUSH_DENIED'			=> 'You have denied notifications from this site. To enable push notifications, allow notifications from this site in your browser settings.',
 	'NOTIFY_WEBPUSH_DISABLED'		=> 'Push notifications not supported',
+	'NOTIFY_WEBPUSH_POPUP_TITLE'	=> 'Enable Push Notifications?',
+	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'Stay updated with instant notifications for new replies, mentions, and more.',
+	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Allow',
+	'NOTIFY_WEBPUSH_POPUP_DECLINE'	=> 'Decline',
 ]);

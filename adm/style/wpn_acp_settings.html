@@ -39,6 +39,11 @@
 			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_method_enabled]" value="1" {% if S_WEBPUSH_METHOD_ENABLED %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
 				<label><input type="radio" class="radio" name="config[wpn_webpush_method_enabled]" value="0"{% if not S_WEBPUSH_METHOD_ENABLED %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
+		<dl>
+			<dt><label>{{ lang('WEBPUSH_POPUP_PROMPT') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_POPUP_PROMPT_EXPLAIN') }}</span></dt>
+			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_popup_prompt]" value="1" {% if S_WEBPUSH_POPUP_PROMPT %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="config[wpn_webpush_popup_prompt]" value="0"{% if not S_WEBPUSH_POPUP_PROMPT %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
+		</dl>
 	</fieldset>
 	<fieldset class="submit-buttons">
 		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">&nbsp;

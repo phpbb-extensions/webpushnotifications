@@ -33,9 +33,6 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
-	/** @type {string} URL to decline popup */
-	let declinePopupUrl = '';
-
 	/**
 	 * Init function for phpBB Web Push
 	 * @type {array} options
@@ -44,7 +41,6 @@ function PhpbbWebpush() {
 		serviceWorkerUrl = options.serviceWorkerUrl;
 		subscribeUrl = options.subscribeUrl;
 		unsubscribeUrl = options.unsubscribeUrl;
-		declinePopupUrl = options.declinePopupUrl;
 		this.formTokens = options.formTokens;
 		subscriptions = options.subscriptions;
 		ajaxErrorTitle = options.ajaxErrorTitle;
@@ -130,6 +126,11 @@ function PhpbbWebpush() {
 			return;
 		}
 
+		// Check if user declined on this browser
+		if (localStorage.getItem('wpn_popup_declined') === 'true') {
+			return;
+		}
+
 		// Check if this browser already has a subscription
 		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
 			.then(registration => {
@@ -168,22 +169,9 @@ function PhpbbWebpush() {
 		if (declineBtn) {
 			declineBtn.addEventListener('click', () => {
 				popup.style.display = 'none';
-				declinePopup();
+				localStorage.setItem('wpn_popup_declined', 'true');
 			});
 		}
-	}
-
-	/**
-	 * Send decline popup request
-	 */
-	function declinePopup() {
-		fetch(declinePopupUrl, {
-			method: 'POST',
-			headers: {
-				'X-Requested-With': 'XMLHttpRequest',
-			},
-			body: getFormData({}),
-		}).catch(error => console.info(error));
 	}
 
 	/**
@@ -328,6 +316,7 @@ function PhpbbWebpush() {
 			if ('form_tokens' in response) {
 				updateFormTokens(response.form_tokens);
 			}
+			localStorage.removeItem('wpn_popup_declined');
 			const popup = document.getElementById('wpn_popup_prompt');
 			if (popup) {
 				popup.style.display = 'none';

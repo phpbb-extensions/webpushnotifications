@@ -420,62 +420,6 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEmpty($this->get_subscription_data());
 	}
 
-	public function test_decline_popup_success()
-	{
-		$this->form_helper->method('check_form_tokens')->willReturn(true);
-		$this->request->method('is_ajax')->willReturn(true);
-		$this->user->data['user_id'] = 2;
-		$this->user->data['is_bot'] = false;
-		$this->user->data['user_type'] = USER_NORMAL;
-
-		$response = $this->controller->decline_popup();
-
-		$this->assertInstanceOf(JsonResponse::class, $response);
-		$this->assertEquals(['success' => true], json_decode($response->getContent(), true));
-
-		$sql = 'SELECT user_wpn_popup_declined FROM phpbb_users WHERE user_id = 2';
-		$result = $this->db->sql_query($sql);
-		$declined = $this->db->sql_fetchfield('user_wpn_popup_declined');
-		$this->db->sql_freeresult($result);
-
-		$this->assertEquals(1, $declined);
-	}
-
-	public function test_subscribe_clears_declined_status()
-	{
-		$this->form_helper->method('check_form_tokens')->willReturn(true);
-		$this->request->method('is_ajax')->willReturn(true);
-		$this->user->data['user_id'] = 2;
-		$this->user->data['is_bot'] = false;
-		$this->user->data['user_type'] = USER_NORMAL;
-
-		// First decline
-		$this->controller->decline_popup();
-
-		$sql = 'SELECT user_wpn_popup_declined FROM phpbb_users WHERE user_id = 2';
-		$result = $this->db->sql_query($sql);
-		$declined = $this->db->sql_fetchfield('user_wpn_popup_declined');
-		$this->db->sql_freeresult($result);
-		$this->assertEquals(1, $declined);
-
-		// Then subscribe
-		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
-		$symfony_request->method('get')->willReturn(json_encode([
-			'endpoint' => 'test_endpoint',
-			'expiration_time' => 0,
-			'keys' => ['p256dh' => 'test_p256dh', 'auth' => 'test_auth']
-		]));
-
-		$this->controller->subscribe($symfony_request);
-
-		// Check declined status is cleared
-		$sql = 'SELECT user_wpn_popup_declined FROM phpbb_users WHERE user_id = 2';
-		$result = $this->db->sql_query($sql);
-		$declined = $this->db->sql_fetchfield('user_wpn_popup_declined');
-		$this->db->sql_freeresult($result);
-		$this->assertEquals(0, $declined);
-	}
-
 	private function get_subscription_data()
 	{
 		$sql = 'SELECT *

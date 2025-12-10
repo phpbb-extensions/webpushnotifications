@@ -160,12 +160,6 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_MESSAGE', $crawler->filter('.wpn-popup-message')->text());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_ALLOW', $crawler->filter('#wpn_popup_allow')->text());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DECLINE', $crawler->filter('#wpn_popup_decline')->text());
-
-		// Test decline popup route exists
-		$this->add_lang('common');
-		self::request('POST', 'app.php/user/push/decline-popup', [], false);
-		$response = json_decode(self::get_content(), true);
-		$this->assertArrayHasKey('success', $response);
 	}
 
 	protected function set_acp_option($option, $value)

@@ -13,7 +13,3 @@ phpbb_webpushnotifications_ucp_push_subscribe_controller:
 phpbb_webpushnotifications_ucp_push_unsubscribe_controller:
     path: /push/unsubscribe
     defaults: { _controller: phpbb.wpn.ucp.controller.webpush:unsubscribe }
-
-phpbb_webpushnotifications_ucp_push_decline_popup_controller:
-    path: /push/decline-popup
-    defaults: { _controller: phpbb.wpn.ucp.controller.webpush:decline_popup }

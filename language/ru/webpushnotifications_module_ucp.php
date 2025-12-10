@@ -49,4 +49,8 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Посетите настройки уведомлений, чтобы установить предпочтительные типы браузерных уведомлений.',
 	'NOTIFY_WEBPUSH_DENIED'			=> 'Вы запретили браузерные уведомления для даного сайта. Для того, чтобы подписаться, необходимо их разрешить в настройках браузера.',
 	'NOTIFY_WEBPUSH_DISABLED'		=> 'Не поддерживается',
+	'NOTIFY_WEBPUSH_POPUP_TITLE'	=> 'Enable Push Notifications?',
+	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'Stay updated with instant notifications for new replies, mentions, and more.',
+	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Allow',
+	'NOTIFY_WEBPUSH_POPUP_DECLINE'	=> 'Decline',
 ]);

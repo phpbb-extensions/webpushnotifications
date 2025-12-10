@@ -53,36 +53,37 @@
 }
 
 .wpn-popup-overlay {
+	background: rgba(0, 0, 0, 0.5);
 	position: fixed;
+	z-index: 9999;
 	top: 0;
 	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
 	width: 100%;
 	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 9999;
-	display: flex;
-	align-items: flex-start;
-	justify-content: center;
 	padding-top: 20px;
 }
 
 .wpn-popup-container {
-	background: #fff;
+	background: #ffffff;
 	border-radius: 8px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-	max-width: 500px;
 	width: 90%;
+	max-width: 500px;
 	animation: wpnSlideDown 0.3s ease-out;
 }
 
 @keyframes wpnSlideDown {
 	from {
-		transform: translateY(-50px);
 		opacity: 0;
+		transform: translateY(-50px);
 	}
+
 	to {
-		transform: translateY(0);
 		opacity: 1;
+		transform: translateY(0);
 	}
 }
 
@@ -91,38 +92,38 @@
 }
 
 .wpn-popup-title {
-	margin: 0 0 12px;
 	font-size: 20px;
 	font-weight: 600;
-	color: #333;
+	color: #333333;
+	margin: 0 0 12px;
 }
 
 .wpn-popup-message {
-	margin: 0 0 20px;
 	font-size: 14px;
 	line-height: 1.5;
-	color: #666;
+	color: #666666;
+	margin: 0 0 20px;
 }
 
 .wpn-popup-buttons {
 	display: flex;
-	gap: 12px;
 	justify-content: flex-end;
+	gap: 12px;
 }
 
 .wpn-popup-btn {
-	padding: 10px 20px;
-	border: none;
-	border-radius: 4px;
 	font-size: 14px;
 	font-weight: 500;
+	border: none;
+	border-radius: 4px;
+	padding: 10px 20px;
 	cursor: pointer;
 	transition: all 0.2s;
 }
 
 .wpn-popup-btn-allow {
 	background: #0066cc;
-	color: #fff;
+	color: #ffffff;
 }
 
 .wpn-popup-btn-allow:hover {
@@ -131,7 +132,7 @@
 
 .wpn-popup-btn-decline {
 	background: #f0f0f0;
-	color: #666;
+	color: #666666;
 }
 
 .wpn-popup-btn-decline:hover {
@@ -142,6 +143,7 @@
 	.wpn-popup-buttons {
 		flex-direction: column-reverse;
 	}
+
 	.wpn-popup-btn {
 		width: 100%;
 	}

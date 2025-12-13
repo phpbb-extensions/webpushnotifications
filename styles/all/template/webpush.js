@@ -158,18 +158,30 @@ function PhpbbWebpush() {
 
 		const allowBtn = document.getElementById('wpn_popup_allow');
 		const declineBtn = document.getElementById('wpn_popup_decline');
+		const overlay = document.getElementById('wpn_popup_prompt');
 
 		if (allowBtn) {
-			allowBtn.addEventListener('click', () => {
+			allowBtn.addEventListener('click', (event) => {
+				event.stopPropagation();
 				popup.style.display = 'none';
 				subscribeButtonHandler({ preventDefault: () => {} });
 			});
 		}
 
 		if (declineBtn) {
-			declineBtn.addEventListener('click', () => {
+			declineBtn.addEventListener('click', (event) => {
+				event.stopPropagation();
 				popup.style.display = 'none';
 				setDeclined();
+			});
+		}
+
+		if (overlay) {
+			overlay.addEventListener('click', (event) => {
+				if (event.target === overlay) {
+					popup.style.display = 'none';
+					setDeclined();
+				}
 			});
 		}
 	}

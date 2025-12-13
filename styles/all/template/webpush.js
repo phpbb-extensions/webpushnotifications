@@ -127,7 +127,7 @@ function PhpbbWebpush() {
 		}
 
 		// Check if user declined on this browser
-		if (localStorage.getItem('wpn_popup_declined') === 'true') {
+		if (getDeclined() === 'true') {
 			return;
 		}
 
@@ -169,7 +169,7 @@ function PhpbbWebpush() {
 		if (declineBtn) {
 			declineBtn.addEventListener('click', () => {
 				popup.style.display = 'none';
-				localStorage.setItem('wpn_popup_declined', 'true');
+				setDeclined();
 			});
 		}
 	}
@@ -316,7 +316,7 @@ function PhpbbWebpush() {
 			if ('form_tokens' in response) {
 				updateFormTokens(response.form_tokens);
 			}
-			localStorage.removeItem('wpn_popup_declined');
+			resetDeclined();
 			const popup = document.getElementById('wpn_popup_prompt');
 			if (popup) {
 				popup.style.display = 'none';
@@ -365,6 +365,16 @@ function PhpbbWebpush() {
 		}
 
 		return outputArray;
+	}
+
+	function setDeclined() {
+		localStorage.setItem('wpn_popup_declined', 'true');
+	}
+	function getDeclined() {
+		return localStorage.getItem('wpn_popup_declined');
+	}
+	function resetDeclined() {
+		localStorage.removeItem('wpn_popup_declined');
 	}
 }
 

@@ -17,7 +17,6 @@ use phpbb\db\driver\driver_interface;
 use phpbb\log\log_interface;
 use phpbb\notification\method\base;
 use phpbb\notification\type\type_interface;
-use phpbb\path_helper;
 use phpbb\user;
 use phpbb\user_loader;
 use phpbb\webpushnotifications\form\form_helper;
@@ -43,9 +42,6 @@ class webpush extends base implements extended_method_interface
 
 	/** @var user */
 	protected $user;
-
-	/** @var path_helper */
-	protected $path_helper;
 
 	/** @var string */
 	protected $phpbb_root_path;
@@ -73,13 +69,12 @@ class webpush extends base implements extended_method_interface
 	 * @param log_interface $log
 	 * @param user_loader $user_loader
 	 * @param user $user
-	 * @param path_helper $path_helper
 	 * @param string $phpbb_root_path
 	 * @param string $php_ext
 	 * @param string $notification_webpush_table
 	 * @param string $push_subscriptions_table
 	 */
-	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user, path_helper $path_helper,
+	public function __construct(config $config, driver_interface $db, log_interface $log, user_loader $user_loader, user $user,
 								string $phpbb_root_path, string $php_ext, string $notification_webpush_table, string $push_subscriptions_table)
 	{
 		$this->config = $config;
@@ -87,7 +82,6 @@ class webpush extends base implements extended_method_interface
 		$this->log = $log;
 		$this->user_loader = $user_loader;
 		$this->user = $user;
-		$this->path_helper = $path_helper;
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
 		$this->notification_webpush_table = $notification_webpush_table;

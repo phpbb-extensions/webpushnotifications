@@ -15,14 +15,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class controller_manifest_test extends \phpbb_test_case
 {
 	protected $config;
-	protected $path_helper;
 	protected $user;
 	protected $manifest;
 
 	protected function setUp(): void
 	{
-		global $phpbb_root_path, $phpEx;
-		global $config, $user, $request, $symfony_request;
+		global $config, $user, $phpbb_root_path, $phpEx;
 
 		parent::setUp();
 
@@ -38,40 +36,17 @@ class controller_manifest_test extends \phpbb_test_case
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$language = new \phpbb\language\language($lang_loader);
 		$user = $this->user = new \phpbb\user($language, '\phpbb\datetime');
-		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
-		$request = $this->request = $this->createMock(\phpbb\request\request_interface::class);
-		$this->path_helper = new \phpbb\path_helper($symfony_request, new \phpbb\filesystem\filesystem(), $this->request, $phpbb_root_path, $phpEx);
 
-		$this->manifest = new \phpbb\webpushnotifications\controller\manifest(
-			$this->config,
-			$this->path_helper,
-			$this->user
-		);
+		$this->manifest = new \phpbb\webpushnotifications\controller\manifest($this->config, $this->user);
 	}
 
 	public function manifest_data()
 	{
 		return [
-			'using web root path' => [
+			'using board url root path' => [
 				[
 					'force_server_vars'	=> false,
 					'script_path'		=> '',
-					'sitename'			=> 'yourdomain.com',
-					'pwa_short_name'	=> 'yourdomain',
-				],
-				[
-					'name'		=> 'yourdomain.com',
-					'short_name'	=> 'yourdomain',
-					'display'		=> 'standalone',
-					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
-				],
-			],
-			'using script path' => [
-				[
-					'force_server_vars'	=> true,
-					'script_path'		=> '/',
 					'sitename'			=> 'yourdomain.com',
 					'pwa_short_name'	=> 'yourdomain',
 				],
@@ -84,6 +59,22 @@ class controller_manifest_test extends \phpbb_test_case
 					'scope'			=> '/',
 				],
 			],
+			'using script path' => [
+				[
+					'force_server_vars'	=> true,
+					'script_path'		=> '/foo/',
+					'sitename'			=> 'yourdomain.com',
+					'pwa_short_name'	=> 'yourdomain',
+				],
+				[
+					'name'		=> 'yourdomain.com',
+					'short_name'	=> 'yourdomain',
+					'display'		=> 'standalone',
+					'orientation'	=> 'portrait',
+					'start_url'		=> '/foo/',
+					'scope'			=> '/foo/',
+				],
+			],
 			'with shortname' => [
 				[
 					'sitename'			=> 'testdomain.com',
@@ -94,8 +85,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> 'testdomain',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 				],
 			],
 			'without shortname' => [
@@ -108,8 +99,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> 'testdomain.c',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 				],
 			],
 			'with icons' => [
@@ -124,8 +115,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'short_name'	=> '',
 					'display'		=> 'standalone',
 					'orientation'	=> 'portrait',
-					'start_url'		=> './phpBB/',
-					'scope'			=> './phpBB/',
+					'start_url'		=> '/',
+					'scope'			=> '/',
 					'icons'			=> [
 						[
 							'src'	=> 'http://images/site_icons/foo_sm.png',

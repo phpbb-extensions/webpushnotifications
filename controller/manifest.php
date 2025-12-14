@@ -11,7 +11,6 @@
 namespace phpbb\webpushnotifications\controller;
 
 use phpbb\config\config;
-use phpbb\path_helper;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,9 +20,6 @@ class manifest
 	/** @var config */
 	protected $config;
 
-	/** @var path_helper */
-	protected $path_helper;
-
 	/** @var user */
 	protected $user;
 
@@ -31,13 +27,11 @@ class manifest
 	 * Constructor for webpush controller
 	 *
 	 * @param config $config
-	 * @param path_helper $path_helper
 	 * @param user $user
 	 */
-	public function __construct(config $config, path_helper $path_helper, user $user)
+	public function __construct(config $config, user $user)
 	{
 		$this->config = $config;
-		$this->path_helper = $path_helper;
 		$this->user = $user;
 	}
 
@@ -48,20 +42,25 @@ class manifest
 	 */
 	public function handle(): JsonResponse
 	{
-		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : $this->path_helper->get_web_root_path();
+		// Get the board URL and extract the path component
 		$board_url = generate_board_url();
+		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : (parse_url($board_url)['path'] ?? '');
+
+		// Ensure path ends with '/' for PWA scope
+		$scope = rtrim($board_path, '/\\') . '/';
+		$start_url = $scope;
 
 		// Emoji fixer-uppers
 		$sitename = ext::decode_entities($this->config['sitename'], ENT_QUOTES);
-		$pwa_short_name = ext::decode_entities($this->config['pwa_short_name'], ENT_QUOTES);
+		$sitename_short = ext::decode_entities($this->config['pwa_short_name'], ENT_QUOTES);
 
 		$manifest = [
 			'name'			=> $sitename,
-			'short_name'	=> $pwa_short_name ?: utf8_substr($sitename, 0, 12),
+			'short_name'	=> $sitename_short ?: utf8_substr($sitename, 0, 12),
 			'display'		=> 'standalone',
 			'orientation'	=> 'portrait',
-			'start_url'		=> $board_path,
-			'scope'			=> $board_path,
+			'start_url'		=> $start_url,
+			'scope'			=> $scope,
 		];
 
 		if (!empty($this->config['pwa_icon_small']) && !empty($this->config['pwa_icon_large']))

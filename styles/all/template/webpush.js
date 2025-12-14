@@ -62,6 +62,7 @@ function PhpbbWebpush() {
 					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
 
 					updateButtonState();
+					initPopupPrompt();
 				})
 				.catch(error => {
 					console.info(error);
@@ -113,6 +114,75 @@ function PhpbbWebpush() {
 							}
 						});
 				});
+		}
+	}
+
+	/**
+	 * Initialize popup prompt
+	 */
+	function initPopupPrompt() {
+		const popup = document.getElementById('wpn_popup_prompt');
+		if (!popup || Notification.permission === 'denied') {
+			return;
+		}
+
+		// Check if user declined on this browser
+		if (getDeclined() === 'true') {
+			return;
+		}
+
+		// Check if this browser already has a subscription
+		navigator.serviceWorker.getRegistration(serviceWorkerUrl)
+			.then(registration => {
+				if (typeof registration === 'undefined') {
+					showPopup(popup);
+					return;
+				}
+
+				registration.pushManager.getSubscription()
+					.then(subscription => {
+						if (!isValidSubscription(subscription)) {
+							showPopup(popup);
+						}
+					});
+			});
+	}
+
+	/**
+	 * Show popup with event handlers
+	 */
+	function showPopup(popup) {
+		setTimeout(() => {
+			popup.style.display = 'flex';
+		}, 1000);
+
+		const allowBtn = document.getElementById('wpn_popup_allow');
+		const declineBtn = document.getElementById('wpn_popup_decline');
+		const overlay = document.getElementById('wpn_popup_prompt');
+
+		if (allowBtn) {
+			allowBtn.addEventListener('click', (event) => {
+				event.stopPropagation();
+				popup.style.display = 'none';
+				subscribeButtonHandler({ preventDefault: () => {} });
+			});
+		}
+
+		if (declineBtn) {
+			declineBtn.addEventListener('click', (event) => {
+				event.stopPropagation();
+				popup.style.display = 'none';
+				setDeclined();
+			});
+		}
+
+		if (overlay) {
+			overlay.addEventListener('click', (event) => {
+				if (event.target === overlay) {
+					popup.style.display = 'none';
+					setDeclined();
+				}
+			});
 		}
 	}
 
@@ -258,6 +328,11 @@ function PhpbbWebpush() {
 			if ('form_tokens' in response) {
 				updateFormTokens(response.form_tokens);
 			}
+			resetDeclined();
+			const popup = document.getElementById('wpn_popup_prompt');
+			if (popup) {
+				popup.style.display = 'none';
+			}
 		}
 	}
 
@@ -302,6 +377,16 @@ function PhpbbWebpush() {
 		}
 
 		return outputArray;
+	}
+
+	function setDeclined() {
+		localStorage.setItem('wpn_popup_declined', 'true');
+	}
+	function getDeclined() {
+		return localStorage.getItem('wpn_popup_declined');
+	}
+	function resetDeclined() {
+		localStorage.removeItem('wpn_popup_declined');
 	}
 }
 

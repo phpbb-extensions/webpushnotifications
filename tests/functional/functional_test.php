@@ -140,6 +140,28 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertEquals(json_encode($expected), self::get_content());
 	}
 
+	public function test_popup_prompt()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
+
+		// Assert popup is not present by default
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(0, $crawler->filter('#wpn_popup_prompt'));
+
+		$this->set_acp_option('wpn_webpush_popup_prompt', 1);
+
+		// Assert popup is present when enabled
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(1, $crawler->filter('#wpn_popup_prompt'));
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_TITLE', $crawler->filter('.wpn-popup-title')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_MESSAGE', $crawler->filter('.wpn-popup-message')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_ALLOW', $crawler->filter('#wpn_popup_allow')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DECLINE', $crawler->filter('#wpn_popup_decline')->text());
+	}
+
 	protected function set_acp_option($option, $value)
 	{
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);

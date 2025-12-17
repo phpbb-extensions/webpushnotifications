@@ -2,7 +2,13 @@
 <div id="wpn_popup_prompt" class="wpn-popup-overlay" style="display:none;">
 	<div class="wpn-popup-container">
 		<div class="wpn-popup-content">
-			<h3 class="wpn-popup-title">{{ lang('NOTIFY_WEBPUSH_POPUP_TITLE') }}</h3>
+			<h3 class="wpn-popup-title">
+				<span>{{ lang('NOTIFY_WEBPUSH_POPUP_TITLE') }}</span>
+				<span class="fa-stack fa-lg">
+					<i class="fa fa-circle fa-stack-2x"></i>
+					<i class="fa fa-bell fa-stack-1x fa-inverse"></i>
+				</span>
+			</h3>
 			<p class="wpn-popup-message">{{ lang('NOTIFY_WEBPUSH_POPUP_MESSAGE') }}</p>
 			<div class="wpn-popup-buttons">
 				<button id="wpn_popup_allow" class="wpn-popup-btn wpn-popup-btn-allow">{{ lang('NOTIFY_WEBPUSH_POPUP_ALLOW') }}</button>

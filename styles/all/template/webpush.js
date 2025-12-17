@@ -126,8 +126,8 @@ function PhpbbWebpush() {
 			return;
 		}
 
-		// Check if user declined on this browser
-		if (getDeclined() === 'true') {
+		// Check if user denied prompt on this browser
+		if (promptDenied.get() === 'true') {
 			return;
 		}
 
@@ -157,7 +157,7 @@ function PhpbbWebpush() {
 		}, 1000);
 
 		const allowBtn = document.getElementById('wpn_popup_allow');
-		const declineBtn = document.getElementById('wpn_popup_decline');
+		const denyBtn = document.getElementById('wpn_popup_deny');
 		const overlay = document.getElementById('wpn_popup_prompt');
 
 		if (allowBtn) {
@@ -168,11 +168,11 @@ function PhpbbWebpush() {
 			});
 		}
 
-		if (declineBtn) {
-			declineBtn.addEventListener('click', (event) => {
+		if (denyBtn) {
+			denyBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
 				popup.style.display = 'none';
-				setDeclined();
+				promptDenied.set();
 			});
 		}
 
@@ -180,7 +180,7 @@ function PhpbbWebpush() {
 			overlay.addEventListener('click', (event) => {
 				if (event.target === overlay) {
 					popup.style.display = 'none';
-					setDeclined();
+					promptDenied.set();
 				}
 			});
 		}
@@ -328,7 +328,7 @@ function PhpbbWebpush() {
 			if ('form_tokens' in response) {
 				updateFormTokens(response.form_tokens);
 			}
-			resetDeclined();
+			promptDenied.remove();
 			const popup = document.getElementById('wpn_popup_prompt');
 			if (popup) {
 				popup.style.display = 'none';
@@ -379,15 +379,21 @@ function PhpbbWebpush() {
 		return outputArray;
 	}
 
-	function setDeclined() {
-		localStorage.setItem('wpn_popup_declined', 'true');
-	}
-	function getDeclined() {
-		return localStorage.getItem('wpn_popup_declined');
-	}
-	function resetDeclined() {
-		localStorage.removeItem('wpn_popup_declined');
-	}
+	const promptDenied = {
+		key: 'wpn_popup_denied',
+
+		set() {
+			localStorage.setItem(this.key, 'true');
+		},
+
+		get() {
+			return localStorage.getItem(this.key);
+		},
+
+		remove() {
+			localStorage.removeItem(this.key);
+		}
+	};
 }
 
 function domReady(callBack) {

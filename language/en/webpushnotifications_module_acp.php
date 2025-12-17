@@ -51,6 +51,6 @@ $lang = array_merge($lang, [
 	'WEBPUSH_DROPDOWN_SUBSCRIBE'	=> 'Show web push settings in the notification dropdown',
 	'WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN'=> 'Show or hide the “Enable Web Push” toggle switch in the notification dropdown. This allows users to easily enable or disable push notifications from any page of the forum.',
 	'WEBPUSH_POPUP_PROMPT'			=> 'Show popup prompt for unsubscribed members',
-	'WEBPUSH_POPUP_PROMPT_EXPLAIN'	=> 'Display a popup message asking registered members if they want to receive push notifications. The popup will only appear to members who are not currently subscribed and have not previously declined.',
+	'WEBPUSH_POPUP_PROMPT_EXPLAIN'	=> 'Display a popup message asking registered members if they want to receive push notifications. The popup will only appear to members who are not currently subscribed and have not previously denied.',
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'This board is not using a secure SSL/HTTPS protocol, which is required for enabling web push notifications. Alternatively, the server environment might be misconfigured. Ensure that the <em>HTTPS</em> and <em>HEADER_CLIENT_PROTO</em> server environment variables are correctly configured.',
 ]);

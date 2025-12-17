@@ -130,12 +130,12 @@
 	background: #0052a3;
 }
 
-.wpn-popup-btn-decline {
+.wpn-popup-btn-deny {
 	background: #f0f0f0;
 	color: #666666;
 }
 
-.wpn-popup-btn-decline:hover {
+.wpn-popup-btn-deny:hover {
 	background: #e0e0e0;
 }
 

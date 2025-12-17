@@ -1,8 +1,8 @@
 /* global phpbb */
 
-'use strict';
-
 function PhpbbWebpush() {
+	'use strict';
+
 	/** @type {string} URL to service worker */
 	let serviceWorkerUrl = '';
 
@@ -164,7 +164,9 @@ function PhpbbWebpush() {
 			allowBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
 				popup.style.display = 'none';
-				subscribeButtonHandler({ preventDefault: () => {} });
+				subscribeButtonHandler({
+					preventDefault: () => {}
+				});
 			});
 		}
 
@@ -397,6 +399,8 @@ function PhpbbWebpush() {
 }
 
 function domReady(callBack) {
+	'use strict';
+
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', callBack);
 	} else {
@@ -407,6 +411,8 @@ function domReady(callBack) {
 phpbb.webpush = new PhpbbWebpush();
 
 domReady(() => {
+	'use strict';
+
 	/* global phpbbWebpushOptions */
 	phpbb.webpush.init(phpbbWebpushOptions);
 });

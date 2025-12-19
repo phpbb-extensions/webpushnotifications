@@ -101,12 +101,8 @@
 	margin: 0 0 12px;
 }
 
-.wpn-popup-title .fa-stack-2x {
+.wpn-popup-title > span > i:first-child {
 	color: #0066cc;
-}
-
-.wpn-popup-title .fa-stack-1x {
-	top: -1px;
 }
 
 .wpn-popup-message {

@@ -52,5 +52,5 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_POPUP_TITLE'	=> 'Allow browser notifications?',
 	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'We would like to send you browser notifications for replies, private messages, and relevant forum activity. Optional — you can manage these settings at any time.',
 	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Allow',
-	'NOTIFY_WEBPUSH_POPUP_DECLINE'	=> 'Decline',
+	'NOTIFY_WEBPUSH_POPUP_DENY'		=> 'Deny',
 ]);

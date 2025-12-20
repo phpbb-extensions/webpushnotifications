@@ -159,7 +159,7 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_TITLE', $crawler->filter('.wpn-popup-title')->text());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_MESSAGE', $crawler->filter('.wpn-popup-message')->text());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_ALLOW', $crawler->filter('#wpn_popup_allow')->text());
-		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DECLINE', $crawler->filter('#wpn_popup_decline')->text());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DENY', $crawler->filter('#wpn_popup_deny')->text());
 	}
 
 	protected function set_acp_option($option, $value)

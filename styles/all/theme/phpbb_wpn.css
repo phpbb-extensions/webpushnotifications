@@ -95,7 +95,18 @@
 	font-size: 18px;
 	font-weight: 600;
 	color: #333333;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin: 0 0 12px;
+}
+
+.wpn-popup-title .fa-stack-2x {
+	color: #0066cc;
+}
+
+.wpn-popup-title .fa-stack-1x {
+	top: -1px;
 }
 
 .wpn-popup-message {
@@ -130,12 +141,12 @@
 	background: #0052a3;
 }
 
-.wpn-popup-btn-decline {
+.wpn-popup-btn-deny {
 	background: #f0f0f0;
 	color: #666666;
 }
 
-.wpn-popup-btn-decline:hover {
+.wpn-popup-btn-deny:hover {
 	background: #e0e0e0;
 }
 

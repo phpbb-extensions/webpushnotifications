@@ -280,7 +280,7 @@ function PhpbbWebpush() {
 				});
 		} catch (error) {
 			console.error('Push subscription error:', error);
-			phpbb.alert(subscribeButton.getAttribute('data-l-err'), subscribeButton.getAttribute('data-l-msg'));
+			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-disabled-msg'));
 		}
 	}
 

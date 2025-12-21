@@ -237,6 +237,8 @@ function PhpbbWebpush() {
 	async function subscribeButtonHandler(event) {
 		event.preventDefault();
 
+		subscribeButton.addEventListener('click', subscribeButtonHandler);
+
 		try {
 			// Prevent the user from clicking the subscribe button multiple times.
 			const result = await Notification.requestPermission();

@@ -281,6 +281,11 @@ function PhpbbWebpush() {
 					phpbb.alert(ajaxErrorTitle, error);
 				});
 		} catch (error) {
+			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
+			const popup = document.getElementById('wpn_popup_prompt');
+			if (popup) {
+				popup.style.display = 'none';
+			}
 			console.error('Push subscription error:', error);
 			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-disabled-msg'));
 		}

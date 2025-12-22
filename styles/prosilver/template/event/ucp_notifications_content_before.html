@@ -5,7 +5,7 @@
 				<dl>
 					<dt><label for="subscribe_webpush">{{ lang('NOTIFY_WEBPUSH_NOTIFICATIONS') ~ lang('COLON') }}</label></dt>
 					<dd>
-						<input id="subscribe_webpush" type="submit" name="subscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_ENABLE') }}" class="wpn button1 button button-form" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED') }}">
+						<input id="subscribe_webpush" type="submit" name="subscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_ENABLE') }}" class="wpn button1 button button-form" data-l-err="{{ lang('INFORMATION')|e('html_attr') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED')|e('html_attr') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED')|e('html_attr') }}">
 						<input id="unsubscribe_webpush" type="submit" name="unsubscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_DISABLE') }}" class="wpn button1 button button-form hidden">
 						<br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span>
 					</dd>

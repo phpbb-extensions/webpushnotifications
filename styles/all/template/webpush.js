@@ -90,7 +90,7 @@ function PhpbbWebpush() {
 		}
 
 		if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
-			subscribeButton.value = subscribeButton.getAttribute('data-disabled-msg');
+			subscribeButton.value = subscribeButton.getAttribute('data-l-unsupported');
 		}
 	}
 
@@ -164,8 +164,8 @@ function PhpbbWebpush() {
 			allowBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
 				popup.style.display = 'none';
-				subscribeButtonHandler({
-					preventDefault: () => {}
+				subscribeButtonHandler(event).catch(error => {
+					console.error('Subscription handler error:', error);
 				});
 			});
 		}
@@ -237,48 +237,60 @@ function PhpbbWebpush() {
 	async function subscribeButtonHandler(event) {
 		event.preventDefault();
 
-		subscribeButton.addEventListener('click', subscribeButtonHandler);
+		subscribeButton.removeEventListener('click', subscribeButtonHandler);
 
-		// Prevent the user from clicking the subscribe button multiple times.
-		const result = await Notification.requestPermission();
-		if (result === 'denied') {
-			phpbb.alert(subscribeButton.getAttribute('data-l-err'), subscribeButton.getAttribute('data-l-msg'));
-			return;
-		}
-
-		const registration = await navigator.serviceWorker.getRegistration(serviceWorkerUrl);
-
-		// We might already have a subscription that is unknown to this instance of phpBB.
-		// Unsubscribe before trying to subscribe again.
-		if (typeof registration !== 'undefined') {
-			const subscribed = await registration.pushManager.getSubscription();
-			if (subscribed) {
-				await subscribed.unsubscribe();
+		try {
+			// Prevent the user from clicking the subscribe button multiple times.
+			const result = await Notification.requestPermission();
+			if (result === 'denied') {
+				phpbb.alert(subscribeButton.getAttribute('data-l-err'), subscribeButton.getAttribute('data-l-msg'));
+				return;
 			}
-		}
 
-		const newSubscription = await registration.pushManager.subscribe({
-			userVisibleOnly: true,
-			applicationServerKey: urlB64ToUint8Array(vapidPublicKey),
-		});
+			const registration = await navigator.serviceWorker.getRegistration(serviceWorkerUrl);
 
-		const loadingIndicator = phpbb.loadingIndicator();
-		fetch(subscribeUrl, {
-			method: 'POST',
-			headers: {
-				'X-Requested-With': 'XMLHttpRequest',
-			},
-			body: getFormData(newSubscription),
-		})
-			.then(response => {
-				loadingIndicator.fadeOut(phpbb.alertTime);
-				return response.json();
-			})
-			.then(handleSubscribe)
-			.catch(error => {
-				loadingIndicator.fadeOut(phpbb.alertTime);
-				phpbb.alert(ajaxErrorTitle, error);
+			// We might already have a subscription that is unknown to this instance of phpBB.
+			// Unsubscribe before trying to subscribe again.
+			if (typeof registration !== 'undefined') {
+				const subscribed = await registration.pushManager.getSubscription();
+				if (subscribed) {
+					await subscribed.unsubscribe();
+				}
+			}
+
+			const newSubscription = await registration.pushManager.subscribe({
+				userVisibleOnly: true,
+				applicationServerKey: urlB64ToUint8Array(vapidPublicKey),
 			});
+
+			const loadingIndicator = phpbb.loadingIndicator();
+			fetch(subscribeUrl, {
+				method: 'POST',
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+				},
+				body: getFormData(newSubscription),
+			})
+				.then(response => {
+					loadingIndicator.fadeOut(phpbb.alertTime);
+					return response.json();
+				})
+				.then(handleSubscribe)
+				.catch(error => {
+					loadingIndicator.fadeOut(phpbb.alertTime);
+					phpbb.alert(ajaxErrorTitle, error);
+				});
+		} catch (error) {
+			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
+			const popup = document.getElementById('wpn_popup_prompt');
+			if (popup) {
+				popup.style.display = 'none';
+			}
+			console.error('Push subscription error:', error);
+			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
+		} finally {
+			subscribeButton.addEventListener('click', subscribeButtonHandler);
+		}
 	}
 
 	/**

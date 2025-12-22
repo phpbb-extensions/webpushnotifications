@@ -90,7 +90,7 @@ function PhpbbWebpush() {
 		}
 
 		if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
-			subscribeButton.value = subscribeButton.getAttribute('data-disabled-msg');
+			subscribeButton.value = subscribeButton.getAttribute('data-l-unsupported');
 		}
 	}
 
@@ -287,7 +287,7 @@ function PhpbbWebpush() {
 				popup.style.display = 'none';
 			}
 			console.error('Push subscription error:', error);
-			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-disabled-msg'));
+			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
 		} finally {
 			subscribeButton.addEventListener('click', subscribeButtonHandler);
 		}

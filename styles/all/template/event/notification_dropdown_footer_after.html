@@ -1,7 +1,7 @@
 {% if NOTIFICATIONS_WEBPUSH_ENABLE and notification_types is not defined %}
 	<div class="wpn-notification-dropdown-footer" title="{{ lang('NOTIFY_WEBPUSH_DROPDOWN_TITLE') }}">
 		<span class="ellipsis-text">{{ lang('NOTIFY_WEBPUSH_ENABLE_SLIDER') ~ lang('COLON') }}</span>
-		<button id="subscribe_webpush" name="subscribe_webpush" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}" data-disabled-msg="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED') }}">
+		<button id="subscribe_webpush" name="subscribe_webpush" data-l-err="{{ lang('INFORMATION') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED') }}">
 			<i class="icon fa-toggle-off fa-fw icon-lightgray" aria-hidden="true" title="{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}"><span class="sr-only">{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}</span></i>
 		</button>
 		<button id="unsubscribe_webpush" name="unsubscribe_webpush" class="hidden">

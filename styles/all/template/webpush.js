@@ -33,6 +33,9 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
+	/** @type {function} Escape key handler for popup */
+	let popupEscapeHandler;
+
 	/**
 	 * Init function for phpBB Web Push
 	 * @type {array} options
@@ -163,7 +166,7 @@ function PhpbbWebpush() {
 		if (allowBtn) {
 			allowBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				subscribeButtonHandler(event).catch(error => {
 					console.error('Subscription handler error:', error);
 				});
@@ -173,7 +176,7 @@ function PhpbbWebpush() {
 		if (denyBtn) {
 			denyBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				promptDenied.set();
 			});
 		}
@@ -181,11 +184,32 @@ function PhpbbWebpush() {
 		if (overlay) {
 			overlay.addEventListener('click', (event) => {
 				if (event.target === overlay) {
-					popup.style.display = 'none';
+					hidePopup(popup);
 					promptDenied.set();
 				}
 			});
+
+			popupEscapeHandler = (event) => {
+				if (event.key === 'Escape') {
+					hidePopup(popup);
+					promptDenied.set();
+				}
+			};
+
+			document.addEventListener('keydown', popupEscapeHandler);
 		}
+	}
+
+	/**
+	 * Hide popup
+	 * @param popup
+	 */
+	function hidePopup(popup) {
+		if (popup) {
+			popup.style.display = 'none';
+		}
+		document.removeEventListener('keydown', popupEscapeHandler);
+		popupEscapeHandler = null;
 	}
 
 	/**
@@ -282,10 +306,7 @@ function PhpbbWebpush() {
 				});
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 			console.error('Push subscription error:', error);
 			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
 		} finally {
@@ -343,10 +364,7 @@ function PhpbbWebpush() {
 				updateFormTokens(response.form_tokens);
 			}
 			promptDenied.remove();
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 		}
 	}
 

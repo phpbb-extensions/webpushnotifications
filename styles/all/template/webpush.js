@@ -33,6 +33,9 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
+	/** @type {function} Escape key handler for popup */
+	let popupEscapeHandler;
+
 	/**
 	 * Init function for phpBB Web Push
 	 * @type {array} options
@@ -185,6 +188,15 @@ function PhpbbWebpush() {
 					promptDenied.set();
 				}
 			});
+
+			popupEscapeHandler = (event) => {
+				if (event.key === 'Escape') {
+					hidePopup(popup);
+					promptDenied.set();
+				}
+			};
+
+			document.addEventListener('keydown', popupEscapeHandler);
 		}
 	}
 
@@ -196,6 +208,8 @@ function PhpbbWebpush() {
 		if (popup) {
 			popup.style.display = 'none';
 		}
+		document.removeEventListener('keydown', popupEscapeHandler);
+		popupEscapeHandler = null;
 	}
 
 	/**

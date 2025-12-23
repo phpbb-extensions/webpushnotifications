@@ -163,7 +163,7 @@ function PhpbbWebpush() {
 		if (allowBtn) {
 			allowBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				subscribeButtonHandler(event).catch(error => {
 					console.error('Subscription handler error:', error);
 				});
@@ -173,7 +173,7 @@ function PhpbbWebpush() {
 		if (denyBtn) {
 			denyBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				promptDenied.set();
 			});
 		}
@@ -181,10 +181,20 @@ function PhpbbWebpush() {
 		if (overlay) {
 			overlay.addEventListener('click', (event) => {
 				if (event.target === overlay) {
-					popup.style.display = 'none';
+					hidePopup(popup);
 					promptDenied.set();
 				}
 			});
+		}
+	}
+
+	/**
+	 * Hide popup
+	 * @param popup
+	 */
+	function hidePopup(popup) {
+		if (popup) {
+			popup.style.display = 'none';
 		}
 	}
 
@@ -282,10 +292,7 @@ function PhpbbWebpush() {
 				});
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 			console.error('Push subscription error:', error);
 			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
 		} finally {
@@ -343,10 +350,7 @@ function PhpbbWebpush() {
 				updateFormTokens(response.form_tokens);
 			}
 			promptDenied.remove();
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 		}
 	}
 

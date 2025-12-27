@@ -21,22 +21,26 @@ self.addEventListener('push', event => {
 		return;
 	}
 
-	let itemId = 0;
-	let typeId = 0;
-	let userId = 0;
-	let notificationVersion = 0;
-	let pushToken = '';
+	let pushData;
 	try {
-		const notificationData = event.data.json();
-		itemId = notificationData.item_id;
-		typeId = notificationData.type_id;
-		userId = notificationData.user_id;
-		notificationVersion = parseInt(notificationData.version, 10);
-		pushToken = notificationData.token;
+		pushData = event.data.json();
 	} catch {
 		event.waitUntil(self.registration.showNotification(event.data.text()));
 		return;
 	}
+
+	// Handle dismiss action
+	if (pushData.action === 'dismiss') {
+		event.waitUntil(handleDismissNotifications(pushData.notifications));
+		return;
+	}
+
+	// Handle regular notification display
+	let itemId = pushData.item_id || 0;
+	let typeId = pushData.type_id || 0;
+	let userId = pushData.user_id || 0;
+	let notificationVersion = parseInt(pushData.version, 10) || 0;
+	let pushToken = pushData.token || '';
 
 	event.waitUntil((async () => {
 		const getNotificationUrl = '{{ U_WEBPUSH_GET_NOTIFICATION }}';
@@ -65,10 +69,12 @@ self.addEventListener('push', event => {
 			const responseData = await response.json();
 
 			const responseBody = responseData.title + '\n' + responseData.text;
+			const notificationTag = typeId + '_' + itemId;
 			const options = {
 				body: responseBody,
 				data: responseData,
 				icon: responseData.avatar.src,
+				tag: notificationTag,
 			};
 
 			await self.registration.showNotification(responseData.heading, options);
@@ -87,3 +93,30 @@ self.addEventListener('notificationclick', event => {
 		event.waitUntil(self.clients.openWindow(event.notification.data.url));
 	}
 });
+
+/**
+ * Handle dismiss notifications pushed from the server
+ *
+ * @param {Array} notifications Array of notifications to dismiss
+ * @returns {Promise<void>}
+ */
+async function handleDismissNotifications(notifications) {
+	if (!notifications || !Array.isArray(notifications) || notifications.length === 0) {
+		return;
+	}
+
+	try {
+		// Close each notification by its tag
+		for (const dismissed of notifications) {
+			const tag = dismissed.type_id + '_' + dismissed.item_id;
+
+			// Get and close notifications with this specific tag
+			const matchingNotifications = await self.registration.getNotifications({ tag: tag });
+			for (const notification of matchingNotifications) {
+				notification.close();
+			}
+		}
+	} catch (e) {
+		console.error('Error dismissing notifications:', e);
+	}
+}

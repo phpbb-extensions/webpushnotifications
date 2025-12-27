@@ -310,6 +310,47 @@ class webpush extends base implements extended_method_interface
 	*/
 	public function mark_notifications($notification_type_id, $item_id, $user_id, $time = false, $mark_read = true)
 	{
+		// Send dismiss push messages BEFORE deleting to close the browser notifications
+		// This is called by the notification manager when phpBB marks notifications as read
+		// (e.g., viewing a PM, viewing a topic, clicking "mark all read", etc.)
+		if ($notification_type_id !== false && $item_id !== false && $user_id !== false)
+		{
+			// When item_id and user_id are specific, send dismiss for each notification
+			// Arrays are typically same-length parallel arrays or single notification type with specific item
+			$type_ids = is_array($notification_type_id) ? $notification_type_id : [$notification_type_id];
+			$item_ids = is_array($item_id) ? $item_id : [$item_id];
+			$user_ids = is_array($user_id) ? $user_id : [$user_id];
+
+			// Most common case: single notification (single type, item, user)
+			if (count($type_ids) === 1 && count($item_ids) === 1 && count($user_ids) === 1)
+			{
+				$this->dismiss_using_webpush($type_ids[0], $item_ids[0], $user_ids[0]);
+			}
+			// Parallel arrays case: matching length arrays
+			else if (count($type_ids) === count($item_ids) && count($item_ids) === count($user_ids))
+			{
+				for ($i = 0, $iMax = count($type_ids); $i < $iMax; $i++)
+				{
+					$this->dismiss_using_webpush($type_ids[$i], $item_ids[$i], $user_ids[$i]);
+				}
+			}
+			// Mixed case: iterate combinations (rare but handle it)
+			else
+			{
+				foreach ($type_ids as $type)
+				{
+					foreach ($item_ids as $iid)
+					{
+						foreach ($user_ids as $uid)
+						{
+							$this->dismiss_using_webpush($type, $iid, $uid);
+						}
+					}
+				}
+			}
+		}
+
+		// Delete the notifications from our table
 		$sql = 'DELETE FROM ' . $this->notification_webpush_table . '
 			WHERE ' . ($notification_type_id !== false ? $this->db->sql_in_set('notification_type_id', is_array($notification_type_id) ? $notification_type_id : [$notification_type_id]) : '1=1') .
 			($user_id !== false ? ' AND ' . $this->db->sql_in_set('user_id', $user_id) : '') .
@@ -322,6 +363,24 @@ class webpush extends base implements extended_method_interface
 	*/
 	public function mark_notifications_by_parent($notification_type_id, $item_parent_id, $user_id, $time = false, $mark_read = true)
 	{
+		// Send dismiss push messages BEFORE deleting
+		// Query needed because service worker uses item_id (not item_parent_id) to match notification tags
+		if ($notification_type_id !== false && $user_id !== false && $item_parent_id !== false)
+		{
+			$sql = 'SELECT notification_type_id, item_id, user_id
+				FROM ' . $this->notification_webpush_table . '
+				WHERE ' . $this->db->sql_in_set('notification_type_id', is_array($notification_type_id) ? $notification_type_id : [$notification_type_id]) .
+				' AND ' . $this->db->sql_in_set('user_id', is_array($user_id) ? $user_id : [$user_id]) .
+				' AND ' . $this->db->sql_in_set('item_parent_id', is_array($item_parent_id) ? $item_parent_id : [$item_parent_id], false, true);
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$this->dismiss_using_webpush($row['notification_type_id'], $row['item_id'], $row['user_id']);
+			}
+			$this->db->sql_freeresult($result);
+		}
+
+		// Delete the notifications from our table
 		$sql = 'DELETE FROM ' . $this->notification_webpush_table . '
 			WHERE ' . ($notification_type_id !== false ? $this->db->sql_in_set('notification_type_id', is_array($notification_type_id) ? $notification_type_id : [$notification_type_id]) : '1=1') .
 			($user_id !== false ? ' AND ' . $this->db->sql_in_set('user_id', $user_id) : '') .
@@ -491,6 +550,77 @@ class webpush extends base implements extended_method_interface
 			{
 				// This shouldn't happen since we won't pass padding length outside limits
 			}
+		}
+	}
+
+	/**
+	 * Send dismiss message via Web Push to close a browser notification
+	 *
+	 * @param int $notification_type_id Notification type ID
+	 * @param int $item_id Item ID
+	 * @param int $user_id User ID
+	 * @return void
+	 */
+	protected function dismiss_using_webpush(int $notification_type_id, int $item_id, int $user_id): void
+	{
+		// Get user subscriptions
+		$user_subscription_map = $this->get_user_subscription_map([$user_id]);
+		$user_subscriptions = $user_subscription_map[$user_id] ?? [];
+
+		if (empty($user_subscriptions))
+		{
+			return;
+		}
+
+		$auth = [
+			'VAPID' => [
+				'subject' => generate_board_url(false),
+				'publicKey' => $this->config['wpn_webpush_vapid_public'],
+				'privateKey' => $this->config['wpn_webpush_vapid_private'],
+			],
+		];
+
+		$web_push = new \Minishlink\WebPush\WebPush($auth);
+
+		// Create dismiss message
+		$data = [
+			'action'		=> 'dismiss',
+			'notifications'	=> [[
+				'type_id' => $notification_type_id,
+				'item_id' => $item_id,
+			]],
+		];
+		$json_data = json_encode($data);
+
+		// Send dismiss message to all user's subscriptions
+		foreach ($user_subscriptions as $subscription)
+		{
+			try
+			{
+				$this->set_endpoint_padding($web_push, $subscription['endpoint']);
+				$push_subscription = Subscription::create([
+					'endpoint'	=> $subscription['endpoint'],
+					'keys'		=> [
+						'p256dh'	=> $subscription['p256dh'],
+						'auth'		=> $subscription['auth'],
+					],
+				]);
+				$web_push->queueNotification($push_subscription, $json_data);
+			}
+			catch (\ErrorException $exception)
+			{
+				// Ignore - dismiss is best-effort
+			}
+		}
+
+		// Flush and ignore any errors - dismiss messages are best-effort
+		try
+		{
+			$web_push->flush();
+		}
+		catch (\ErrorException $exception)
+		{
+			// Ignore errors
 		}
 	}
 }

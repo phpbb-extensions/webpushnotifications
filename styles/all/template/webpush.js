@@ -33,6 +33,12 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
+	/** @type {HTMLElement} Toggle popup button */
+	let togglePopupButton;
+
+	/** @type {string} URL to toggle popup prompt preference */
+	let togglePopupUrl = '';
+
 	/** @type {function} Escape key handler for popup */
 	let popupEscapeHandler;
 
@@ -44,6 +50,7 @@ function PhpbbWebpush() {
 		serviceWorkerUrl = options.serviceWorkerUrl;
 		subscribeUrl = options.subscribeUrl;
 		unsubscribeUrl = options.unsubscribeUrl;
+		togglePopupUrl = options.togglePopupUrl;
 		this.formTokens = options.formTokens;
 		subscriptions = options.subscriptions;
 		ajaxErrorTitle = options.ajaxErrorTitle;
@@ -51,6 +58,12 @@ function PhpbbWebpush() {
 
 		subscribeButton = document.querySelector('#subscribe_webpush');
 		unsubscribeButton = document.querySelector('#unsubscribe_webpush');
+		togglePopupButton = document.querySelector('#toggle_popup_prompt');
+
+		// Set up toggle popup button handler if it exists (on UCP settings page)
+		if (togglePopupButton) {
+			togglePopupButton.addEventListener('click', togglePopupHandler);
+		}
 
 		// Service workers are only supported in secure context
 		if (window.isSecureContext !== true) {
@@ -344,6 +357,55 @@ function PhpbbWebpush() {
 			.then(unsubscribed => {
 				if (unsubscribed) {
 					setSubscriptionState(false);
+				}
+			})
+			.catch(error => {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				phpbb.alert(ajaxErrorTitle, error);
+			});
+	}
+
+	/**
+	 * Handler for toggle popup prompt button
+	 *
+	 * @param {Object} event Toggle button push event
+	 */
+	function togglePopupHandler(event) {
+		event.preventDefault();
+
+		const loadingIndicator = phpbb.loadingIndicator();
+		const formData = new FormData();
+		formData.append('form_token', phpbb.webpush.formTokens.formToken);
+		formData.append('creation_time', phpbb.webpush.formTokens.creationTime.toString());
+
+		fetch(togglePopupUrl, {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+			},
+			body: formData,
+		})
+			.then(response => response.json())
+			.then(data => {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				if (data.success) {
+					// Update toggle icon based on new state
+					const button = document.getElementById('toggle_popup_prompt');
+					if (button) {
+						const icon = button.querySelector('i');
+						if (icon) {
+							if (data.disabled) {
+								icon.classList.remove('fa-toggle-off');
+								icon.classList.add('fa-toggle-on');
+							} else {
+								icon.classList.remove('fa-toggle-on');
+								icon.classList.add('fa-toggle-off');
+							}
+						}
+					}
+					if ('form_tokens' in data) {
+						updateFormTokens(data.form_tokens);
+					}
 				}
 			})
 			.catch(error => {

@@ -53,4 +53,6 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'Браузерные уведомления позволяют быстро получать информацию о новых ответах, личных сообщениях и других активностях на данной конференции.  Функцию можно отключить или включить в любое время в настройках уведомлений в Личном разделе.',
 	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Включить',
 	'NOTIFY_WEBPUSH_POPUP_DENY'		=> 'Отклонить',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE'	=> 'Disable web push notification prompts',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'Turn this on to stop us from asking you to enable web push notifications on any of your devices. If you disable web push notification prompts, we won’t be able to alert you if you ever become unsubscribed.',
 ]);

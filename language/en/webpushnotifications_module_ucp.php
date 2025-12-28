@@ -53,4 +53,6 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'We would like to send you browser notifications for replies, private messages, and relevant forum activity. Optional — you can manage these settings at any time.',
 	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Allow',
 	'NOTIFY_WEBPUSH_POPUP_DENY'		=> 'Deny',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE'	=> 'Disable web push notification prompts',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'Turn this on to stop us from asking you to enable web push notifications on any of your devices. If you disable web push notification prompts, we won’t be able to alert you if you ever become unsubscribed.',
 ]);

@@ -162,6 +162,58 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DENY', $crawler->filter('#wpn_popup_deny')->text());
 	}
 
+	public function test_popup_preference_toggle()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
+
+		$this->set_acp_option('wpn_webpush_popup_prompt', 1);
+
+		// Go to UCP notification settings
+		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
+
+		// Assert toggle button is present
+		$this->assertCount(1, $crawler->filter('#toggle_popup_prompt'));
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DISABLE', $crawler->filter('label[for="toggle_popup_prompt"]')->text());
+
+		// Assert toggle is initially off (prompts enabled)
+		$toggle_icon = $crawler->filter('#toggle_popup_prompt i');
+		$this->assertCount(1, $toggle_icon);
+		$this->assertTrue($toggle_icon->attr('class') !== null && strpos($toggle_icon->attr('class'), 'fa-toggle-off') !== false);
+
+		// After user disables popup (in reality this would be via AJAX, but we test the state)
+		// Set user preference to disabled via DB
+		$db = $this->get_db();
+		$sql = 'UPDATE phpbb_users
+			SET user_wpn_popup_disabled = 1
+			WHERE user_id = 2';
+		$db->sql_query($sql);
+
+		// Reload page
+		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
+
+		// Assert toggle is now on (prompts disabled)
+		$toggle_icon = $crawler->filter('#toggle_popup_prompt i');
+		$this->assertCount(1, $toggle_icon);
+		$this->assertTrue($toggle_icon->attr('class') !== null && strpos($toggle_icon->attr('class'), 'fa-toggle-on') !== false);
+
+		// Assert popup is not shown on index when user has disabled it
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(0, $crawler->filter('#wpn_popup_prompt'));
+
+		// Re-enable popup preference
+		$sql = 'UPDATE phpbb_users
+			SET user_wpn_popup_disabled = 0
+			WHERE user_id = 2';
+		$db->sql_query($sql);
+
+		// Assert popup is shown again
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(1, $crawler->filter('#wpn_popup_prompt'));
+	}
+
 	protected function set_acp_option($option, $value)
 	{
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);

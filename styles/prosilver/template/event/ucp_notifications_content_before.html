@@ -10,6 +10,15 @@
 						<br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span>
 					</dd>
 				</dl>
+				<dl>
+					<dt><label for="toggle_popup_prompt">{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') ~ lang('COLON') }}</label></dt>
+					<dd>
+						<button id="toggle_popup_prompt" type="button" name="toggle_popup_prompt" class="wpn-toggle-button" aria-label="{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') }}">
+							<i class="icon icon-lg fa-fw fa-toggle-{% if S_WEBPUSH_POPUP_DISABLED %}on{% else %}off{% endif %}" aria-hidden="true"></i>
+						</button>
+						<br><span>{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN') }}</span>
+					</dd>
+				</dl>
 			</fieldset>
 		</div>
 	</div>

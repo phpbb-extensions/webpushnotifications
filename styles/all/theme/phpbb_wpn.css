@@ -16,6 +16,43 @@
 	margin: 0 0 8px;
 }
 
+.wpn-fieldset {
+	display: grid;
+	column-gap: 1rem;
+	grid-template-columns: 1fr 320px;
+	row-gap: 1.25rem;
+}
+
+.wpn-fieldset > dl {
+	display: contents;
+}
+
+/* Optional styling */
+.wpn-fieldset dt {
+	float: none;
+	align-self: start;
+	width: auto;
+}
+
+.wpn-fieldset dd {
+	display: flex;
+	align-items: center;
+	margin: 0;
+}
+
+.wpn-fieldset dt label {
+	line-height: 1.4;
+	display: inline-block;
+}
+
+.wpn-fieldset .fa-toggle-on {
+	color: #105289;
+}
+
+.wpn-fieldset .fa-toggle-off {
+	color: #5d5d5d;
+}
+
 .wpn-notification-dropdown-footer {
 	font-size: 12px;
 	white-space: nowrap;
@@ -47,8 +84,17 @@
 }
 
 @media (max-width: 700px) {
-	.wpn.button {
-		margin-top: 8px;
+	.wpn-fieldset {
+		grid-template-columns: 1fr;
+		row-gap: 0.5rem;
+	}
+
+	.wpn-fieldset dt {
+		grid-column: 1;
+	}
+
+	.wpn-fieldset dd {
+		grid-column: 1;
 	}
 }
 

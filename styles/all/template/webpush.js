@@ -33,6 +33,15 @@ function PhpbbWebpush() {
 	/** @type {HTMLElement} Unsubscribe button */
 	let unsubscribeButton;
 
+	/** @type {HTMLElement} Toggle popup button */
+	let togglePopupButton;
+
+	/** @type {string} URL to toggle popup prompt preference */
+	let togglePopupUrl = '';
+
+	/** @type {function} Escape key handler for popup */
+	let popupEscapeHandler;
+
 	/**
 	 * Init function for phpBB Web Push
 	 * @type {array} options
@@ -41,6 +50,7 @@ function PhpbbWebpush() {
 		serviceWorkerUrl = options.serviceWorkerUrl;
 		subscribeUrl = options.subscribeUrl;
 		unsubscribeUrl = options.unsubscribeUrl;
+		togglePopupUrl = options.togglePopupUrl;
 		this.formTokens = options.formTokens;
 		subscriptions = options.subscriptions;
 		ajaxErrorTitle = options.ajaxErrorTitle;
@@ -48,6 +58,12 @@ function PhpbbWebpush() {
 
 		subscribeButton = document.querySelector('#subscribe_webpush');
 		unsubscribeButton = document.querySelector('#unsubscribe_webpush');
+		togglePopupButton = document.querySelector('#toggle_popup_prompt');
+
+		// Set up toggle popup button handler if it exists (on UCP settings page)
+		if (togglePopupButton) {
+			togglePopupButton.addEventListener('click', togglePopupHandler);
+		}
 
 		// Service workers are only supported in secure context
 		if (window.isSecureContext !== true) {
@@ -163,7 +179,7 @@ function PhpbbWebpush() {
 		if (allowBtn) {
 			allowBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				subscribeButtonHandler(event).catch(error => {
 					console.error('Subscription handler error:', error);
 				});
@@ -173,7 +189,7 @@ function PhpbbWebpush() {
 		if (denyBtn) {
 			denyBtn.addEventListener('click', (event) => {
 				event.stopPropagation();
-				popup.style.display = 'none';
+				hidePopup(popup);
 				promptDenied.set();
 			});
 		}
@@ -181,11 +197,32 @@ function PhpbbWebpush() {
 		if (overlay) {
 			overlay.addEventListener('click', (event) => {
 				if (event.target === overlay) {
-					popup.style.display = 'none';
+					hidePopup(popup);
 					promptDenied.set();
 				}
 			});
+
+			popupEscapeHandler = (event) => {
+				if (event.key === 'Escape') {
+					hidePopup(popup);
+					promptDenied.set();
+				}
+			};
+
+			document.addEventListener('keydown', popupEscapeHandler);
 		}
+	}
+
+	/**
+	 * Hide popup
+	 * @param popup
+	 */
+	function hidePopup(popup) {
+		if (popup) {
+			popup.style.display = 'none';
+		}
+		document.removeEventListener('keydown', popupEscapeHandler);
+		popupEscapeHandler = null;
 	}
 
 	/**
@@ -282,10 +319,7 @@ function PhpbbWebpush() {
 				});
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 			console.error('Push subscription error:', error);
 			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
 		} finally {
@@ -332,6 +366,55 @@ function PhpbbWebpush() {
 	}
 
 	/**
+	 * Handler for toggle popup prompt button
+	 *
+	 * @param {Object} event Toggle button push event
+	 */
+	function togglePopupHandler(event) {
+		event.preventDefault();
+
+		const loadingIndicator = phpbb.loadingIndicator();
+		const formData = new FormData();
+		formData.append('form_token', phpbb.webpush.formTokens.formToken);
+		formData.append('creation_time', phpbb.webpush.formTokens.creationTime.toString());
+
+		fetch(togglePopupUrl, {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+			},
+			body: formData,
+		})
+			.then(response => response.json())
+			.then(data => {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				if (data.success) {
+					// Update toggle icon based on new state
+					const button = document.getElementById('toggle_popup_prompt');
+					if (button) {
+						const icon = button.querySelector('i');
+						if (icon) {
+							if (data.disabled) {
+								icon.classList.remove('fa-toggle-off');
+								icon.classList.add('fa-toggle-on');
+							} else {
+								icon.classList.remove('fa-toggle-on');
+								icon.classList.add('fa-toggle-off');
+							}
+						}
+					}
+					if ('form_tokens' in data) {
+						updateFormTokens(data.form_tokens);
+					}
+				}
+			})
+			.catch(error => {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				phpbb.alert(ajaxErrorTitle, error);
+			});
+	}
+
+	/**
 	 * Handle subscribe response
 	 *
 	 * @param {Object} response Response from subscription endpoint
@@ -343,10 +426,7 @@ function PhpbbWebpush() {
 				updateFormTokens(response.form_tokens);
 			}
 			promptDenied.remove();
-			const popup = document.getElementById('wpn_popup_prompt');
-			if (popup) {
-				popup.style.display = 'none';
-			}
+			hidePopup(document.getElementById('wpn_popup_prompt'));
 		}
 	}
 

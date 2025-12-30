@@ -44,7 +44,7 @@ class manifest
 	{
 		// Get the board URL and extract the path component
 		$board_url = generate_board_url();
-		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : (parse_url($board_url)['path'] ?? '');
+		$board_path = $this->config['force_server_vars'] ? $this->config['script_path'] : (parse_url($board_url, PHP_URL_PATH) ?? '');
 
 		// Ensure path ends with '/' for PWA scope
 		$scope = rtrim($board_path, '/\\') . '/';

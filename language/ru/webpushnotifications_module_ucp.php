@@ -49,10 +49,10 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_DROPDOWN_TITLE'	=> 'Посетите настройки уведомлений, чтобы установить предпочтительные типы браузерных уведомлений.',
 	'NOTIFY_WEBPUSH_DENIED'			=> 'Вы запретили браузерные уведомления для даного сайта. Для того, чтобы подписаться, необходимо их разрешить в настройках браузера.',
 	'NOTIFY_WEBPUSH_NOT_SUPPORTED'	=> 'Не поддерживается',
-	'NOTIFY_WEBPUSH_POPUP_TITLE'	=> 'Включить браузерные уведомления?',
+	'NOTIFY_WEBPUSH_POPUP_TITLE'	=> 'Включить браузерные уведомления',
 	'NOTIFY_WEBPUSH_POPUP_MESSAGE'	=> 'Браузерные уведомления позволяют быстро получать информацию о новых ответах, личных сообщениях и других активностях на данной конференции.  Функцию можно отключить или включить в любое время в настройках уведомлений в Личном разделе.',
 	'NOTIFY_WEBPUSH_POPUP_ALLOW'	=> 'Включить',
 	'NOTIFY_WEBPUSH_POPUP_DENY'		=> 'Отклонить',
-	'NOTIFY_WEBPUSH_POPUP_DISABLE'	=> 'Disable web push notification prompts',
-	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'Turn this on to stop us from asking you to enable web push notifications on any of your devices. If you disable web push notification prompts, we won’t be able to alert you if you ever become unsubscribed.',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE'	=> 'Отключить запросы «Включить браузерные уведомления»',
+	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'Включите этот параметр, чтобы мы больше не спрашивали вас о включении веб-push-уведомлений на любом из ваших устройств. Обратите внимание, что в этом случае мы не сможем предупредить вас, если веб-push-уведомления будут отключены.',
 ]);

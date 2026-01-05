@@ -390,11 +390,13 @@ class webpush extends base implements extended_method_interface
 			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> ($this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe']) || stripos($this->user->page['page'], 'notification_options'),
 			'U_WEBPUSH_SUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 			'U_WEBPUSH_UNSUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
+			'U_WEBPUSH_TOGGLE_POPUP'		=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_toggle_popup_controller'),
 			'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],
 			'U_WEBPUSH_WORKER_URL'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 			'SUBSCRIPTIONS'					=> $subscriptions,
 			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
-			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'] && $this->user->id() != ANONYMOUS && $this->user->data['user_type'] != USER_IGNORE,
+			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'] && $this->user->id() != ANONYMOUS && $this->user->data['user_type'] != USER_IGNORE && !($this->user->data['user_wpn_popup_disabled'] ?? 0),
+			'S_WEBPUSH_POPUP_DISABLED'		=> $this->user->data['user_wpn_popup_disabled'] ?? 0,
 		];
 	}
 

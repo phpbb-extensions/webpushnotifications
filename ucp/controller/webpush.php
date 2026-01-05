@@ -353,6 +353,30 @@ class webpush
 	}
 
 	/**
+	 * Handle toggle popup prompt requests
+	 *
+	 * @return JsonResponse
+	 */
+	public function toggle_popup(): JsonResponse
+	{
+		$this->check_subscribe_requests();
+
+		// Toggle the user preference
+		$new_value = !$this->user->data['user_wpn_popup_disabled'];
+
+		$sql = 'UPDATE ' . USERS_TABLE . '
+			SET user_wpn_popup_disabled = ' . (int) $new_value . '
+			WHERE user_id = ' . (int) $this->user->id();
+		$this->db->sql_query($sql);
+
+		return new JsonResponse([
+			'success'		=> true,
+			'disabled'		=> $new_value,
+			'form_tokens'	=> $this->form_helper->get_form_tokens(self::FORM_TOKEN_UCP),
+		]);
+	}
+
+	/**
 	 * Takes an avatar string (usually in full html format already) and extracts the url.
 	 * If the avatar url is a relative path, it's converted to an absolute path.
 	 *

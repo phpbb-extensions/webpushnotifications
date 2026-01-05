@@ -1,15 +1,15 @@
 {% if S_WEBPUSH_POPUP_PROMPT %}
-<div id="wpn_popup_prompt" class="wpn-popup-overlay" style="display:none;">
+<div id="wpn_popup_prompt" class="wpn-popup-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="wpn_popup_title" aria-describedby="wpn_popup_message">
 	<div class="wpn-popup-container">
 		<div class="wpn-popup-content">
-			<h3 class="wpn-popup-title">
+			<h3 id="wpn_popup_title" class="wpn-popup-title">
 				<span>{{ lang('NOTIFY_WEBPUSH_POPUP_TITLE') }}</span>
-				<span class="fa-stack fa-lg">
+				<span class="fa-stack fa-lg" aria-hidden="true">
 					<i class="fa fa-circle fa-stack-2x"></i>
 					<i class="fa fa-bell fa-stack-1x fa-inverse"></i>
 				</span>
 			</h3>
-			<p class="wpn-popup-message">{{ lang('NOTIFY_WEBPUSH_POPUP_MESSAGE') }}</p>
+			<p id="wpn_popup_message" class="wpn-popup-message">{{ lang('NOTIFY_WEBPUSH_POPUP_MESSAGE') }}</p>
 			<div class="wpn-popup-buttons">
 				<button id="wpn_popup_allow" class="wpn-popup-btn wpn-popup-btn-allow">{{ lang('NOTIFY_WEBPUSH_POPUP_ALLOW') }}</button>
 				<button id="wpn_popup_deny" class="wpn-popup-btn wpn-popup-btn-deny">{{ lang('NOTIFY_WEBPUSH_POPUP_DENY') }}</button>

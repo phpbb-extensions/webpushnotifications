@@ -420,6 +420,98 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEmpty($this->get_subscription_data());
 	}
 
+	public function test_toggle_popup_enable_to_disable()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+		$this->user->data['user_wpn_popup_disabled'] = 0;
+
+		$response = $this->controller->toggle_popup();
+
+		$this->assertInstanceOf(JsonResponse::class, $response);
+		$response_data = json_decode($response->getContent(), true);
+
+		$this->assertTrue($response_data['success']);
+		$this->assertTrue($response_data['disabled']);
+		$this->assertEquals(1, $this->get_user_popup_preference(2));
+	}
+
+	public function test_toggle_popup_disable_to_enable()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+		$this->user->data['user_wpn_popup_disabled'] = 1;
+
+		// Set initial state
+		$sql = 'UPDATE phpbb_users
+			SET user_wpn_popup_disabled = 1
+			WHERE user_id = 2';
+		$this->db->sql_query($sql);
+
+		$response = $this->controller->toggle_popup();
+
+		$this->assertInstanceOf(JsonResponse::class, $response);
+		$response_data = json_decode($response->getContent(), true);
+
+		$this->assertTrue($response_data['success']);
+		$this->assertFalse($response_data['disabled']);
+		$this->assertEquals(0, $this->get_user_popup_preference(2));
+	}
+
+	public function test_toggle_popup_invalid_form_token()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(false);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('FORM_INVALID');
+
+		$this->controller->toggle_popup();
+	}
+
+	public function test_toggle_popup_not_ajax()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(false);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('NO_AUTH_OPERATION');
+
+		$this->controller->toggle_popup();
+	}
+
+	public function data_toggle_popup_anonymous_user()
+	{
+		return [
+			[ANONYMOUS, USER_NORMAL, false],
+			[2, USER_IGNORE, false],
+			[2, USER_INACTIVE, false],
+			[2, USER_NORMAL, true],
+		];
+	}
+
+	/**
+	 * @dataProvider data_toggle_popup_anonymous_user
+	 */
+	public function test_toggle_popup_anonymous_user($user_id, $user_type, $is_bot)
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = $user_id;
+		$this->user->data['is_bot'] = $is_bot;
+		$this->user->data['user_type'] = $user_type;
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('NO_AUTH_OPERATION');
+
+		$this->controller->toggle_popup();
+	}
+
 	private function get_subscription_data()
 	{
 		$sql = 'SELECT *
@@ -429,5 +521,16 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 		return $row;
+	}
+
+	private function get_user_popup_preference($user_id)
+	{
+		$sql = 'SELECT user_wpn_popup_disabled
+			FROM phpbb_users
+			WHERE user_id = ' . (int) $user_id;
+		$result = $this->db->sql_query($sql);
+		$value = (int) $this->db->sql_fetchfield('user_wpn_popup_disabled');
+		$this->db->sql_freeresult($result);
+		return $value;
 	}
 }

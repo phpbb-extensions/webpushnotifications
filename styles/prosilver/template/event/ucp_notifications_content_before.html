@@ -1,13 +1,20 @@
 {% if NOTIFICATIONS_WEBPUSH_ENABLE and notification_types is defined %}
 	<div class="panel">
 		<div class="inner">
-			<fieldset>
+			<fieldset class="wpn-fieldset">
 				<dl>
-					<dt><label for="subscribe_webpush">{{ lang('NOTIFY_WEBPUSH_NOTIFICATIONS') ~ lang('COLON') }}</label></dt>
+					<dt><label for="subscribe_webpush">{{ lang('NOTIFY_WEBPUSH_NOTIFICATIONS') ~ lang('COLON') }}</label><br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span></dt>
 					<dd>
 						<input id="subscribe_webpush" type="submit" name="subscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_ENABLE') }}" class="wpn button1 button button-form" data-l-err="{{ lang('INFORMATION')|e('html_attr') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED')|e('html_attr') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED')|e('html_attr') }}">
 						<input id="unsubscribe_webpush" type="submit" name="unsubscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_DISABLE') }}" class="wpn button1 button button-form hidden">
-						<br><span>{{ lang('NOTIFY_WEBPUSH_ENABLE_EXPLAIN') }}</span>
+					</dd>
+				</dl>
+				<dl>
+					<dt><label for="toggle_popup_prompt">{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') ~ lang('COLON') }}</label><br><span>{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN') }}</span></dt>
+					<dd>
+						<button id="toggle_popup_prompt" type="button" name="toggle_popup_prompt" aria-label="{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') }}">
+							<i class="icon icon-lg fa-fw fa-toggle-{% if S_WEBPUSH_POPUP_DISABLED %}on{% else %}off{% endif %}" aria-hidden="true"></i>
+						</button>
 					</dd>
 				</dl>
 			</fieldset>

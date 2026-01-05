@@ -485,13 +485,26 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->controller->toggle_popup();
 	}
 
-	public function test_toggle_popup_anonymous_user()
+	public function data_toggle_popup_anonymous_user()
+	{
+		return [
+			[ANONYMOUS, USER_NORMAL, false],
+			[2, USER_IGNORE, false],
+			[2, USER_INACTIVE, false],
+			[2, USER_NORMAL, true],
+		];
+	}
+
+	/**
+	 * @dataProvider data_toggle_popup_anonymous_user
+	 */
+	public function test_toggle_popup_anonymous_user($user_id, $user_type, $is_bot)
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(true);
 		$this->request->method('is_ajax')->willReturn(true);
-		$this->user->data['user_id'] = ANONYMOUS;
-		$this->user->data['is_bot'] = false;
-		$this->user->data['user_type'] = USER_NORMAL;
+		$this->user->data['user_id'] = $user_id;
+		$this->user->data['is_bot'] = $is_bot;
+		$this->user->data['user_type'] = $user_type;
 
 		$this->expectException(http_exception::class);
 		$this->expectExceptionMessage('NO_AUTH_OPERATION');

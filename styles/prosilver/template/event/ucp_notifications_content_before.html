@@ -13,7 +13,7 @@
 				<dl>
 					<dt><label for="toggle_popup_prompt">{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') ~ lang('COLON') }}</label><br><span>{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN') }}</span></dt>
 					<dd>
-						<input id="toggle_popup_prompt" type="button" name="toggle_popup_prompt" value="{% if S_WEBPUSH_POPUP_DISABLED %}{{ lang('NOTIFY_WEBPUSH_POPUP_ENABLER') }}{% else %}{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLER') }}{% endif %}" class="button1 button button-form" data-l-disable="{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLER')|e('html_attr') }}" data-l-enable="{{ lang('NOTIFY_WEBPUSH_POPUP_ENABLER')|e('html_attr') }}">
+						<input id="toggle_popup_prompt" type="button" name="toggle_popup_prompt" value="{{ lang(S_WEBPUSH_POPUP_DISABLED ? 'NOTIFY_WEBPUSH_POPUP_ENABLER' : 'NOTIFY_WEBPUSH_POPUP_DISABLER') }}" class="button1 button button-form" data-l-disable="{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLER')|e('html_attr') }}" data-l-enable="{{ lang('NOTIFY_WEBPUSH_POPUP_ENABLER')|e('html_attr') }}">
 					</dd>
 				</dl>
 				{% endif %}

@@ -9,6 +9,7 @@
 						<input id="unsubscribe_webpush" type="submit" name="unsubscribe_webpush" value="{{ lang('NOTIFY_WEBPUSH_DISABLE') }}" class="wpn button1 button button-form hidden">
 					</dd>
 				</dl>
+				{% if S_WEBPUSH_POPUP_PROMPT %}
 				<dl>
 					<dt><label for="toggle_popup_prompt">{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE') ~ lang('COLON') }}</label><br><span>{{ lang('NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN') }}</span></dt>
 					<dd>
@@ -17,6 +18,7 @@
 						</button>
 					</dd>
 				</dl>
+				{% endif %}
 			</fieldset>
 		</div>
 	</div>

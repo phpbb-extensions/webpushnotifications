@@ -395,7 +395,7 @@ class webpush extends base implements extended_method_interface
 			'U_WEBPUSH_WORKER_URL'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_worker_controller'),
 			'SUBSCRIPTIONS'					=> $subscriptions,
 			'WEBPUSH_FORM_TOKENS'			=> $form_helper->get_form_tokens(\phpbb\webpushnotifications\ucp\controller\webpush::FORM_TOKEN_UCP),
-			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'] && $this->user->id() != ANONYMOUS && $this->user->data['user_type'] != USER_IGNORE && !($this->user->data['user_wpn_popup_disabled'] ?? 0),
+			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'] && $this->user->id() != ANONYMOUS && $this->user->data['user_type'] != USER_IGNORE,
 			'S_WEBPUSH_POPUP_DISABLED'		=> $this->user->data['user_wpn_popup_disabled'] ?? 0,
 		];
 	}

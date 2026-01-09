@@ -178,10 +178,9 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertCount(1, $crawler->filter('#toggle_popup_prompt'));
 		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DISABLE', $crawler->filter('label[for="toggle_popup_prompt"]')->text());
 
-		// Assert toggle is initially off (prompts enabled)
-		$toggle_icon = $crawler->filter('#toggle_popup_prompt i');
-		$this->assertCount(1, $toggle_icon);
-		$this->assertTrue($toggle_icon->attr('class') !== null && strpos($toggle_icon->attr('class'), 'fa-toggle-off') !== false);
+		// Assert button text shows "Disable" initially (prompts enabled)
+		$button_value = $crawler->filter('#toggle_popup_prompt')->attr('value');
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_DISABLER', $button_value);
 
 		// After user disables popup (in reality this would be via AJAX, but we test the state)
 		// Set user preference to disabled via DB
@@ -194,10 +193,9 @@ class functional_test extends \phpbb_functional_test_case
 		// Reload page
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
 
-		// Assert toggle is now on (prompts disabled)
-		$toggle_icon = $crawler->filter('#toggle_popup_prompt i');
-		$this->assertCount(1, $toggle_icon);
-		$this->assertTrue($toggle_icon->attr('class') !== null && strpos($toggle_icon->attr('class'), 'fa-toggle-on') !== false);
+		// Assert button text shows "Enable" now (prompts disabled)
+		$button_value = $crawler->filter('#toggle_popup_prompt')->attr('value');
+		$this->assertContainsLang('NOTIFY_WEBPUSH_POPUP_ENABLER', $button_value);
 
 		// Assert popup is not shown on index when user has disabled it
 		$crawler = self::request('GET', 'index.php');

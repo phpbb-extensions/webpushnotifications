@@ -1,4 +1,4 @@
-{% if S_WEBPUSH_POPUP_PROMPT %}
+{% if S_WEBPUSH_POPUP_PROMPT and not S_WEBPUSH_POPUP_DISABLED %}
 <div id="wpn_popup_prompt" class="wpn-popup-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="wpn_popup_title" aria-describedby="wpn_popup_message">
 	<div class="wpn-popup-container">
 		<div class="wpn-popup-content">

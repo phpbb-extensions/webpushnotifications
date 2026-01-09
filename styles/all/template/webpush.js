@@ -389,19 +389,10 @@ function PhpbbWebpush() {
 			.then(data => {
 				loadingIndicator.fadeOut(phpbb.alertTime);
 				if (data.success) {
-					// Update toggle icon based on new state
+					// Update button text based on new state
 					const button = document.getElementById('toggle_popup_prompt');
 					if (button) {
-						const icon = button.querySelector('i');
-						if (icon) {
-							if (data.disabled) {
-								icon.classList.remove('fa-toggle-off');
-								icon.classList.add('fa-toggle-on');
-							} else {
-								icon.classList.remove('fa-toggle-on');
-								icon.classList.add('fa-toggle-off');
-							}
-						}
+						button.value = data.disabled ? button.getAttribute('data-l-enable') : button.getAttribute('data-l-disable');
 					}
 					if ('form_tokens' in data) {
 						updateFormTokens(data.form_tokens);

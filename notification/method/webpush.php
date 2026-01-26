@@ -282,7 +282,8 @@ class webpush extends base implements extended_method_interface
 				if (!$report->isSuccess())
 				{
 					// Fill array of endpoints to remove if subscription has expired
-					if ($report->isSubscriptionExpired())
+					// Library checks for 404/410; we also check for 401 (Unauthorized)
+					if ($report->isSubscriptionExpired() || $this->is_subscription_unauthorized($report))
 					{
 						$expired_endpoints[] = $report->getEndpoint();
 					}
@@ -494,5 +495,21 @@ class webpush extends base implements extended_method_interface
 				// This shouldn't happen since we won't pass padding length outside limits
 			}
 		}
+	}
+
+	/**
+	 * Check if subscription push failed with 401 Unauthorized status
+	 *
+	 * 401 indicates the push service no longer accepts this subscription,
+	 * typically due to revoked credentials or subscription no longer being valid.
+	 *
+	 * @param \Minishlink\WebPush\MessageSentReport $report
+	 *
+	 * @return bool True if subscription returned 401 Unauthorized
+	 */
+	protected function is_subscription_unauthorized(\Minishlink\WebPush\MessageSentReport $report): bool
+	{
+		$response = $report->getResponse();
+		return $response && $response->getStatusCode() === 401;
 	}
 }

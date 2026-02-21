@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.0.4 - 2026-02-20
+
+- Added a new optional pop-up/prompt asking board members to subscribe to push notifications.
+- Improvements to the handling and reporting of expired, lost or failed subscriptions.
+- Improvements to the progressive web app functionality.
+
 ### 1.0.3 - 2025-05-21
 
 - Fixed issues where opening an image attachment could lock you out of the UI while on a mobile device as a progressive web app.

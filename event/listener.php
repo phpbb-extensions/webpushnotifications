@@ -368,8 +368,8 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function trim_shortname($name)
 	{
-		$decoded = ext::decode_entities($name, ENT_QUOTES);
+		$decoded = ext::decode_entities($name, ENT_COMPAT);
 		$trimmed = utf8_substr($decoded, 0, 12);
-		return htmlspecialchars($trimmed, ENT_QUOTES, 'UTF-8');
+		return utf8_htmlspecialchars($trimmed);
 	}
 }

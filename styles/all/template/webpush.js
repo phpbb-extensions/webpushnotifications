@@ -301,22 +301,29 @@ function PhpbbWebpush() {
 			});
 
 			const loadingIndicator = phpbb.loadingIndicator();
-			fetch(subscribeUrl, {
-				method: 'POST',
-				headers: {
-					'X-Requested-With': 'XMLHttpRequest',
-				},
-				body: getFormData(newSubscription),
-			})
-				.then(response => {
-					loadingIndicator.fadeOut(phpbb.alertTime);
-					return response.json();
-				})
-				.then(handleSubscribe)
-				.catch(error => {
-					loadingIndicator.fadeOut(phpbb.alertTime);
-					phpbb.alert(ajaxErrorTitle, error);
+			try {
+				const response = await fetch(subscribeUrl, {
+					method: 'POST',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: getFormData(newSubscription),
 				});
+				const data = await response.json();
+				loadingIndicator.fadeOut(phpbb.alertTime);
+
+				if (data.success) {
+					handleSubscribe(data);
+				} else {
+					await newSubscription.unsubscribe();
+					promptDenied.set();
+					hidePopup(document.getElementById('wpn_popup_prompt'));
+					phpbb.alert(ajaxErrorTitle, data.message || subscribeButton.getAttribute('data-l-unsupported'));
+				}
+			} catch (error) {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				phpbb.alert(ajaxErrorTitle, error);
+			}
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
 			hidePopup(document.getElementById('wpn_popup_prompt'));

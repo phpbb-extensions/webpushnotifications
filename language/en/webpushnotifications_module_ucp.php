@@ -57,4 +57,5 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'We show a reminder asking you to allow browser notifications when they are not currently enabled or when we cannot detect them. Turn this off to permanently stop these reminder pop-ups on all your devices. If you turn this off, you will not be warned if your browser notifications stop working in the future.',
 	'NOTIFY_WEBPUSH_POPUP_ENABLER'	=> 'Enable reminders',
 	'NOTIFY_WEBPUSH_POPUP_DISABLER'	=> 'Disable reminders',
+	'WEBPUSH_INVALID_ENDPOINT'		=> 'The push notification endpoint is not from a recognised push service.',
 ]);

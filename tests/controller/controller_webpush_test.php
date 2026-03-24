@@ -392,7 +392,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
 		$symfony_request->method('get')->willReturn(json_encode([
-			'endpoint' => 'test_endpoint',
+			'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
 			'expiration_time' => 0,
 			'keys' => ['p256dh' => 'test_p256dh', 'auth' => 'test_auth']
 		]));
@@ -404,7 +404,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 		$this->assertEquals([
 			'user_id' => '2',
-			'endpoint' => 'test_endpoint',
+			'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
 			'p256dh' => 'test_p256dh',
 			'auth' => 'test_auth',
 			'expiration_time' => '0',
@@ -418,6 +418,77 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
 
 		$this->assertEmpty($this->get_subscription_data());
+	}
+
+	public function data_subscribe_invalid_endpoint(): array
+	{
+		return [
+			'no_host'				=> ['not_a_url'],
+			'disallowed_host'		=> ['https://evil.example.com/push/endpoint'],
+			'disallowed_subdomain'	=> ['https://evil.fcm.googleapis.com.attacker.com/push'],
+			'empty_string'			=> [''],
+		];
+	}
+
+	/**
+	 * @dataProvider data_subscribe_invalid_endpoint
+	 */
+	public function test_subscribe_invalid_endpoint(string $endpoint): void
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+
+		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
+		$symfony_request->method('get')->willReturn(json_encode([
+			'endpoint' => $endpoint,
+			'expiration_time' => 0,
+			'keys' => ['p256dh' => 'test_p256dh', 'auth' => 'test_auth']
+		]));
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+
+		$this->controller->subscribe($symfony_request);
+	}
+
+	public function data_is_valid_endpoint(): array
+	{
+		return [
+			// Exact whitelist matches
+			['https://android.googleapis.com/gcm/send/test', true],
+			['https://fcm.googleapis.com/fcm/send/test', true],
+			['https://updates.push.services.mozilla.com/push/v1/test', true],
+			['https://updates-autopush.stage.mozaws.net/push/v1/test', true],
+			['https://updates-autopush.dev.mozaws.net/push/v1/test', true],
+			// Wildcard *.notify.windows.com
+			['https://am-0.notify.windows.com/throttledthirdparty/test', true],
+			['https://db5.notify.windows.com/push/test', true],
+			// Wildcard *.push.apple.com
+			['https://api.push.apple.com/3/device/test', true],
+			['https://api.development.push.apple.com/3/device/test', true],
+			// Invalid: disallowed host
+			['https://evil.example.com/push/endpoint', false],
+			// Invalid: subdomain spoofing
+			['https://evil.fcm.googleapis.com.attacker.com/push', false],
+			// Invalid: not a URL
+			['not_a_url', false],
+			// Invalid: bare wildcard domain without subdomain
+			['https://notify.windows.com/push', false],
+			['https://push.apple.com/push', false],
+			// Invalid: empty string
+			['', false],
+		];
+	}
+
+	/**
+	 * @dataProvider data_is_valid_endpoint
+	 */
+	public function test_is_valid_endpoint(string $endpoint, bool $expected): void
+	{
+		$this->assertEquals($expected, $this->controller->is_valid_endpoint($endpoint));
 	}
 
 	public function test_toggle_popup_enable_to_disable()

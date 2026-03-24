@@ -309,6 +309,8 @@ class webpush
 			return false;
 		}
 
+		$host = strtolower($host);
+
 		if (in_array($host, self::PUSH_SERVICE_WHITELIST, true))
 		{
 			return true;
@@ -357,6 +359,8 @@ class webpush
 		$this->check_subscribe_requests();
 
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
+
+		$data['endpoint'] = $data['endpoint'] ?? '';
 
 		if (!$this->is_valid_endpoint($data['endpoint']))
 		{

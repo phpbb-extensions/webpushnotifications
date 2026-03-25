@@ -152,19 +152,23 @@ class listener_test extends \phpbb_database_test_case
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 
-	public function test_load_language_on_setup()
+	public function test_load_language_on_setup($lang_set_ext = [])
 	{
 		$this->set_listener();
 
-		$data = new \phpbb\event\data(array('lang_set_ext'));
-		$this->listener->load_language_on_setup($data);
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.user_setup', [$this->listener, 'load_language_on_setup']);
 
-		self::assertEquals(array(
-			array(
+		$event_data = ['lang_set_ext'];
+		$event_data_after = $dispatcher->trigger_event('core.user_setup', compact($event_data));
+		extract($event_data_after);
+
+		self::assertEquals([
+			[
 				'ext_name' => 'phpbb/webpushnotifications',
 				'lang_set' => 'common',
-			),
-		), $data['lang_set_ext']);
+			]
+		], $lang_set_ext);
 	}
 
 	public function test_load_language()

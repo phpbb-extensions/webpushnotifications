@@ -281,9 +281,11 @@ class webpush extends base implements extended_method_interface
 			{
 				if (!$report->isSuccess())
 				{
-					// Fill array of endpoints to remove if subscription has expired
-					// Library checks for 404/410; we also check for 401 (Unauthorized)
-					if ($report->isSubscriptionExpired() || $this->is_subscription_unauthorized($report))
+					// Fill array of endpoints to remove if subscription has expired or is permanently gone.
+					// Library checks for 404/410; we also check for 401 (Unauthorized) and endpoints
+					// using the .invalid TLD (e.g. permanently-removed.invalid), which per RFC 6761 are
+					// guaranteed to never resolve and are used as a sentinel for dead subscriptions.
+					if ($report->isSubscriptionExpired() || $this->is_subscription_unauthorized($report) || $this->is_endpoint_permanently_removed($report->getEndpoint()))
 					{
 						$expired_endpoints[] = $report->getEndpoint();
 					}
@@ -511,5 +513,23 @@ class webpush extends base implements extended_method_interface
 	{
 		$response = $report->getResponse();
 		return $response && $response->getStatusCode() === 401;
+	}
+
+	/**
+	 * Check if a push endpoint uses the .invalid TLD, meaning it can never resolve.
+	 *
+	 * Per RFC 6761, the .invalid TLD is reserved and guaranteed to never resolve in DNS.
+	 * It is commonly used as a sentinel value for dead/permanently-removed push subscriptions
+	 * (e.g. permanently-removed.invalid) where the push service has indicated the endpoint
+	 * is gone but no HTTP response was returned (e.g. cURL error 6: could not resolve host).
+	 *
+	 * @param string $endpoint
+	 *
+	 * @return bool True if the endpoint host ends with .invalid
+	 */
+	protected function is_endpoint_permanently_removed(string $endpoint): bool
+	{
+		$host = parse_url($endpoint, PHP_URL_HOST);
+		return $host !== null && substr($host, -strlen('.invalid')) === '.invalid';
 	}
 }

@@ -82,14 +82,31 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.page_header_after'			=> [['load_template_data'], ['pwa_manifest']],
-			'core.ucp_display_module_before'	=> 'load_language',
-			'core.acp_main_notice'				=> 'compatibility_notice',
+			'core.user_setup'						=> 'load_language_on_setup',
+			'core.page_header_after'				=> [['load_template_data'], ['pwa_manifest']],
+			'core.ucp_display_module_before'		=> 'load_language',
+			'core.acp_main_notice'					=> 'compatibility_notice',
 			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
-			'core.acp_board_config_emoji_enabled'=> 'acp_pwa_allow_emoji',
-			'core.validate_config_variable'		=> 'validate_pwa_options',
-			'core.help_manager_add_block_after'	=> 'wpn_faq',
+			'core.acp_board_config_emoji_enabled'	=> 'acp_pwa_allow_emoji',
+			'core.validate_config_variable'			=> 'validate_pwa_options',
+			'core.help_manager_add_block_after'		=> 'wpn_faq',
 		];
+	}
+
+	/**
+	 * Load common language file during user setup
+	 *
+	 * @param	\phpbb\event\data	$event	The event object
+	 * @return	void
+	 */
+	public function load_language_on_setup($event)
+	{
+		$lang_set_ext = $event['lang_set_ext'];
+		$lang_set_ext[] = [
+			'ext_name' => 'phpbb/webpushnotifications',
+			'lang_set' => 'common',
+		];
+		$event['lang_set_ext'] = $lang_set_ext;
 	}
 
 	/**

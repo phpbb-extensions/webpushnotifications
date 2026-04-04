@@ -141,6 +141,7 @@ class listener_test extends \phpbb_database_test_case
 	public function test_getSubscribedEvents()
 	{
 		self::assertEquals([
+			'core.user_setup',
 			'core.page_header_after',
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
@@ -149,6 +150,25 @@ class listener_test extends \phpbb_database_test_case
 			'core.validate_config_variable',
 			'core.help_manager_add_block_after',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
+	}
+
+	public function test_load_language_on_setup($lang_set_ext = [])
+	{
+		$this->set_listener();
+
+		$dispatcher = new \phpbb\event\dispatcher();
+		$dispatcher->addListener('core.user_setup', [$this->listener, 'load_language_on_setup']);
+
+		$event_data = ['lang_set_ext'];
+		$event_data_after = $dispatcher->trigger_event('core.user_setup', compact($event_data));
+		extract($event_data_after);
+
+		self::assertEquals([
+			[
+				'ext_name' => 'phpbb/webpushnotifications',
+				'lang_set' => 'common',
+			]
+		], $lang_set_ext);
 	}
 
 	public function test_load_language()

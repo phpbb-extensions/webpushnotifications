@@ -36,6 +36,21 @@ class webpush
 	/** @var string UCP form token name */
 	public const FORM_TOKEN_UCP = 'ucp_webpush';
 
+	/** @var array Allowed push service endpoint hosts https://github.com/pushpad/known-push-services */
+	public const PUSH_SERVICE_WHITELIST = [
+		'android.googleapis.com',
+		'fcm.googleapis.com',
+		'updates.push.services.mozilla.com',
+		'updates-autopush.stage.mozaws.net',
+		'updates-autopush.dev.mozaws.net',
+	];
+
+	/** @var array Allowed push service endpoint host wildcard suffixes (e.g. *.notify.windows.com) https://github.com/pushpad/known-push-services */
+	public const PUSH_SERVICE_WILDCARD_SUFFIXES = [
+		'.notify.windows.com',
+		'.push.apple.com',
+	];
+
 	/** @var config */
 	protected $config;
 
@@ -280,6 +295,39 @@ class webpush
 	}
 
 	/**
+	 * Check if a push subscription endpoint belongs to an allowed push service
+	 *
+	 * @param string $endpoint The push subscription endpoint URL
+	 * @return bool True if the endpoint host matches a known/allowed push service
+	 */
+	public function is_valid_endpoint(string $endpoint): bool
+	{
+		$host = parse_url($endpoint, PHP_URL_HOST);
+
+		if (empty($host))
+		{
+			return false;
+		}
+
+		$host = strtolower($host);
+
+		if (in_array($host, self::PUSH_SERVICE_WHITELIST, true))
+		{
+			return true;
+		}
+
+		foreach (self::PUSH_SERVICE_WILDCARD_SUFFIXES as $suffix)
+		{
+			if (substr($host, -strlen($suffix)) === $suffix)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Check (un)subscribe form for valid link hash
 	 *
 	 * @throws http_exception If form is invalid or user should not request (un)subscription
@@ -311,6 +359,13 @@ class webpush
 		$this->check_subscribe_requests();
 
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
+
+		$data['endpoint'] = $data['endpoint'] ?? '';
+
+		if (!$this->is_valid_endpoint($data['endpoint']))
+		{
+			throw new http_exception(Response::HTTP_BAD_REQUEST, 'WEBPUSH_INVALID_ENDPOINT');
+		}
 
 		$sql = 'INSERT INTO ' . $this->push_subscriptions_table . ' ' . $this->db->sql_build_array('INSERT', [
 			'user_id'			=> $this->user->id(),

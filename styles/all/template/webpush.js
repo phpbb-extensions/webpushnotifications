@@ -301,22 +301,35 @@ function PhpbbWebpush() {
 			});
 
 			const loadingIndicator = phpbb.loadingIndicator();
-			fetch(subscribeUrl, {
-				method: 'POST',
-				headers: {
-					'X-Requested-With': 'XMLHttpRequest',
-				},
-				body: getFormData(newSubscription),
-			})
-				.then(response => {
-					loadingIndicator.fadeOut(phpbb.alertTime);
-					return response.json();
-				})
-				.then(handleSubscribe)
-				.catch(error => {
-					loadingIndicator.fadeOut(phpbb.alertTime);
-					phpbb.alert(ajaxErrorTitle, error);
+			try {
+				const response = await fetch(subscribeUrl, {
+					method: 'POST',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: getFormData(newSubscription),
 				});
+				const data = await response.json();
+				loadingIndicator.fadeOut(phpbb.alertTime);
+
+				if (data.success) {
+					handleSubscribe(data);
+				} else {
+					// Server rejected the subscription; clean up the browser-side subscription
+					// without awaiting, so a failure here can't bubble to the outer catch and
+					// incorrectly trigger promptDenied or show the wrong error message.
+					newSubscription.unsubscribe().catch(console.error);
+					promptDenied.set();
+					hidePopup(document.getElementById('wpn_popup_prompt'));
+					phpbb.alert(ajaxErrorTitle, data.message || subscribeButton.getAttribute('data-l-unsupported'));
+				}
+			} catch (error) {
+				loadingIndicator.fadeOut(phpbb.alertTime);
+				// Clean up the browser-side subscription so it doesn't become orphaned
+				// when the server request fails (network error, bad JSON, etc.).
+				newSubscription.unsubscribe().catch(console.error);
+				phpbb.alert(ajaxErrorTitle, error.message || subscribeButton.getAttribute('data-l-unsupported'));
+			}
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
 			hidePopup(document.getElementById('wpn_popup_prompt'));

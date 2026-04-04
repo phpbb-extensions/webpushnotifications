@@ -602,6 +602,47 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		}
 	}
 
+	/**
+	 * @dataProvider data_notification_webpush
+	 */
+	public function test_permanently_removed_subscriptions_deleted($notification_type, $post_data, $expected_users): void
+	{
+		// Skip test if no expected users
+		if (empty($expected_users))
+		{
+			$this->assertTrue(true);
+			return;
+		}
+
+		// Insert a permanently-removed.invalid subscription for the first user.
+		// This simulates a dead subscription whose endpoint can never resolve (RFC 6761).
+		$first_user_id = array_key_first($expected_users);
+		$dead_endpoint = 'https://permanently-removed.invalid/fcm/send/test_dead_subscription';
+		$this->insert_subscription_for_user($first_user_id, $dead_endpoint);
+
+		$this->assertEquals(1, $this->get_subscription_count(), 'Expected 1 subscription before notification');
+
+		$post_data = array_merge([
+			'post_time' => 1349413322,
+			'poster_id' => 1,
+			'topic_title' => '',
+			'post_subject' => '',
+			'post_username' => '',
+			'forum_name' => '',
+		], $post_data);
+
+		// Send notifications — should trigger cleanup of the permanently-removed subscription
+		$this->notifications->add_notifications($notification_type, $post_data);
+
+		// The dead subscription should have been silently deleted
+		$this->assertEquals(0, $this->get_subscription_count(), 'Expected permanently-removed subscription to be deleted');
+
+		// Verify no admin log was written — unlike real delivery failures (which log errors),
+		// permanently-removed endpoints should be silently cleaned up without noise.
+		$admin_logs = $this->log->get_logs('admin');
+		$this->assertEmpty($admin_logs, 'Expected no admin log entry for a permanently-removed subscription');
+	}
+
 	public function test_get_type(): void
 	{
 		$this->assertEquals('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush->get_type());
@@ -686,6 +727,51 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			->willReturn($body);
 
 		return $request;
+	}
+
+	/**
+	 * Test is_endpoint_permanently_removed method
+	 */
+	public function test_is_endpoint_permanently_removed(): void
+	{
+		$reflection = new \ReflectionMethod($this->notification_method_webpush, 'is_endpoint_permanently_removed');
+		$reflection->setAccessible(true);
+
+		// .invalid TLD sentinel — should return true
+		$this->assertTrue(
+			$reflection->invoke($this->notification_method_webpush, 'https://permanently-removed.invalid/fcm/send/abc123'),
+			'Expected permanently-removed.invalid to be treated as permanently removed'
+		);
+
+		// Any .invalid host — should return true
+		$this->assertTrue(
+			$reflection->invoke($this->notification_method_webpush, 'https://some-other.invalid/push/endpoint'),
+			'Expected any .invalid host to be treated as permanently removed'
+		);
+
+		// Valid FCM endpoint — should return false
+		$this->assertFalse(
+			$reflection->invoke($this->notification_method_webpush, 'https://fcm.googleapis.com/fcm/send/abc123'),
+			'Expected valid FCM endpoint to not be treated as permanently removed'
+		);
+
+		// Valid Mozilla endpoint — should return false
+		$this->assertFalse(
+			$reflection->invoke($this->notification_method_webpush, 'https://updates.push.services.mozilla.com/push/v1/abc123'),
+			'Expected valid Mozilla endpoint to not be treated as permanently removed'
+		);
+
+		// Subdomain spoofing attempt (host ends in .invalid.attacker.com, not .invalid) — should return false
+		$this->assertFalse(
+			$reflection->invoke($this->notification_method_webpush, 'https://permanently-removed.invalid.attacker.com/push'),
+			'Expected .invalid.attacker.com to not be treated as permanently removed'
+		);
+
+		// Empty/invalid URL — should return false
+		$this->assertFalse(
+			$reflection->invoke($this->notification_method_webpush, 'not_a_url'),
+			'Expected unparseable URL to not be treated as permanently removed'
+		);
 	}
 
 	/**
@@ -903,6 +989,27 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->db->sql_freeresult($result);
 
 		return $sql_ary;
+	}
+
+	/**
+	 * Create a real subscription via the push testing service for the given user, then overwrite
+	 * its endpoint with the specified value. This gives a subscription with valid encryption keys
+	 * (required for payload encryption) but an endpoint that will never resolve — used for testing
+	 * dead/sentinel endpoints such as permanently-removed.invalid.
+	 */
+	protected function insert_subscription_for_user(int $user_id, string $endpoint): void
+	{
+		// Get a real subscription from the push testing service so the p256dh/auth keys are
+		// valid base64url-encoded EC keys that the library can actually encrypt against.
+		$subscription_data = $this->create_subscription_for_user($user_id);
+
+		// Overwrite the endpoint to the dead one we want to test with.
+		$push_subscriptions_table = $this->container->getParameter('tables.phpbb.wpn.push_subscriptions');
+		$sql = 'UPDATE ' . $push_subscriptions_table . "
+			SET endpoint = '" . $this->db->sql_escape($endpoint) . "'
+			WHERE user_id = " . (int) $user_id . "
+				AND endpoint = '" . $this->db->sql_escape($subscription_data['endpoint']) . "'";
+		$this->db->sql_query($sql);
 	}
 
 	/**

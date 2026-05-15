@@ -359,6 +359,8 @@ class webpush
 		$this->check_subscribe_requests();
 
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
+		$previous_endpoint = $data['previous_endpoint'] ?? '';
+		$expiration_time = $data['expiration_time'] ?? $data['expirationTime'] ?? 0;
 
 		$data['endpoint'] = $data['endpoint'] ?? '';
 
@@ -367,10 +369,19 @@ class webpush
 			throw new http_exception(Response::HTTP_BAD_REQUEST, 'WEBPUSH_INVALID_ENDPOINT');
 		}
 
+		$replace_endpoints = array_values(array_unique(array_filter([$data['endpoint'], $previous_endpoint])));
+		if (!empty($replace_endpoints))
+		{
+			$sql = 'DELETE FROM ' . $this->push_subscriptions_table . '
+				WHERE user_id = ' . (int) $this->user->id() . '
+					AND ' . $this->db->sql_in_set('endpoint', $replace_endpoints);
+			$this->db->sql_query($sql);
+		}
+
 		$sql = 'INSERT INTO ' . $this->push_subscriptions_table . ' ' . $this->db->sql_build_array('INSERT', [
 			'user_id'			=> $this->user->id(),
 			'endpoint'			=> $data['endpoint'],
-			'expiration_time'	=> $data['expiration_time'] ?? 0,
+			'expiration_time'	=> $expiration_time,
 			'p256dh'			=> $data['keys']['p256dh'],
 			'auth'				=> $data['keys']['auth'],
 		]);

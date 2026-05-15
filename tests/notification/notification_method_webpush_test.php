@@ -662,6 +662,12 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$report_401 = new \Minishlink\WebPush\MessageSentReport($request_401, $response_401, false, 'Unauthorized');
 		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_401), 'Expected 401 to be treated as unauthorized');
 
+		// Test 403 status (should return true for invalid VAPID/subscription mismatches)
+		$response_403 = $this->createMockResponse(403);
+		$request_403 = $this->createMockRequest();
+		$report_403 = new \Minishlink\WebPush\MessageSentReport($request_403, $response_403, false, 'Forbidden');
+		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_403), 'Expected 403 to be treated as a permanent authorization failure');
+
 		// Test 404 status (should return false, handled by isSubscriptionExpired)
 		$response_404 = $this->createMockResponse(404);
 		$request_404 = $this->createMockRequest();

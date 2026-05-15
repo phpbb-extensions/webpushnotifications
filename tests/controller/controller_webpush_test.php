@@ -420,6 +420,48 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEmpty($this->get_subscription_data());
 	}
 
+	public function test_subscribe_replaces_previous_subscription()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+
+		$sql = 'INSERT INTO phpbb_wpn_push_subscriptions ' . $this->db->sql_build_array('INSERT', [
+			'user_id'			=> 2,
+			'endpoint'			=> 'https://fcm.googleapis.com/fcm/send/old_endpoint',
+			'expiration_time'	=> 0,
+			'p256dh'			=> 'old_p256dh',
+			'auth'				=> 'old_auth',
+		]);
+		$this->db->sql_query($sql);
+
+		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
+		$symfony_request->method('get')->willReturn(json_encode([
+			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
+			'previous_endpoint' => 'https://fcm.googleapis.com/fcm/send/old_endpoint',
+			'expirationTime' => 42,
+			'keys' => ['p256dh' => 'new_p256dh', 'auth' => 'new_auth']
+		]));
+
+		$response = $this->controller->subscribe($symfony_request);
+
+		$this->assertInstanceOf(JsonResponse::class, $response);
+		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
+
+		$subscriptions = $this->get_all_subscriptions(2);
+		$this->assertCount(1, $subscriptions);
+		$this->assertEquals([
+			'user_id' => '2',
+			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
+			'p256dh' => 'new_p256dh',
+			'auth' => 'new_auth',
+			'expiration_time' => '42',
+			'subscription_id' => '2',
+		], $subscriptions[0]);
+	}
+
 	public function data_subscribe_invalid_endpoint(): array
 	{
 		return [
@@ -592,6 +634,22 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 		return $row;
+	}
+
+	private function get_all_subscriptions(int $user_id): array
+	{
+		$sql = 'SELECT *
+			FROM phpbb_wpn_push_subscriptions
+			WHERE user_id = ' . $user_id . '
+			ORDER BY subscription_id ASC';
+		$result = $this->db->sql_query($sql);
+		$rows = [];
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$rows[] = $row;
+		}
+		$this->db->sql_freeresult($result);
+		return $rows;
 	}
 
 	private function get_user_popup_preference($user_id)

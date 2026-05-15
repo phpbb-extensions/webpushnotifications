@@ -441,7 +441,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$symfony_request->method('get')->willReturn(json_encode([
 			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
 			'previous_endpoint' => 'https://fcm.googleapis.com/fcm/send/old_endpoint',
-			'expirationTime' => 42,
+			'expirationTime' => 42000,
 			'keys' => ['p256dh' => 'new_p256dh', 'auth' => 'new_auth']
 		]));
 
@@ -460,6 +460,53 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'expiration_time' => '42',
 			'subscription_id' => '2',
 		], $subscriptions[0]);
+	}
+
+	public function test_subscribe_invalid_payload_preserves_existing_subscription()
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+
+		$sql = 'INSERT INTO phpbb_wpn_push_subscriptions ' . $this->db->sql_build_array('INSERT', [
+			'user_id'			=> 2,
+			'endpoint'			=> 'https://fcm.googleapis.com/fcm/send/old_endpoint',
+			'expiration_time'	=> 10,
+			'p256dh'			=> 'old_p256dh',
+			'auth'				=> 'old_auth',
+		]);
+		$this->db->sql_query($sql);
+
+		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
+		$symfony_request->method('get')->willReturn(json_encode([
+			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
+			'previous_endpoint' => 'https://fcm.googleapis.com/fcm/send/old_endpoint',
+			'expirationTime' => 42000,
+			'keys' => ['auth' => 'new_auth']
+		]));
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('AJAX_ERROR_TEXT');
+
+		try
+		{
+			$this->controller->subscribe($symfony_request);
+		}
+		finally
+		{
+			$subscriptions = $this->get_all_subscriptions(2);
+			$this->assertCount(1, $subscriptions);
+			$this->assertEquals([
+				'user_id' => '2',
+				'endpoint' => 'https://fcm.googleapis.com/fcm/send/old_endpoint',
+				'p256dh' => 'old_p256dh',
+				'auth' => 'old_auth',
+				'expiration_time' => '10',
+				'subscription_id' => '1',
+			], $subscriptions[0]);
+		}
 	}
 
 	public function data_subscribe_invalid_endpoint(): array

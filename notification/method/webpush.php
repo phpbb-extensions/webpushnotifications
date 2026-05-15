@@ -384,7 +384,7 @@ class webpush extends base implements extended_method_interface
 			{
 				$subscriptions[] = [
 					'endpoint'			=> $subscription['endpoint'],
-					'expirationTime'	=> (int) $subscription['expiration_time'],
+					'expirationTime'	=> max(0, (int) $subscription['expiration_time']) * 1000,
 				];
 			}
 		}

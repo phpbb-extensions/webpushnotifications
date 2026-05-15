@@ -648,6 +648,42 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->assertEquals('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush->get_type());
 	}
 
+	public function test_get_ucp_template_data_uses_millisecond_expiration_time(): void
+	{
+		$this->user->data['user_id'] = 2;
+		$this->user->page['page'] = 'ucp.php?i=ucp_notifications';
+		$this->config['load_notifications'] = true;
+		$this->config['allow_board_notifications'] = true;
+		$this->config['wpn_webpush_dropdown_subscribe'] = true;
+
+		$sql = 'INSERT INTO phpbb_wpn_push_subscriptions ' . $this->db->sql_build_array('INSERT', [
+			'user_id'			=> 2,
+			'endpoint'			=> 'https://fcm.googleapis.com/fcm/send/test_endpoint',
+			'expiration_time'	=> 42,
+			'p256dh'			=> 'test_p256dh',
+			'auth'				=> 'test_auth',
+		]);
+		$this->db->sql_query($sql);
+
+		$controller_helper = $this->createMock(\phpbb\controller\helper::class);
+		$controller_helper->method('route')->willReturnArgument(0);
+
+		$form_helper = $this->createMock(\phpbb\webpushnotifications\form\form_helper::class);
+		$form_helper->method('get_form_tokens')->willReturn([
+			'creation_time' => 1,
+			'form_token' => 'test',
+		]);
+
+		$template_data = $this->notification_method_webpush->get_ucp_template_data($controller_helper, $form_helper);
+
+		$this->assertSame([
+			[
+				'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
+				'expirationTime' => 42000,
+			],
+		], $template_data['SUBSCRIPTIONS']);
+	}
+
 	/**
 	 * Test is_subscription_unauthorized method with various HTTP status codes
 	 */

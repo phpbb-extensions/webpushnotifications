@@ -221,7 +221,7 @@ class listener_test extends \phpbb_database_test_case
 				'method_data' => [
 					'id' => 'notification.method.phpbb.wpn.webpush',
 				],
-				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => 1]],
+				[['endpoint' => 'https://web.push.test.localhost/foo3', 'expirationTime' => 1000]],
 				true,
 			],
 			[	// webpush method with an invalid webpush subscription, expect code execution but no subscription data

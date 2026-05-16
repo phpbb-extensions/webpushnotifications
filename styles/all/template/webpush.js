@@ -21,7 +21,7 @@ function PhpbbWebpush() {
 	/** @type {{endpoint: string, expirationTime: number}[]} Subscriptions */
 	let subscriptions;
 
-	/** @type {string} Title of error message */
+	/** @type {string} Title of an error message */
 	let ajaxErrorTitle = '';
 
 	/** @type {string} VAPID public key */
@@ -44,7 +44,8 @@ function PhpbbWebpush() {
 
 	/**
 	 * Init function for phpBB Web Push
-	 * @type {array} options
+	 *
+	 * @param {Object} options Init options
 	 */
 	this.init = function(options) {
 		serviceWorkerUrl = options.serviceWorkerUrl;
@@ -73,7 +74,7 @@ function PhpbbWebpush() {
 
 		if ('serviceWorker' in navigator && 'PushManager' in window) {
 			navigator.serviceWorker.register(serviceWorkerUrl)
-				.then(async () => {
+				.then(async() => {
 					subscribeButton.addEventListener('click', subscribeButtonHandler);
 					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
 
@@ -91,9 +92,9 @@ function PhpbbWebpush() {
 	};
 
 	/**
-	 * If subscribing is disabled, hide dropdown toggle and update subscribe button text
+	 * If subscribing is disabled, hide the dropdown toggle and update the subscription button text
 	 *
-	 * @return void
+	 * @returns {void}
 	 */
 	function setDisabledState() {
 		subscribeButton.disabled = true;
@@ -111,9 +112,9 @@ function PhpbbWebpush() {
 	}
 
 	/**
-	 * Update button state depending on notifications state
+	 * Update button state depending on the notification state
 	 *
-	 * @return void
+	 * @returns {Promise<void>}
 	 */
 	async function updateButtonState() {
 		setSubscriptionState(false);
@@ -177,6 +178,8 @@ function PhpbbWebpush() {
 
 	/**
 	 * Show popup with event handlers
+	 *
+	 * @param {HTMLElement} popup
 	 */
 	function showPopup(popup) {
 		setTimeout(() => {
@@ -226,7 +229,8 @@ function PhpbbWebpush() {
 
 	/**
 	 * Hide popup
-	 * @param popup
+	 *
+	 * @param {HTMLElement|null} popup
 	 */
 	function hidePopup(popup) {
 		if (popup) {
@@ -237,7 +241,7 @@ function PhpbbWebpush() {
 	}
 
 	/**
-	 * Check whether subscription is valid
+	 * Check whether a subscription is valid
 	 *
 	 * @param {PushSubscription} subscription
 	 * @returns {boolean}
@@ -405,7 +409,7 @@ function PhpbbWebpush() {
 	/**
 	 * Handler for pushing subscribe button
 	 *
-	 * @param {Object} event Subscribe button push event
+	 * @param {Event} event Subscribe button push event
 	 * @returns {Promise<void>}
 	 */
 	async function subscribeButtonHandler(event) {
@@ -450,7 +454,7 @@ function PhpbbWebpush() {
 	/**
 	 * Handler for pushing unsubscribe button
 	 *
-	 * @param {Object} event Unsubscribe button push event
+	 * @param {Event} event Unsubscribe button push event
 	 * @returns {Promise<void>}
 	 */
 	async function unsubscribeButtonHandler(event) {
@@ -494,7 +498,7 @@ function PhpbbWebpush() {
 	/**
 	 * Handler for toggle popup prompt button
 	 *
-	 * @param {Object} event Toggle button push event
+	 * @param {Event} event Toggle button push event
 	 */
 	function togglePopupHandler(event) {
 		event.preventDefault();
@@ -534,7 +538,9 @@ function PhpbbWebpush() {
 	/**
 	 * Handle subscribe response
 	 *
-	 * @param {Object} response Response from subscription endpoint
+	 * @param {{success: boolean, form_tokens?: Object}} response Response from subscription endpoint
+	 * @param {PushSubscription} subscription Browser subscription
+	 * @param {string} previousEndpoint Previous endpoint for refreshed subscriptions
 	 */
 	function handleSubscribe(response, subscription, previousEndpoint = '') {
 		if (response.success) {
@@ -566,7 +572,7 @@ function PhpbbWebpush() {
 	/**
 	 * Update form tokens with supplied ones
 	 *
-	 * @param {Object} formTokens
+	 * @param {{creation_time: number, form_token: string}} formTokens
 	 */
 	function updateFormTokens(formTokens) {
 		phpbb.webpush.formTokens.creationTime = formTokens.creation_time;
@@ -576,7 +582,7 @@ function PhpbbWebpush() {
 	/**
 	 * Convert a base64 string to Uint8Array
 	 *
-	 * @param base64String
+	 * @param {string} base64String
 	 * @returns {Uint8Array}
 	 */
 	function urlB64ToUint8Array(base64String) {

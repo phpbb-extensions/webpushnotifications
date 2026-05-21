@@ -458,7 +458,7 @@ class webpush
 
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
 
-		$endpoint = $data['endpoint'];
+		$endpoint = is_string($data['endpoint'] ?? null) ? $data['endpoint'] : '';
 
 		$sql = 'DELETE FROM ' . $this->push_subscriptions_table . '
 			WHERE user_id = ' . (int) $this->user->id() . "

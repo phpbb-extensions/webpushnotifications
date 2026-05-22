@@ -196,8 +196,11 @@ class webpush extends base implements extended_method_interface
 
 		// Load all the users we need
 		$notify_users = array_diff($user_ids, $banned_users);
+
+		// If we have no users (e.g. all recipients are banned) empty queue and exit
 		if (empty($notify_users))
 		{
+			$this->empty_queue();
 			return;
 		}
 

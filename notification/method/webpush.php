@@ -534,6 +534,6 @@ class webpush extends base implements extended_method_interface
 	protected function is_endpoint_permanently_removed(string $endpoint): bool
 	{
 		$host = parse_url($endpoint, PHP_URL_HOST);
-		return $host !== null && substr($host, -strlen('.invalid')) === '.invalid';
+		return is_string($host) && substr($host, -strlen('.invalid')) === '.invalid';
 	}
 }

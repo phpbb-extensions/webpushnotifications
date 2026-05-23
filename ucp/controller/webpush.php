@@ -283,7 +283,9 @@ class webpush
 		]);
 
 		$response = new Response($content);
-		$response->headers->set('Content-Type', 'text/javascript; charset=UTF-8');
+		$response->headers->set('Content-Type', 'application/javascript; charset=UTF-8');
+		$response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
+		$response->headers->set('X-Robots-Tag', 'noindex, nofollow');
 
 		if (!empty($this->user->data['is_bot']))
 		{

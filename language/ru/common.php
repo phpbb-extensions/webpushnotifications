@@ -38,5 +38,8 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
+	'PWA_INSTALL_BUTTON'		=> 'Install app',
+	'PWA_INSTALL_DISMISS'		=> 'Close',
+	'PWA_INSTALL_SUBTITLE'		=> 'Add to home screen',
 	'WEBPUSH_INVALID_ENDPOINT'	=> 'Конечная точка push-уведомления не принадлежит известному сервису push-уведомлений.',
 ]);

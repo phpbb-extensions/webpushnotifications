@@ -17,6 +17,7 @@ use phpbb\request\request;
 use phpbb\symfony_request;
 use phpbb\template\template;
 use phpbb\user;
+use phpbb\webpushnotifications\ext;
 
 class wpn_acp_module
 {
@@ -33,6 +34,9 @@ class wpn_acp_module
 	/** @var log $log */
 	protected $log;
 
+	/** @var \FastImageSize\FastImageSize $imagesize */
+	protected $imagesize;
+
 	/** @var request $request */
 	protected $request;
 
@@ -44,6 +48,9 @@ class wpn_acp_module
 
 	/** @var user $user */
 	protected $user;
+
+	/** @var string */
+	protected $root_path;
 
 	/** @var array $errors */
 	protected $errors = [];
@@ -63,12 +70,14 @@ class wpn_acp_module
 		global $phpbb_container;
 
 		$this->config = $phpbb_container->get('config');
+		$this->imagesize = $phpbb_container->get('upload_imagesize');
 		$this->lang = $phpbb_container->get('language');
 		$this->log = $phpbb_container->get('log');
 		$this->request = $phpbb_container->get('request');
 		$this->symfony_request = $phpbb_container->get('symfony_request');
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
+		$this->root_path = $phpbb_container->getParameter('core.root_path');
 
 		$form_key = 'phpbb/webpushnotifications';
 		add_form_key($form_key);
@@ -94,6 +103,26 @@ class wpn_acp_module
 			}
 
 			$this->display_settings();
+		}
+		else if ($mode === 'pwa')
+		{
+			$this->tpl_name = 'wpn_acp_pwa';
+
+			$this->lang->add_lang('webpushnotifications_module_acp', 'phpbb/webpushnotifications');
+
+			$this->page_title = $this->lang->lang('ACP_WEBPUSH_PWA_SETTINGS');
+
+			if ($this->request->is_set_post('submit'))
+			{
+				if (!check_form_key($form_key))
+				{
+					trigger_error($this->lang->lang('FORM_INVALID'), E_USER_WARNING);
+				}
+
+				$this->save_pwa_settings();
+			}
+
+			$this->display_pwa_settings();
 		}
 	}
 
@@ -162,6 +191,147 @@ class wpn_acp_module
 		}
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
+	}
+
+	/**
+	 * Add PWA settings template vars to the form
+	 */
+	public function display_pwa_settings()
+	{
+		$this->template->assign_vars([
+			'S_PWA_SHOW_INSTALL_BANNER'	=> (bool) $this->config['pwa_show_install_banner'],
+			'PWA_SHORT_NAME'			=> $this->config['pwa_short_name'],
+			'PWA_ICON_SMALL'			=> $this->config['pwa_icon_small'],
+			'PWA_ICON_LARGE'			=> $this->config['pwa_icon_large'],
+			'PWA_THEME_COLOUR'			=> $this->config['pwa_theme_colour'],
+			'PWA_BACKGROUND_COLOUR'		=> $this->config['pwa_background_colour'],
+			'U_ACTION'					=> $this->u_action,
+		]);
+
+		$this->display_errors();
+	}
+
+	/**
+	 * Save PWA settings data to the database
+	 *
+	 * @return void
+	 */
+	public function save_pwa_settings()
+	{
+		$config_array = $this->request->variable('config', ['' => ''], true);
+
+		$config_array['pwa_short_name'] = $config_array['pwa_short_name'] ?? '';
+		$config_array['pwa_icon_small'] = $config_array['pwa_icon_small'] ?? '';
+		$config_array['pwa_icon_large'] = $config_array['pwa_icon_large'] ?? '';
+		$config_array['pwa_theme_colour'] = $this->normalise_colour($config_array['pwa_theme_colour'] ?? '#000000', '#000000');
+		$config_array['pwa_background_colour'] = $this->normalise_colour($config_array['pwa_background_colour'] ?? '#ffffff', '#ffffff');
+
+		$this->validate_pwa_short_name($config_array['pwa_short_name']);
+		$this->validate_pwa_icons($config_array['pwa_icon_small'], $config_array['pwa_icon_large']);
+
+		if ($this->display_errors())
+		{
+			return;
+		}
+
+		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_CONFIG_WEBPUSH');
+
+		// Ensure 4-byte emoji can be stored correctly
+		$config_array['pwa_short_name'] = utf8_encode_ucr($config_array['pwa_short_name']);
+
+		foreach ([
+			'pwa_short_name',
+			'pwa_icon_small',
+			'pwa_icon_large',
+			'pwa_theme_colour',
+			'pwa_background_colour',
+			'pwa_show_install_banner',
+		] as $config_name)
+		{
+			$this->config->set($config_name, $config_array[$config_name] ?? 0);
+		}
+
+		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
+	}
+
+	/**
+	 * Validate PWA short site name
+	 */
+	protected function validate_pwa_short_name(string $short_name): void
+	{
+		if ($short_name === '')
+		{
+			return;
+		}
+
+		$short_name = ext::decode_entities($short_name, ENT_QUOTES);
+		if (utf8_strlen($short_name) > 12)
+		{
+			$this->errors[] = $this->lang->lang('PWA_SHORT_NAME_INVALID');
+		}
+	}
+
+	/**
+	 * Validate PWA icon filenames and dimensions
+	 */
+	protected function validate_pwa_icons(string $small_icon, string $large_icon): void
+	{
+		if ($small_icon === '' && $large_icon === '')
+		{
+			return;
+		}
+
+		if ($small_icon === '')
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_NOT_PROVIDED', $this->lang->lang('PWA_ICON_SMALL'));
+			return;
+		}
+
+		if ($large_icon === '')
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_NOT_PROVIDED', $this->lang->lang('PWA_ICON_LARGE'));
+			return;
+		}
+
+		$this->validate_pwa_icon($small_icon, 192);
+		$this->validate_pwa_icon($large_icon, 512);
+	}
+
+	/**
+	 * Validate one PWA icon file
+	 */
+	protected function validate_pwa_icon(string $filename, int $size): void
+	{
+		if (basename($filename) !== $filename)
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_INVALID', $filename);
+			return;
+		}
+
+		$image = $this->root_path . ext::PWA_ICON_DIR . '/' . $filename;
+		$image_info = $this->imagesize->getImageSize($image);
+		if ($image_info === false)
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_INVALID', $filename);
+			return;
+		}
+
+		if ($image_info['width'] !== $size || $image_info['height'] !== $size)
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_SIZE_INVALID', $filename);
+		}
+
+		if ($image_info['type'] !== IMAGETYPE_PNG)
+		{
+			$this->errors[] = $this->lang->lang('PWA_ICON_MIME_INVALID', $filename);
+		}
+	}
+
+	protected function normalise_colour($colour, $default): string
+	{
+		$colour = strtolower(trim((string) $colour));
+
+		return preg_match('/^#[a-f0-9]{6}$/', $colour) ? $colour : $default;
 	}
 
 	/**

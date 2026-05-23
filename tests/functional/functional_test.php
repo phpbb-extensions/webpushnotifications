@@ -122,12 +122,14 @@ class functional_test extends \phpbb_functional_test_case
 			'orientation'	=> 'portrait',
 			'start_url'		=> '/',
 			'scope'			=> '/',
+			'theme_color'	=> '#000000',
+			'background_color' => '#ffffff',
 		];
 
 		$this->login();
 		$this->admin_login();
 
-		$crawler = self::request('GET', 'adm/index.php?i=acp_board&mode=settings&sid=' . $this->sid);
+		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=pwa&sid=' . $this->sid);
 
 		$form_data = [
 			'config[pwa_short_name]'	=> $expected['short_name'],

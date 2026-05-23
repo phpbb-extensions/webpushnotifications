@@ -10,11 +10,11 @@
 
 namespace phpbb\webpushnotifications\event;
 
-use FastImageSize\FastImageSize;
 use phpbb\config\config;
 use phpbb\controller\helper as controller_helper;
 use phpbb\language\language;
 use phpbb\notification\manager;
+use phpbb\request\request_interface;
 use phpbb\template\template;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
@@ -35,11 +35,11 @@ class listener implements EventSubscriberInterface
 	/* @var form_helper */
 	protected $form_helper;
 
-	/** @var FastImageSize */
-	protected $imagesize;
-
 	/* @var language */
 	protected $language;
+
+	/** @var request_interface */
+	protected $request;
 
 	/* @var template */
 	protected $template;
@@ -50,33 +50,28 @@ class listener implements EventSubscriberInterface
 	/* @var manager */
 	protected $phpbb_notifications;
 
-	/** @var string */
-	protected $root_path;
-
 	/**
 	 * Constructor
 	 *
 	 * @param config $config
 	 * @param controller_helper $controller_helper Controller helper object
-	 * @param FastImageSize $imagesize
 	 * @param form_helper $form_helper Form helper object
 	 * @param language $language Language object
+	 * @param request_interface $request
 	 * @param template $template Template object
 	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
-	 * @param string $root_path
 	 */
-	public function __construct(config $config, controller_helper $controller_helper, FastImageSize $imagesize, form_helper $form_helper, language $language, template $template, user $user, manager $phpbb_notifications, $root_path)
+	public function __construct(config $config, controller_helper $controller_helper, form_helper $form_helper, language $language, request_interface $request, template $template, user $user, manager $phpbb_notifications)
 	{
 		$this->config = $config;
 		$this->controller_helper = $controller_helper;
-		$this->imagesize = $imagesize;
 		$this->form_helper = $form_helper;
 		$this->language = $language;
+		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
 		$this->phpbb_notifications = $phpbb_notifications;
-		$this->root_path = $root_path;
 	}
 
 	public static function getSubscribedEvents()
@@ -86,9 +81,6 @@ class listener implements EventSubscriberInterface
 			'core.page_header_after'				=> [['load_template_data'], ['pwa_manifest']],
 			'core.ucp_display_module_before'		=> 'load_language',
 			'core.acp_main_notice'					=> 'compatibility_notice',
-			'core.acp_board_config_edit_add'		=> 'acp_pwa_options',
-			'core.acp_board_config_emoji_enabled'	=> 'acp_pwa_allow_emoji',
-			'core.validate_config_variable'			=> 'validate_pwa_options',
 			'core.help_manager_add_block_after'		=> 'wpn_faq',
 		];
 	}
@@ -163,153 +155,10 @@ class listener implements EventSubscriberInterface
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
+			'PWA_THEME_COLOUR'	=> $this->config['pwa_theme_colour'] ?? '#000000',
+			'S_PWA_SHOW_BANNER'	=> !empty($this->config['pwa_show_install_banner']),
+			'S_PWA_IS_MOBILE'	=> $this->is_mobile_phone(),
 		]);
-	}
-
-	/**
-	 * Progressive web app options for the ACP
-	 *
-	 * @param \phpbb\event\data $event
-	 * @return void
-	 */
-	public function acp_pwa_options($event)
-	{
-		if ($event['mode'] === 'settings' && array_key_exists('legend4', $event['display_vars']['vars']))
-		{
-			$this->language->add_lang('webpushnotifications_common_acp', 'phpbb/webpushnotifications');
-
-			$my_config_vars = [
-				'legend_pwa_settings'=> 'PWA_SETTINGS',
-				'pwa_short_name'	=> ['lang' => 'PWA_SHORT_NAME', 'validate' => 'pwa_options:string', 'type' => 'custom', 'function' => [$this, 'pwa_short_sitename'], 'explain' => true],
-				'pwa_icon_small'	=> ['lang' => 'PWA_ICON_SMALL', 'validate' => 'pwa_options:icons', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
-				'pwa_icon_large'	=> ['lang' => 'PWA_ICON_LARGE', 'validate' => 'pwa_options:icons', 'type' => 'custom', 'function' => [$this, 'pwa_icon_name'], 'explain' => true],
-			];
-
-			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend4']));
-
-			$this->template->assign_var('S_PWA_OPTIONS', true);
-		}
-	}
-
-	/**
-	 * Allow PWA short name ACP field to accept emoji characters
-	 *
-	 * @param \phpbb\event\data $event
-	 * @return void
-	 */
-	public function acp_pwa_allow_emoji($event)
-	{
-		if (in_array('pwa_short_name', $event['config_name_ary'], true))
-		{
-			return;
-		}
-
-		$config_name_ary = $event['config_name_ary'];
-		$config_name_ary[] = 'pwa_short_name';
-		$event['config_name_ary'] = $config_name_ary;
-	}
-
-	/**
-	 * Return HTML for PWA icon name settings
-	 *
-	 * @param string $value Value of config
-	 * @param string $key Name of config
-	 * @return string
-	 */
-	public function pwa_icon_name($value, $key)
-	{
-		return ext::PWA_ICON_DIR . '/<input id="' . $key . '" type="text" size="40" maxlength="255" name="config[' . $key . ']" value="' . $value . '">';
-	}
-
-	/**
-	 * Return HTML for PWA short site name setting
-	 *
-	 * @param string $value Value of config
-	 * @param string $key Name of config
-	 * @return string
-	 */
-	public function pwa_short_sitename($value, $key)
-	{
-		$placeholder = $this->trim_shortname($this->config['sitename']);
-
-		return '<input id="' . $key . '" type="text" size="40" maxlength="12" name="config[' . $key . ']" value="' . $value . '" placeholder="' . $placeholder . '">';
-	}
-
-	/**
-	 * Validate PWA options
-	 *
-	 * @param \phpbb\event\data $event
-	 * @return void
-	 */
-	public function validate_pwa_options($event)
-	{
-		$type	= 0;
-		$mode	= 1;
-
-		$validator = explode(':', $event['config_definition']['validate']);
-
-		if ($validator[$type] !== 'pwa_options')
-		{
-			return;
-		}
-
-		switch ($validator[$mode])
-		{
-			case 'string':
-				// Ignore validation if icon fields are empty
-				if (empty($event['cfg_array']['pwa_short_name']))
-				{
-					return;
-				}
-
-				$short_name = ext::decode_entities($event['cfg_array']['pwa_short_name'], ENT_QUOTES);
-
-				// Do not allow strings longer than 12 characters
-				if (utf8_strlen($short_name) > 12)
-				{
-					$this->add_error($event, 'PWA_SHORT_NAME_INVALID');
-					return;
-				}
-			break;
-
-			case 'icons':
-				// Ignore validation if icon fields are empty
-				if (empty($event['cfg_array']['pwa_icon_small']) && empty($event['cfg_array']['pwa_icon_large']))
-				{
-					return;
-				}
-
-				$value = $event['cfg_array'][$event['config_name']];
-
-				// Don't allow empty values, if one icon is set, both must be set.
-				if (empty($value))
-				{
-					$this->add_error($event, 'PWA_ICON_NOT_PROVIDED', $this->language->lang(strtoupper($event['config_name'])));
-					return;
-				}
-
-				// Check if image is valid
-				$image = $this->root_path . ext::PWA_ICON_DIR . '/' . $value;
-				$image_info = $this->imagesize->getImageSize($image);
-				if ($image_info !== false)
-				{
-					if (($event['config_name'] === 'pwa_icon_small' && $image_info['width'] !== 192 && $image_info['height'] !== 192) ||
-						($event['config_name'] === 'pwa_icon_large' && $image_info['width'] !== 512 && $image_info['height'] !== 512))
-					{
-						$this->add_error($event, 'PWA_ICON_SIZE_INVALID', $value);
-					}
-
-					if ($image_info['type'] !== IMAGETYPE_PNG)
-					{
-						$this->add_error($event, 'PWA_ICON_MIME_INVALID', $value);
-					}
-				}
-				else
-				{
-					$this->add_error($event, 'PWA_ICON_INVALID', $value);
-				}
-			break;
-		}
 	}
 
 	/**
@@ -351,21 +200,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add errors to the error array
-	 *
-	 * @param \phpbb\event\data $event
-	 * @param string $error_key
-	 * @param string $param
-	 * @return void
-	 */
-	protected function add_error($event, $error_key, $param = null)
-	{
-		$error = $event['error'];
-		$error[] = $this->language->lang($error_key, $param);
-		$event['error'] = $error;
-	}
-
-	/**
 	 * Can notifications be used by the user?
 	 *
 	 * @return bool
@@ -388,5 +222,21 @@ class listener implements EventSubscriberInterface
 		$decoded = ext::decode_entities($name, ENT_COMPAT);
 		$trimmed = utf8_substr($decoded, 0, 12);
 		return utf8_htmlspecialchars($trimmed);
+	}
+
+	/**
+	 * Lightweight phone detection for install-banner display
+	 *
+	 * @return bool
+	 */
+	protected function is_mobile_phone()
+	{
+		$user_agent = (string) $this->request->server('HTTP_USER_AGENT', '');
+		if ($user_agent === '' || preg_match('/ipad|tablet|kindle|silk|playbook/i', $user_agent))
+		{
+			return false;
+		}
+
+		return (bool) preg_match('/mobile|iphone|ipod|android.*mobile|windows phone|blackberry|opera mini/i', $user_agent);
 	}
 }

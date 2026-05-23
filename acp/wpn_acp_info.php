@@ -23,6 +23,11 @@ class wpn_acp_info
 					'auth' => 'ext_phpbb/webpushnotifications && acl_a_server',
 					'cat' => ['ACP_CLIENT_COMMUNICATION']
 				],
+				'pwa'	=> [
+					'title' => 'ACP_WEBPUSH_PWA_SETTINGS',
+					'auth' => 'ext_phpbb/webpushnotifications && acl_a_board',
+					'cat' => ['ACP_CLIENT_COMMUNICATION']
+				],
 			],
 		];
 	}

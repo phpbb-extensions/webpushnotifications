@@ -38,7 +38,8 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To enable push notifications on Apple mobile devices, your site needs to function as a Progressive Web Application (PWA). This requires users to add your site to their device’s home screen. For an improved user experience, you can find additional PWA settings under <strong>Board settings</strong>, where you can configure an optional app name and app icons for how your site will appear on users’ home screens.',
+	// Web push settings
+	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To enable push notifications on Apple mobile devices, your site needs to function as a Progressive Web Application (PWA). This requires users to add your site to their device’s home screen. Configure app metadata and install behaviour under <strong>PWA settings</strong>.',
 	'WEBPUSH_ENABLE'				=> 'Enable Web Push',
 	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow users to receive notifications in their browser or device via Web Push. To utilise Web Push, you must input or generate valid VAPID identification keys.',
 	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Generate Identification keys',
@@ -53,4 +54,23 @@ $lang = array_merge($lang, [
 	'WEBPUSH_POPUP_PROMPT'			=> 'Show popup prompt for unsubscribed members',
 	'WEBPUSH_POPUP_PROMPT_EXPLAIN'	=> 'Display a popup message asking registered members if they want to receive push notifications. The popup will only appear to members who are not currently subscribed and have not previously denied.',
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'This board is not using a secure SSL/HTTPS protocol, which is required for enabling web push notifications. Alternatively, the server environment might be misconfigured. Ensure that the <em>HTTPS</em> and <em>HEADER_CLIENT_PROTO</em> server environment variables are correctly configured.',
+
+	// PWA Settings
+	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App behaviour, including app manifest metadata and install banner display.',
+	'PWA_SHORT_NAME'			=> 'Short site name',
+	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
+	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',
+	'PWA_ICON_SMALL'			=> 'Small mobile device icon',
+	'PWA_ICON_SMALL_EXPLAIN'	=> 'File name of a 192px x 192px PNG image. This file must be uploaded to your board’s <samp>' . \phpbb\webpushnotifications\ext::PWA_ICON_DIR . '</samp> directory.',
+	'PWA_ICON_LARGE'			=> 'Large mobile device icon',
+	'PWA_ICON_LARGE_EXPLAIN'	=> 'File name of a 512px x 512px PNG image. This file must be uploaded to your board’s <samp>' . \phpbb\webpushnotifications\ext::PWA_ICON_DIR . '</samp> directory.',
+	'PWA_ICON_SIZE_INVALID'		=> '“%s” does not have the correct image dimensions.',
+	'PWA_ICON_MIME_INVALID'		=> '“%s” must be a PNG image file.',
+	'PWA_ICON_INVALID'			=> '“%s” is not a valid image file or is missing from the expected location. Verify the file name and location are correct.',
+	'PWA_ICON_NOT_PROVIDED'		=> '%s field must not be empty. All icon fields must contain an image.',
+	'PWA_COLOURS'				=> 'Colours',
+	'PWA_THEME_COLOUR'			=> 'Theme colour',
+	'PWA_BACKGROUND_COLOUR'		=> 'Background colour',
+	'PWA_SHOW_INSTALL_BANNER'	=> 'Show install banner',
+	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a mobile install prompt when the browser reports that your board can be installed as an app.',
 ]);

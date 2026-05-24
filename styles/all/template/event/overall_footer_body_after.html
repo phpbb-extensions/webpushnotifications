@@ -19,6 +19,7 @@
 
 {% if S_PWA_SHOW_BANNER and S_PWA_IS_MOBILE %}
 	{% INCLUDEJS '@phpbb_webpushnotifications/pwa_install_banner.js' %}
+	{% INCLUDECSS '@phpbb_webpushnotifications/phpbb_pwa.css' %}
 	<div id="pwa-install-banner" class="pwa-install-banner" hidden>
 		<div class="pwa-install-banner__content">
 			{% if U_TOUCH_ICON %}

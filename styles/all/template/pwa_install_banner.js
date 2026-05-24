@@ -5,7 +5,17 @@
 	let deferredPrompt = null;
 
 	function isStandalone() {
-		return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+		return ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true);
+	}
+
+	function isIOS() {
+		return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+	}
+
+	function isSafari() {
+		const userAgent = window.navigator.userAgent;
+
+		return (/safari/i.test(userAgent) && !/crios|fxios|edgios|opr\//i.test(userAgent));
 	}
 
 	function localStorageGet(key) {
@@ -30,12 +40,31 @@
 		}
 	}
 
+	function showIOSInstallInstructions(banner, installButton) {
+		const defaultSubtitle = document.getElementById('pwa-install-subtitle-default');
+		const iosSubtitle = document.getElementById('pwa-install-subtitle-ios');
+
+		banner.hidden = false;
+
+		if (defaultSubtitle) {
+			defaultSubtitle.hidden = true;
+		}
+
+		if (iosSubtitle) {
+			iosSubtitle.hidden = false;
+		}
+
+		if (installButton) {
+			installButton.hidden = true;
+		}
+	}
+
 	function setupInstallBanner() {
 		const banner = document.getElementById('pwa-install-banner');
 		const installButton = document.getElementById('pwa-btn-install');
 		const dismissButton = document.getElementById('pwa-btn-dismiss');
 
-		if (!banner || !installButton || !dismissButton || isStandalone()) {
+		if (!banner || !dismissButton || isStandalone()) {
 			hideInstallBanner(banner);
 			return;
 		}
@@ -45,27 +74,42 @@
 			return;
 		}
 
+		// iOS Safari does not support beforeinstallprompt.
+		if (isIOS() && isSafari()) {
+			showIOSInstallInstructions(banner, installButton);
+
+			dismissButton.addEventListener('click', () => {
+				hideInstallBanner(banner);
+				localStorageSet(dismissedKey, '1');
+			});
+
+			return;
+		}
+
+		// Chromium install flow.
 		window.addEventListener('beforeinstallprompt', event => {
 			event.preventDefault();
 			deferredPrompt = event;
 			banner.hidden = false;
 		});
 
-		installButton.addEventListener('click', () => {
-			if (!deferredPrompt) {
-				hideInstallBanner(banner);
-				return;
-			}
-
-			deferredPrompt.prompt();
-			deferredPrompt.userChoice.then(choice => {
-				if (choice.outcome === 'accepted') {
+		if (installButton) {
+			installButton.addEventListener('click', () => {
+				if (!deferredPrompt) {
 					hideInstallBanner(banner);
+					return;
 				}
 
-				deferredPrompt = null;
+				deferredPrompt.prompt();
+				deferredPrompt.userChoice.then(choice => {
+					if (choice.outcome === 'accepted') {
+						hideInstallBanner(banner);
+					}
+
+					deferredPrompt = null;
+				});
 			});
-		});
+		}
 
 		dismissButton.addEventListener('click', () => {
 			hideInstallBanner(banner);

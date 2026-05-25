@@ -352,8 +352,7 @@ class listener_test extends \phpbb_database_test_case
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
 				'PWA_THEME_COLOUR'	=> '#000000',
-				'S_PWA_IS_MOBILE'	=> false,
-				'S_PWA_SHOW_BANNER'	=> true,
+				'S_PWA_SHOW_BANNER'	=> false,
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();

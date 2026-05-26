@@ -25,8 +25,14 @@ class wpn_acp_module
 	public $tpl_name;
 	public $u_action;
 
+	/** @var \phpbb\cache\service */
+	protected $cache;
+
 	/** @var config $config */
 	protected $config;
+
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
 
 	/** @var language $lang */
 	protected $lang;
@@ -69,7 +75,9 @@ class wpn_acp_module
 	{
 		global $phpbb_container;
 
+		$this->cache = $phpbb_container->get('cache');
 		$this->config = $phpbb_container->get('config');
+		$this->db = $phpbb_container->get('dbal.conn');
 		$this->imagesize = $phpbb_container->get('upload_imagesize');
 		$this->lang = $phpbb_container->get('language');
 		$this->log = $phpbb_container->get('log');
@@ -203,8 +211,7 @@ class wpn_acp_module
 			'PWA_SHORT_NAME'			=> $this->config['pwa_short_name'],
 			'PWA_ICON_SMALL'			=> $this->config['pwa_icon_small'],
 			'PWA_ICON_LARGE'			=> $this->config['pwa_icon_large'],
-			'PWA_THEME_COLOUR'			=> $this->config['pwa_theme_colour'],
-			'PWA_BACKGROUND_COLOUR'		=> $this->config['pwa_background_colour'],
+			'STYLES'					=> $this->get_styles(),
 			'U_ACTION'					=> $this->u_action,
 		]);
 
@@ -223,11 +230,23 @@ class wpn_acp_module
 		$config_array['pwa_short_name'] = $config_array['pwa_short_name'] ?? '';
 		$config_array['pwa_icon_small'] = $config_array['pwa_icon_small'] ?? '';
 		$config_array['pwa_icon_large'] = $config_array['pwa_icon_large'] ?? '';
-		$config_array['pwa_theme_colour'] = $this->normalise_colour($config_array['pwa_theme_colour'] ?? '#000000', '#000000');
-		$config_array['pwa_background_colour'] = $this->normalise_colour($config_array['pwa_background_colour'] ?? '#ffffff', '#ffffff');
 
 		$this->validate_pwa_short_name($config_array['pwa_short_name']);
 		$this->validate_pwa_icons($config_array['pwa_icon_small'], $config_array['pwa_icon_large']);
+
+		$styles = $this->get_styles();
+		$updates = [];
+		foreach ($styles as $row)
+		{
+			$style_id			= $row['style_id'];
+			$pwa_bg_color		= $this->request->variable('pwa_bg_color_' . $style_id, '');
+			$pwa_theme_color	= $this->request->variable('pwa_theme_color_' . $style_id, '');
+
+			$updates[$style_id] = [
+				'pwa_bg_color'		=> $this->validate_hex_color($pwa_bg_color) ? $pwa_bg_color : $row['pwa_bg_color'],
+				'pwa_theme_color'	=> $this->validate_hex_color($pwa_theme_color) ? $pwa_theme_color : $row['pwa_theme_color'],
+			];
+		}
 
 		if ($this->display_errors())
 		{
@@ -243,13 +262,13 @@ class wpn_acp_module
 			'pwa_short_name',
 			'pwa_icon_small',
 			'pwa_icon_large',
-			'pwa_theme_colour',
-			'pwa_background_colour',
 			'pwa_show_install_banner',
 		] as $config_name)
 		{
 			$this->config->set($config_name, $config_array[$config_name] ?? 0);
 		}
+
+		$this->set_styles($updates);
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);
 	}
@@ -327,11 +346,71 @@ class wpn_acp_module
 		}
 	}
 
-	protected function normalise_colour($colour, $default): string
+	/**
+	 * Validate HTML color hex codes
+	 */
+	protected function validate_hex_color(string $code): bool
 	{
-		$colour = strtolower(trim((string) $colour));
+		$code = trim($code);
 
-		return preg_match('/^#[a-f0-9]{6}$/', $colour) ? $colour : $default;
+		if ($code === '')
+		{
+			return true;
+		}
+
+		$test = (bool) preg_match('/^#([0-9A-F]{3}){1,2}$/i', $code);
+
+		if ($test === false)
+		{
+			$this->errors[] = $this->lang->lang('PWA_INVALID_COLOUR', $code);
+		}
+
+		return $test;
+	}
+
+	/**
+	 * Get style data from the styles table
+	 *
+	 * @return array Style data
+	 */
+	protected function get_styles(): array
+	{
+		$sql = 'SELECT style_id, style_name, pwa_bg_color, pwa_theme_color
+			FROM ' . STYLES_TABLE . '
+			WHERE style_active = 1
+			ORDER BY style_name';
+		$result = $this->db->sql_query($sql, 3600);
+
+		$rows = $this->db->sql_fetchrowset($result);
+		$this->db->sql_freeresult($result);
+
+		return $rows;
+	}
+
+	/**
+	 * Set style data in the styles table
+	 *
+	 * @param array $rows Array of style table data to update; style_id is key
+	 * @return void
+	 */
+	protected function set_styles(array $rows): void
+	{
+		if (!empty($rows))
+		{
+			$this->db->sql_transaction('begin');
+
+			foreach ($rows as $style_id => $row)
+			{
+				$sql = 'UPDATE ' . STYLES_TABLE . '
+					SET ' . $this->db->sql_build_array('UPDATE', $row) . '
+					WHERE style_id = ' . (int) $style_id;
+				$this->db->sql_query($sql);
+			}
+
+			$this->db->sql_transaction('commit');
+
+			$this->cache->destroy('sql', STYLES_TABLE);
+		}
 	}
 
 	/**

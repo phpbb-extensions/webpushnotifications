@@ -68,9 +68,12 @@ $lang = array_merge($lang, [
 	'PWA_ICON_MIME_INVALID'		=> '“%s” must be a PNG image file.',
 	'PWA_ICON_INVALID'			=> '“%s” is not a valid image file or is missing from the expected location. Verify the file name and location are correct.',
 	'PWA_ICON_NOT_PROVIDED'		=> '%s field must not be empty. All icon fields must contain an image.',
+	'PWA_THEME_COLOURS'			=> 'Theme &amp; background colours (optional)',
+	'PWA_THEME_COLOURS_EXPLAIN'	=> 'Used to specify the default colour for your web application’s user interface. Theme colours may be applied to various browser UI elements, such as the toolbar, address bar, and status bar. Background colours appears in the application window before your application’s stylesheets have loaded.',
 	'PWA_COLOURS'				=> 'Colours',
 	'PWA_THEME_COLOUR'			=> 'Theme colour',
 	'PWA_BACKGROUND_COLOUR'		=> 'Background colour',
+	'PWA_INVALID_COLOUR'		=> 'The colour code “<samp>%s</samp>” is not a valid hex code.',
 	'PWA_SHOW_INSTALL_BANNER'	=> 'Show install banner',
 	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a mobile install prompt when the browser reports that your board can be installed as an app.',
 ]);

@@ -99,8 +99,6 @@ class listener_test extends \phpbb_database_test_case
 			'sitename' => 'phpBB',
 			'cookie_name' => 'phpbb3',
 			'pwa_show_install_banner' => true,
-			'pwa_theme_colour' => '#000000',
-			'pwa_background_colour' => '#ffffff',
 			'pwa_icon_small' => '',
 			'pwa_icon_large' => '',
 			'pwa_short_name' => '',
@@ -351,7 +349,8 @@ class listener_test extends \phpbb_database_test_case
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
-				'PWA_THEME_COLOUR'	=> '#000000',
+				'PWA_THEME_COLOR'	=> '#000000',
+				'PWA_BG_COLOR'		=> '#ffffff',
 				'S_PWA_SHOW_BANNER'	=> false,
 			]);
 

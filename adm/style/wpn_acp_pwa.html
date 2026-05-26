@@ -1,4 +1,6 @@
 {% include 'overall_header.html' %}
+{% INCLUDECSS '@phpbb_webpushnotifications/pwa_acp.css' %}
+{% INCLUDEJS '@phpbb_webpushnotifications/pwa_acp.js' %}
 
 <h1>{{ lang('ACP_WEBPUSH_PWA_SETTINGS') }}</h1>
 
@@ -33,16 +35,33 @@
 		</dl>
 	</fieldset>
 
+	<h1>{{ lang('PWA_THEME_COLOURS') }}</h1>
+	<p>{{ lang('PWA_THEME_COLOURS_EXPLAIN') }}</p>
 	<fieldset>
 		<legend>{{ lang('PWA_COLOURS') }}</legend>
 		<dl>
-			<dt><label for="pwa_theme_colour">{{ lang('PWA_THEME_COLOUR') ~ lang('COLON') }}</label></dt>
-			<dd><input type="color" id="pwa_theme_colour" name="config[pwa_theme_colour]" value="{{ PWA_THEME_COLOUR }}"></dd>
+			<dt><label>{{ lang('ACP_STYLES') ~ lang('COLON') }}</label></dt>
+			<dd>
+				<span class="color-pickers">{{ lang('PWA_THEME_COLOUR') }}</span>
+				<span class="color-pickers">{{ lang('PWA_BACKGROUND_COLOUR') }}</span>
+			</dd>
 		</dl>
-		<dl>
-			<dt><label for="pwa_background_colour">{{ lang('PWA_BACKGROUND_COLOUR') ~ lang('COLON') }}</label></dt>
-			<dd><input type="color" id="pwa_background_colour" name="config[pwa_background_colour]" value="{{ PWA_BACKGROUND_COLOUR }}"></dd>
-		</dl>
+		{% set default_color = '#000000' %}
+		{% for style in STYLES %}
+			<dl>
+				<dt><label for="pwa_theme_color_{{ style.style_id }}">{{ style.style_name ~ lang('COLON') }}</label></dt>
+				<dd>
+					<span class="color-pickers">
+						<input type="text" id="pwa_theme_color_{{ style.style_id }}" name="pwa_theme_color_{{ style.style_id }}" size="8" value="{{ style.pwa_theme_color }}" placeholder="{{ default_color }}">
+						<input type="color" id="pwa_theme_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_THEME_COLOUR') }}" value="{{ style.pwa_theme_color|default(default_color) }}">
+					</span>
+					<span class="color-pickers">
+						<input type="text" id="pwa_bg_color_{{ style.style_id }}" name="pwa_bg_color_{{ style.style_id }}" size="8" value="{{ style.pwa_bg_color }}" placeholder="{{ default_color }}">
+						<input type="color" id="pwa_bg_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_BACKGROUND_COLOUR') }}" value="{{ style.pwa_bg_color|default(default_color) }}">
+					</span>
+				</dd>
+			</dl>
+		{% endfor %}
 	</fieldset>
 
 	<fieldset class="submit-buttons">

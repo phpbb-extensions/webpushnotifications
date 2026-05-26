@@ -155,7 +155,8 @@ class listener implements EventSubscriberInterface
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
-			'PWA_THEME_COLOUR'	=> $this->config['pwa_theme_colour'] ?? '#000000',
+			'PWA_THEME_COLOR'	=> !empty($this->user->style['pwa_theme_color']) ? $this->user->style['pwa_theme_color'] : '#000000',
+			'PWA_BG_COLOR'		=> !empty($this->user->style['pwa_bg_color']) ? $this->user->style['pwa_bg_color'] : '#ffffff',
 			'S_PWA_SHOW_BANNER'	=> !empty($this->config['pwa_show_install_banner']) && $this->is_mobile_phone(),
 		]);
 	}

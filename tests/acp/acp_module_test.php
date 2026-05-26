@@ -20,8 +20,14 @@ class acp_module_test extends \phpbb_test_case
 	/** @var bool */
 	public static $valid_form = true;
 
+	/** @var \phpbb_mock_cache */
+	protected $cache;
+
 	/** @var \phpbb\config\config */
 	protected $config;
+
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
 
 	/** @var \phpbb_mock_extension_manager */
 	protected $extension_manager;
@@ -55,6 +61,9 @@ class acp_module_test extends \phpbb_test_case
 
 	/** @var string */
 	protected $root_path;
+
+	/** @var array */
+	protected $style_updates;
 
 	protected function setUp(): void
 	{
@@ -90,7 +99,9 @@ class acp_module_test extends \phpbb_test_case
 			define('IN_ADMIN', true);
 		}
 
+		$this->cache = new \phpbb_mock_cache();
 		$this->config = new \phpbb\config\config($this->default_config());
+		$this->db = $this->createMock('\phpbb\db\driver\driver_interface');
 		$this->imagesize = $this->createMock('\FastImageSize\FastImageSize');
 		$this->lang = $this->createMock('\phpbb\language\language');
 		$this->log = $this->createMock('\phpbb\log\log_interface');
@@ -99,6 +110,7 @@ class acp_module_test extends \phpbb_test_case
 		$this->template = $this->createMock('\phpbb\template\template');
 		$this->user = $this->createMock('\phpbb\user');
 		$this->root_path = $phpbb_root_path;
+		$this->style_updates = [];
 
 		$this->user->data = ['user_id' => 42];
 		$this->user->ip = '127.0.0.1';
@@ -109,11 +121,26 @@ class acp_module_test extends \phpbb_test_case
 				return implode(':', func_get_args());
 			});
 
+		$this->db->method('sql_query')
+			->willReturn('result');
+		$this->db->method('sql_fetchrowset')
+			->with('result')
+			->willReturn($this->style_rows());
+		$this->db->method('sql_build_array')
+			->willReturnCallback(function($query, $row) {
+				$this->style_updates[] = $row;
+				return implode(', ', array_map(static function($name, $value) {
+					return $name . " = '" . $value . "'";
+				}, array_keys($row), $row));
+			});
+
 		$this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 		$this->container->method('get')
 			->willReturnCallback(function($service) {
 				return [
+					'cache' => $this->cache,
 					'config' => $this->config,
+					'dbal.conn' => $this->db,
 					'upload_imagesize' => $this->imagesize,
 					'language' => $this->lang,
 					'log' => $this->log,
@@ -392,14 +419,31 @@ class acp_module_test extends \phpbb_test_case
 			'pwa_short_name' => 'Forum',
 			'pwa_icon_small' => 'icon192.png',
 			'pwa_icon_large' => 'icon512.png',
-			'pwa_theme_colour' => '#ABCDEF',
-			'pwa_background_colour' => ' bad ',
 			'pwa_show_install_banner' => 1,
 		];
 
+		$valid_style_input = [
+			'pwa_bg_color_1' => '#abcdef',
+			'pwa_theme_color_1' => '#ABCDEF',
+			'pwa_bg_color_2' => '',
+			'pwa_theme_color_2' => '#123',
+		];
+
+		$expected_style_updates = [
+			[
+				'pwa_bg_color' => '#abcdef',
+				'pwa_theme_color' => '#ABCDEF',
+			],
+			[
+				'pwa_bg_color' => '',
+				'pwa_theme_color' => '#123',
+			],
+		];
+
 		return [
-			'valid icons and normalised colours' => [
+			'valid icons and style colours' => [
 				$valid,
+				$valid_style_input,
 				[
 					'icon192.png' => ['width' => 192, 'height' => 192, 'type' => IMAGETYPE_PNG],
 					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
@@ -412,17 +456,14 @@ class acp_module_test extends \phpbb_test_case
 					'pwa_short_name' => 'Forum',
 					'pwa_icon_small' => 'icon192.png',
 					'pwa_icon_large' => 'icon512.png',
-					'pwa_theme_colour' => '#abcdef',
-					'pwa_background_colour' => '#ffffff',
 					'pwa_show_install_banner' => 1,
 				],
+				$expected_style_updates,
 				true,
 			],
 			'valid empty name and icons' => [
-				[
-					'pwa_theme_colour' => '#000000',
-					'pwa_background_colour' => '#ffffff',
-				],
+				[],
+				[],
 				[],
 				[
 					'S_ERROR' => false,
@@ -432,9 +473,17 @@ class acp_module_test extends \phpbb_test_case
 					'pwa_short_name' => '',
 					'pwa_icon_small' => '',
 					'pwa_icon_large' => '',
-					'pwa_theme_colour' => '#000000',
-					'pwa_background_colour' => '#ffffff',
 					'pwa_show_install_banner' => 0,
+				],
+				[
+					[
+						'pwa_bg_color' => '#fff000',
+						'pwa_theme_color' => '#000fff',
+					],
+					[
+						'pwa_bg_color' => '',
+						'pwa_theme_color' => '',
+					],
 				],
 				true,
 			],
@@ -442,6 +491,7 @@ class acp_module_test extends \phpbb_test_case
 				array_merge($valid, [
 					'pwa_short_name' => '123456789012&#x1F600;',
 				]),
+				$valid_style_input,
 				[
 					'icon192.png' => ['width' => 192, 'height' => 192, 'type' => IMAGETYPE_PNG],
 					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
@@ -453,12 +503,14 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'pwa_short_name' => 'Old',
 				],
+				[],
 				false,
 			],
 			'missing small icon rejected' => [
 				array_merge($valid, [
 					'pwa_icon_small' => '',
 				]),
+				$valid_style_input,
 				[],
 				[
 					'S_ERROR' => true,
@@ -467,12 +519,14 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'pwa_icon_small' => 'old-small.png',
 				],
+				[],
 				false,
 			],
 			'missing large icon rejected' => [
 				array_merge($valid, [
 					'pwa_icon_large' => '',
 				]),
+				$valid_style_input,
 				[],
 				[
 					'S_ERROR' => true,
@@ -481,12 +535,14 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'pwa_icon_large' => 'old-large.png',
 				],
+				[],
 				false,
 			],
 			'path traversal icon rejected' => [
 				array_merge($valid, [
 					'pwa_icon_small' => '../icon192.png',
 				]),
+				$valid_style_input,
 				[
 					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
 				],
@@ -497,10 +553,12 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'pwa_icon_small' => 'old-small.png',
 				],
+				[],
 				false,
 			],
 			'unreadable icon rejected' => [
 				$valid,
+				$valid_style_input,
 				[
 					'icon192.png' => false,
 					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
@@ -512,10 +570,12 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'pwa_icon_small' => 'old-small.png',
 				],
+				[],
 				false,
 			],
 			'wrong icon size and MIME rejected' => [
 				$valid,
+				$valid_style_input,
 				[
 					'icon192.png' => ['width' => 191, 'height' => 192, 'type' => IMAGETYPE_JPEG],
 					'icon512.png' => ['width' => 512, 'height' => 511, 'type' => IMAGETYPE_PNG],
@@ -528,6 +588,26 @@ class acp_module_test extends \phpbb_test_case
 					'pwa_icon_small' => 'old-small.png',
 					'pwa_icon_large' => 'old-large.png',
 				],
+				[],
+				false,
+			],
+			'invalid style colour rejected' => [
+				$valid,
+				array_merge($valid_style_input, [
+					'pwa_theme_color_1' => 'not-hex',
+				]),
+				[
+					'icon192.png' => ['width' => 192, 'height' => 192, 'type' => IMAGETYPE_PNG],
+					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
+				],
+				[
+					'S_ERROR' => true,
+					'ERROR_MSG' => 'PWA_INVALID_COLOUR:not-hex',
+				],
+				[
+					'pwa_short_name' => 'Old',
+				],
+				[],
 				false,
 			],
 		];
@@ -536,11 +616,17 @@ class acp_module_test extends \phpbb_test_case
 	/**
 	 * @dataProvider pwa_save_data
 	 */
-	public function test_save_pwa_settings_validates_and_persists_pwa_config(array $input, array $image_info, array $error_vars, array $expected_config, $expect_saved): void
+	public function test_save_pwa_settings_validates_and_persists_pwa_config(array $input, array $style_input, array $image_info, array $error_vars, array $expected_config, array $expected_style_updates, $expect_saved): void
 	{
 		$this->request->method('variable')
-			->with('config', ['' => ''], true)
-			->willReturn($input);
+			->willReturnCallback(function($name, $default = null, $multibyte = false) use ($input, $style_input) {
+				if ($name === 'config')
+				{
+					return $input;
+				}
+
+				return $style_input[$name] ?? $default;
+			});
 
 		$this->imagesize->method('getImageSize')
 			->willReturnCallback(function($path) use ($image_info) {
@@ -566,26 +652,30 @@ class acp_module_test extends \phpbb_test_case
 		{
 			self::assertSame($value, $this->config[$name]);
 		}
+
+		self::assertSame($expected_style_updates, $this->style_updates);
 	}
 
-	public function colour_data(): array
+	public function hex_colour_data(): array
 	{
 		return [
-			'valid colour lowercased' => [' #ABCDEF ', '#000000', '#abcdef'],
-			'valid digits kept' => ['#123456', '#000000', '#123456'],
-			'missing hash rejected' => ['123456', '#000000', '#000000'],
-			'short hex rejected' => ['#fff', '#000000', '#000000'],
-			'invalid character rejected' => ['#12345g', '#ffffff', '#ffffff'],
-			'non string rejected' => [123456, '#000000', '#000000'],
+			'empty colour allowed' => ['', true, []],
+			'valid 3 digit colour allowed' => [' #fff ', true, []],
+			'valid 6 digit colour allowed' => ['#ABCDEF', true, []],
+			'missing hash rejected' => ['123456', false, ['PWA_INVALID_COLOUR:123456']],
+			'invalid character rejected' => ['#12345g', false, ['PWA_INVALID_COLOUR:#12345g']],
 		];
 	}
 
 	/**
-	 * @dataProvider colour_data
+	 * @dataProvider hex_colour_data
 	 */
-	public function test_normalise_colour($colour, $default, $expected): void
+	public function test_validate_hex_color($colour, $expected, array $expected_errors): void
 	{
-		self::assertSame($expected, $this->invoke_method($this->create_module(), 'normalise_colour', [$colour, $default]));
+		$module = $this->create_module();
+
+		self::assertSame($expected, $this->invoke_method($module, 'validate_hex_color', [$colour]));
+		self::assertSame($expected_errors, $this->get_protected_property($module, 'errors'));
 	}
 
 	public function test_display_errors_returns_false_without_errors(): void
@@ -621,7 +711,9 @@ class acp_module_test extends \phpbb_test_case
 		$module->u_action = $u_action;
 
 		foreach ([
+			'cache' => $this->cache,
 			'config' => $this->config,
+			'db' => $this->db,
 			'imagesize' => $this->imagesize,
 			'lang' => $this->lang,
 			'log' => $this->log,
@@ -646,6 +738,15 @@ class acp_module_test extends \phpbb_test_case
 		$property->setValue($object, $value);
 	}
 
+	protected function get_protected_property($object, $property)
+	{
+		$reflection = new \ReflectionClass($object);
+		$property = $reflection->getProperty($property);
+		$property->setAccessible(true);
+
+		return $property->getValue($object);
+	}
+
 	protected function invoke_method($object, $method_name, array $parameters = [])
 	{
 		$reflection = new \ReflectionClass($object);
@@ -668,8 +769,24 @@ class acp_module_test extends \phpbb_test_case
 			'pwa_short_name' => 'Old',
 			'pwa_icon_small' => 'old-small.png',
 			'pwa_icon_large' => 'old-large.png',
-			'pwa_theme_colour' => '#000000',
-			'pwa_background_colour' => '#ffffff',
+		];
+	}
+
+	protected function style_rows(): array
+	{
+		return [
+			[
+				'style_id' => 1,
+				'style_name' => 'prosilver',
+				'pwa_bg_color' => '#fff000',
+				'pwa_theme_color' => '#000fff',
+			],
+			[
+				'style_id' => 2,
+				'style_name' => 'silverfoo',
+				'pwa_bg_color' => '',
+				'pwa_theme_color' => '',
+			],
 		];
 	}
 
@@ -693,8 +810,7 @@ class acp_module_test extends \phpbb_test_case
 			'PWA_SHORT_NAME' => 'Old',
 			'PWA_ICON_SMALL' => 'old-small.png',
 			'PWA_ICON_LARGE' => 'old-large.png',
-			'PWA_THEME_COLOUR' => '#000000',
-			'PWA_BACKGROUND_COLOUR' => '#ffffff',
+			'STYLES' => $this->style_rows(),
 			'U_ACTION' => $u_action,
 		];
 	}

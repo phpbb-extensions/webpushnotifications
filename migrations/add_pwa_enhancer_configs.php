@@ -16,7 +16,7 @@ class add_pwa_enhancer_configs extends migration
 {
 	public function effectively_installed(): bool
 	{
-		return $this->config->offsetExists('pwa_theme_colour');
+		return $this->config->offsetExists('pwa_show_install_banner');
 	}
 
 	public static function depends_on()
@@ -27,8 +27,6 @@ class add_pwa_enhancer_configs extends migration
 	public function update_data(): array
 	{
 		return [
-			['config.add', ['pwa_theme_colour', '#000000']],
-			['config.add', ['pwa_background_colour', '#ffffff']],
 			['config.add', ['pwa_show_install_banner', false]],
 			['module.add', ['acp', 'ACP_CLIENT_COMMUNICATION', [
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
@@ -43,8 +41,6 @@ class add_pwa_enhancer_configs extends migration
 	public function revert_data(): array
 	{
 		return [
-			['config.remove', ['pwa_theme_colour']],
-			['config.remove', ['pwa_background_colour']],
 			['config.remove', ['pwa_show_install_banner']],
 			['module.remove', ['acp', 'ACP_CLIENT_COMMUNICATION', [
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',

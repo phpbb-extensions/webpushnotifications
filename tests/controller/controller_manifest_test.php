@@ -31,8 +31,6 @@ class controller_manifest_test extends \phpbb_test_case
 			'pwa_short_name'	=> '',
 			'pwa_icon_small'	=> '',
 			'pwa_icon_large'	=> '',
-			'pwa_theme_colour'	=> '#000000',
-			'pwa_background_colour' => '#ffffff',
 		]);
 
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);

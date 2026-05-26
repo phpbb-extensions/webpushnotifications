@@ -61,8 +61,8 @@ class manifest
 			'orientation'	=> 'portrait',
 			'start_url'		=> $start_url,
 			'scope'			=> $scope,
-			'theme_color'	=> $this->user->style['pwa_theme_color'] ?? '#000000',
-			'background_color' => $this->user->style['pwa_bg_color'] ?? '#ffffff',
+			'theme_color'	=> $this->user->style['pwa_theme_color'] ?? ext::PWA_THEME_COLOR,
+			'background_color' => $this->user->style['pwa_bg_color'] ?? ext::PWA_BG_COLOR,
 		];
 
 		if (!empty($this->config['pwa_icon_small']) && !empty($this->config['pwa_icon_large']))

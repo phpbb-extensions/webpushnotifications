@@ -46,17 +46,16 @@
 				<span class="color-pickers">{{ lang('PWA_BACKGROUND_COLOUR') }}</span>
 			</dd>
 		</dl>
-		{% set default_color = '#000000' %}
 		{% for style in STYLES %}
 			<dl>
 				<dt><label for="pwa_theme_color_{{ style.style_id }}">{{ style.style_name ~ lang('COLON') }}</label></dt>
 				<dd>
 					<span class="color-pickers">
-						<input type="text" id="pwa_theme_color_{{ style.style_id }}" name="pwa_theme_color_{{ style.style_id }}" size="8" value="{{ style.pwa_theme_color }}" placeholder="{{ default_color }}">
+						<input type="text" id="pwa_theme_color_{{ style.style_id }}" name="pwa_theme_color_{{ style.style_id }}" size="8" value="{{ style.pwa_theme_color }}" placeholder="{{ constant('phpbb\\webpushnotifications\\ext::PWA_THEME_COLOR') }}">
 						<input type="color" id="pwa_theme_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_THEME_COLOUR') }}" value="{{ style.pwa_theme_color|default(default_color) }}">
 					</span>
 					<span class="color-pickers">
-						<input type="text" id="pwa_bg_color_{{ style.style_id }}" name="pwa_bg_color_{{ style.style_id }}" size="8" value="{{ style.pwa_bg_color }}" placeholder="{{ default_color }}">
+						<input type="text" id="pwa_bg_color_{{ style.style_id }}" name="pwa_bg_color_{{ style.style_id }}" size="8" value="{{ style.pwa_bg_color }}" placeholder="{{ constant('phpbb\\webpushnotifications\\ext::PWA_BG_COLOR') }}">
 						<input type="color" id="pwa_bg_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_BACKGROUND_COLOUR') }}" value="{{ style.pwa_bg_color|default(default_color) }}">
 					</span>
 				</dd>

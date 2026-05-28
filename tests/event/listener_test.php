@@ -31,6 +31,9 @@ class listener_test extends \phpbb_database_test_case
 	/** @var \phpbb\language\language */
 	protected $language;
 
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\request\request_interface */
+	protected $request;
+
 	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\template\template */
 	protected $template;
 
@@ -66,8 +69,12 @@ class listener_test extends \phpbb_database_test_case
 		$this->language = new \phpbb\language\language($lang_loader);
 		$this->template = $this->getMockBuilder('\phpbb\template\template')
 			->getMock();
-		$request = new \phpbb\request\request();
-		$request->enable_super_globals();
+		$form_request = new \phpbb\request\request();
+		$form_request->enable_super_globals();
+		$this->request = $this->getMockBuilder('\phpbb\request\request_interface')
+			->getMock();
+		$this->request->method('server')
+			->willReturn('');
 		$user = new \phpbb\user($this->language, '\phpbb\datetime');
 		$this->user = $user;
 		$this->user->data['user_form_salt'] = '';
@@ -87,11 +94,19 @@ class listener_test extends \phpbb_database_test_case
 			'load_notifications' => true,
 			'allow_board_notifications' => true,
 			'wpn_webpush_enable' => true,
+			'force_server_vars' => false,
+			'script_path' => '',
+			'sitename' => 'phpBB',
+			'cookie_name' => 'phpbb3',
+			'pwa_show_install_banner' => true,
+			'pwa_icon_small' => '',
+			'pwa_icon_large' => '',
+			'pwa_short_name' => '',
 		]);
 
 		$this->form_helper = new \phpbb\webpushnotifications\form\form_helper(
 			$this->config,
-			$request,
+			$form_request,
 			$this->user
 		);
 
@@ -122,13 +137,12 @@ class listener_test extends \phpbb_database_test_case
 		$this->listener = new \phpbb\webpushnotifications\event\listener(
 			$this->config,
 			$this->controller_helper,
-			$this->imagesize,
 			$this->form_helper,
 			$this->language,
+			$this->request,
 			$this->template,
 			$this->user,
-			$this->notifications,
-			$this->root_path
+			$this->notifications
 		);
 	}
 
@@ -145,9 +159,6 @@ class listener_test extends \phpbb_database_test_case
 			'core.page_header_after',
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
-			'core.acp_board_config_edit_add',
-			'core.acp_board_config_emoji_enabled',
-			'core.validate_config_variable',
 			'core.help_manager_add_block_after',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
@@ -338,186 +349,14 @@ class listener_test extends \phpbb_database_test_case
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
+				'PWA_THEME_COLOR'	=> ext::PWA_THEME_COLOR,
+				'PWA_BG_COLOR'		=> ext::PWA_BG_COLOR,
+				'S_PWA_SHOW_BANNER'	=> false,
 			]);
 
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.acp_main_notice', [$this->listener, 'pwa_manifest']);
 		$dispatcher->trigger_event('core.acp_main_notice');
-	}
-
-	public function acp_pwa_options_data()
-	{
-		return [
-			[ // expected config and mode
-				'settings',
-				['vars' => ['legend4' => []]],
-				['legend_pwa_settings', 'pwa_short_name', 'pwa_icon_small', 'pwa_icon_large', 'legend4'],
-			],
-			[ // unexpected mode
-				'foobar',
-				['vars' => ['legend4' => []]],
-				['legend4'],
-			],
-			[ // unexpected config
-				'post',
-				['vars' => ['foobar' => []]],
-				['foobar'],
-			],
-			[ // unexpected config and mode
-				'foobar',
-				['vars' => ['foobar' => []]],
-				['foobar'],
-			],
-		];
-	}
-
-	/**
-	 * @dataProvider acp_pwa_options_data
-	 */
-	public function test_acp_pwa_options($mode, $display_vars, $expected_keys)
-	{
-		$this->set_listener();
-
-		$dispatcher = new \phpbb\event\dispatcher();
-		$dispatcher->addListener('core.acp_board_config_edit_add', [$this->listener, 'acp_pwa_options']);
-
-		$event_data = ['display_vars', 'mode'];
-		$event_data_after = $dispatcher->trigger_event('core.acp_board_config_edit_add', compact($event_data));
-
-		foreach ($event_data as $expected)
-		{
-			self::assertArrayHasKey($expected, $event_data_after);
-		}
-		extract($event_data_after, EXTR_OVERWRITE);
-
-		$keys = array_keys($display_vars['vars']);
-
-		self::assertEquals($expected_keys, $keys);
-	}
-
-	public function validate_pwa_options_data()
-	{
-		return [
-			[
-				'pwa_options:icons',
-				['pwa_icon_small' => '192.png', 'pwa_icon_large' => '512.png'],
-				[],
-			],
-			[
-				'pwa_options:icons',
-				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '512.png'],
-				['PWA_ICON_SIZE_INVALID'],
-			],
-			[
-				'pwa_options:icons',
-				['pwa_icon_small' => '1.png', 'pwa_icon_large' => '12.png'],
-				['PWA_ICON_SIZE_INVALID'],
-			],
-			[
-				'pwa_options:icons',
-				['pwa_icon_small' => '192.jpg', 'pwa_icon_large' => '512.gif'],
-				['PWA_ICON_MIME_INVALID'],
-			],
-			[
-				'pwa_options:icons',
-				['pwa_icon_small' => '', 'pwa_icon_large' => ''],
-				[],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => 'foo'],
-				[],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => ''],
-				[],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => 'foo❤️'],
-				[],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => 'Фаны phpBB'],
-				[],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => 'Фаны phpBB Board'],
-				['PWA_SHORT_NAME_INVALID'],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => 'foo❤️bar foo bar'],
-				['PWA_SHORT_NAME_INVALID'],
-			],
-			[
-				'pwa_options:string',
-				['pwa_short_name' => str_repeat('a', 50)],
-				['PWA_SHORT_NAME_INVALID'],
-			],
-		];
-	}
-
-	/**
-	 * @dataProvider validate_pwa_options_data
-	 */
-	public function test_validate_pwa_options($validate, $cfg_array, $expected_error)
-	{
-		$config_name = key($cfg_array);
-		$config_definition = ['validate' => $validate];
-
-		$pwa_icon_small = $cfg_array['pwa_icon_small'] ?? '';
-		$pwa_icon_large = $cfg_array['pwa_icon_large'] ?? '';
-
-		[$small_image_name, $small_image_ext] = $pwa_icon_small ? explode('.', $pwa_icon_small, 2) : ['', ''];
-		[$large_image_name, $large_image_ext] = $pwa_icon_large ? explode('.', $pwa_icon_large, 2) : ['', ''];
-
-		$error = [];
-
-		$this->set_listener();
-
-		$this->imagesize->expects($pwa_icon_small && $pwa_icon_large ? self::once() : self::never())
-			->method('getImageSize')
-			->willReturnMap([
-				[$this->root_path . ext::PWA_ICON_DIR . '/', '', false],
-				[$this->root_path . ext::PWA_ICON_DIR . '/' . $pwa_icon_small, '', ['width' => (int) $small_image_name, 'height' => (int) $small_image_name, 'type' => $small_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
-				[$this->root_path . ext::PWA_ICON_DIR . '/' . $pwa_icon_large, '', ['width' => (int) $large_image_name, 'height' => (int) $large_image_name, 'type' => $large_image_ext === 'png' ? IMAGETYPE_PNG : IMAGETYPE_UNKNOWN]],
-			]);
-
-		$dispatcher = new \phpbb\event\dispatcher();
-		$dispatcher->addListener('core.validate_config_variable', [$this->listener, 'validate_pwa_options']);
-
-		$event_data = ['cfg_array', 'config_name', 'config_definition', 'error'];
-		$event_data_after = $dispatcher->trigger_event('core.validate_config_variable', compact($event_data));
-
-		foreach ($event_data as $expected)
-		{
-			self::assertArrayHasKey($expected, $event_data_after);
-		}
-		extract($event_data_after, EXTR_OVERWRITE);
-
-		self::assertEquals($expected_error, $error);
-	}
-
-	public function test_acp_pwa_allow_emoji()
-	{
-		$config_name_ary = ['foo'];
-		$expected = ['foo', 'pwa_short_name'];
-
-		$this->set_listener();
-
-		$dispatcher = new \phpbb\event\dispatcher();
-		$dispatcher->addListener('core.acp_board_config_emoji_enabled', [$this->listener, 'acp_pwa_allow_emoji']);
-
-		$event_data = ['config_name_ary'];
-		$event_data_after = $dispatcher->trigger_event('core.acp_board_config_emoji_enabled', compact($event_data));
-
-		extract($event_data_after, EXTR_OVERWRITE);
-
-		self::assertEquals($expected, $config_name_ary);
 	}
 
 	public function test_wpn_faq()

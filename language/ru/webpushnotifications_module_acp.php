@@ -38,7 +38,8 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Здесь вы можете включить браузерные push—уведомления. Браузерные push—уведомления — это протокол мгновенной доставки пользователю сообщений о различных событиях. Они совместимы с большинством современных браузеров как на настольных, так и на мобильных устройствах. Пользователи могут включить их в своих браузерах и выбрать предпочтительные виды браузерных уведомлений в личном разделе.<br>Для работы браузерных push—уведомлений необходимо ввести или сгенерировать ключи идентификации ниже.<br><br>Для того, чтобы браузерные push—уведомления стали доступны на мобильных устройствах Apple, конференция должна функционировать как прогрессивное веб—приложение (PWA). Параметры прогрессивного веб—приложения (краткое имя сайта и значки для его отображения на домашнем экране) можно задать в разделе <strong>Настройки конференции</strong>. После этого пользователи смогут  добавлять сайт конференции на домашний экран своего мобильного устройства Apple и получать браузерные push—уведомления.',
+	// Web push settings
+	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Здесь вы можете включить браузерные push—уведомления. Браузерные push—уведомления — это протокол мгновенной доставки пользователю сообщений о различных событиях. Они совместимы с большинством современных браузеров как на настольных, так и на мобильных устройствах. Пользователи могут включить их в своих браузерах и выбрать предпочтительные виды браузерных уведомлений в личном разделе.<br>Для работы браузерных push—уведомлений необходимо ввести или сгенерировать ключи идентификации ниже.<br><br>Для того, чтобы браузерные push—уведомления стали доступны на мобильных устройствах Apple, конференция должна функционировать как прогрессивное веб—приложение (PWA). Параметры прогрессивного веб—приложения (краткое имя сайта и значки для его отображения на домашнем экране) можно задать в разделе <strong>PWA settings</strong>. После этого пользователи смогут  добавлять сайт конференции на домашний экран своего мобильного устройства Apple и получать браузерные push—уведомления.',
 	'WEBPUSH_ENABLE'				=> 'Включить браузерные push—уведомления',
 	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Включение возможности получения браузерных push—уведомлений для всех пользователей. Для использования браузерных push—уведомлений необходимо задать или сгенерировать корректные ключи идентификации VAPID.',
 	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Сгенерировать ключи идентификации',
@@ -53,4 +54,26 @@ $lang = array_merge($lang, [
 	'WEBPUSH_POPUP_PROMPT'			=> 'Показывать всплывающее приглашение',
 	'WEBPUSH_POPUP_PROMPT_EXPLAIN'	=> 'Показывать всплывающее сообщение зарегистрированным пользователям с приглашением подписаться на браузерные уведомления данной конференции. Сообщение будет показано только тем зарегистрированным пользователям, которые не подписаны на браузерные уведомления и ранее не отклоняли такое приглашение.',
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'На данной конференции не применяется защищённый протокол SSL/HTTPS, без которого использование браузерных push—уведомлений невозможно, либо соответствующие переменные серверного окружения неверно сконфигурированы. Убедитесь, что значения переменных серверного окружения <em>HTTPS</em> и/или <em>HEADER_CLIENT_PROTO</em> заданы верно.',
+
+	// PWA Settings
+	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App (PWA) features, including app metadata, icons, theme colours, and install prompts.',
+	'PWA_SHORT_NAME'			=> 'Short site name',
+	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
+	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',
+	'PWA_ICON_SMALL'			=> 'Small mobile device icon',
+	'PWA_ICON_SMALL_EXPLAIN'	=> 'File name of a 192px x 192px PNG image. This file must be uploaded to your board’s <samp>%s</samp> directory.',
+	'PWA_ICON_LARGE'			=> 'Large mobile device icon',
+	'PWA_ICON_LARGE_EXPLAIN'	=> 'File name of a 512px x 512px PNG image. This file must be uploaded to your board’s <samp>%s</samp> directory.',
+	'PWA_ICON_SIZE_INVALID'		=> '“%s” does not have the correct image dimensions.',
+	'PWA_ICON_MIME_INVALID'		=> '“%s” must be a PNG image file.',
+	'PWA_ICON_INVALID'			=> '“%s” is not a valid image file or is missing from the expected location. Verify the file name and location are correct.',
+	'PWA_ICON_NOT_PROVIDED'		=> '%s field must not be empty. All icon fields must contain an image.',
+	'PWA_THEME_COLOURS'			=> 'Theme &amp; background colours (optional)',
+	'PWA_THEME_COLOURS_EXPLAIN'	=> 'Used to specify the default colour for your web application’s user interface. Theme colours may be applied to various browser UI elements, such as the toolbar, address bar, and status bar. Background colours appears in the application window before your application’s stylesheets have loaded.',
+	'PWA_COLOURS'				=> 'Colours',
+	'PWA_THEME_COLOUR'			=> 'Theme colour',
+	'PWA_BACKGROUND_COLOUR'		=> 'Background colour',
+	'PWA_INVALID_COLOUR'		=> 'The colour code “<samp>%s</samp>” is not a valid hex code.',
+	'PWA_SHOW_INSTALL_BANNER'	=> 'Show app install banner',
+	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a prompt on supported mobile devices inviting users to install your board as an app.',
 ]);

@@ -57,6 +57,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'orientation'	=> 'portrait',
 					'start_url'		=> '/',
 					'scope'			=> '/',
+					'theme_color'	=> '#000000',
+					'background_color' => '#ffffff',
 				],
 			],
 			'using script path' => [
@@ -73,6 +75,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'orientation'	=> 'portrait',
 					'start_url'		=> '/foo/',
 					'scope'			=> '/foo/',
+					'theme_color'	=> '#000000',
+					'background_color' => '#ffffff',
 				],
 			],
 			'with shortname' => [
@@ -87,6 +91,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'orientation'	=> 'portrait',
 					'start_url'		=> '/',
 					'scope'			=> '/',
+					'theme_color'	=> '#000000',
+					'background_color' => '#ffffff',
 				],
 			],
 			'without shortname' => [
@@ -101,6 +107,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'orientation'	=> 'portrait',
 					'start_url'		=> '/',
 					'scope'			=> '/',
+					'theme_color'	=> '#000000',
+					'background_color' => '#ffffff',
 				],
 			],
 			'with icons' => [
@@ -117,6 +125,8 @@ class controller_manifest_test extends \phpbb_test_case
 					'orientation'	=> 'portrait',
 					'start_url'		=> '/',
 					'scope'			=> '/',
+					'theme_color'	=> '#000000',
+					'background_color' => '#ffffff',
 					'icons'			=> [
 						[
 							'src'	=> 'http://images/site_icons/foo_sm.png',

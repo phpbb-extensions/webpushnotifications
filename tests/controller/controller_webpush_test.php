@@ -328,7 +328,11 @@ class controller_webpush_test extends \phpbb_database_test_case
 
 		$response = $this->controller->worker();
 
-		$this->assertEquals('text/javascript; charset=UTF-8', $response->headers->get('Content-Type'));
+		$this->assertEquals('application/javascript; charset=UTF-8', $response->headers->get('Content-Type'));
+		$this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+		$this->assertStringContainsString('no-cache', $response->headers->get('Cache-Control'));
+		$this->assertStringContainsString('must-revalidate', $response->headers->get('Cache-Control'));
+		$this->assertEquals('noindex, nofollow', $response->headers->get('X-Robots-Tag'));
 		$this->assertEquals('rendered_content', $response->getContent());
 		$this->assertNull($response->headers->get('X-PHPBB-IS-BOT'));
 	}

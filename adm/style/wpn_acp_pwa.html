@@ -1,0 +1,75 @@
+{% include 'overall_header.html' %}
+{% INCLUDECSS '@phpbb_webpushnotifications/pwa_acp.css' %}
+{% INCLUDEJS '@phpbb_webpushnotifications/pwa_acp.js' %}
+
+<h1>{{ lang('ACP_WEBPUSH_PWA_SETTINGS') }}</h1>
+
+<p>{{ lang('ACP_PWA_SETTINGS_EXPLAIN') }}</p>
+
+{% if S_ERROR %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ ERROR_MSG }}</p>
+	</div>
+{% endif %}
+
+{% set iconDir = constant('phpbb\\webpushnotifications\\ext::PWA_ICON_DIR') %}
+
+<form id="webpushnotifications_pwa_settings" method="post" action="{{ U_ACTION }}">
+	<fieldset>
+		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
+		<dl>
+			<dt><label for="pwa_short_name">{{ lang('PWA_SHORT_NAME') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_SHORT_NAME_EXPLAIN') }}</span></dt>
+			<dd><input id="pwa_short_name" type="text" size="40" maxlength="12" name="config[pwa_short_name]" value="{{ PWA_SHORT_NAME }}"></dd>
+		</dl>
+		<dl>
+			<dt><label for="pwa_icon_small">{{ lang('PWA_ICON_SMALL') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_SMALL_EXPLAIN', iconDir) }}</span></dt>
+			<dd>{{ iconDir }}/<input id="pwa_icon_small" type="text" size="40" maxlength="255" name="config[pwa_icon_small]" value="{{ PWA_ICON_SMALL }}"></dd>
+		</dl>
+		<dl>
+			<dt><label for="pwa_icon_large">{{ lang('PWA_ICON_LARGE') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_LARGE_EXPLAIN', iconDir) }}</span></dt>
+			<dd>{{ iconDir }}/<input id="pwa_icon_large" type="text" size="40" maxlength="255" name="config[pwa_icon_large]" value="{{ PWA_ICON_LARGE }}"></dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('PWA_SHOW_INSTALL_BANNER') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_SHOW_INSTALL_BANNER_EXPLAIN') }}</span></dt>
+			<dd><label><input type="radio" class="radio" name="config[pwa_show_install_banner]" value="1"{% if S_PWA_SHOW_INSTALL_BANNER %} checked="checked"{% endif %}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="config[pwa_show_install_banner]" value="0"{% if not S_PWA_SHOW_INSTALL_BANNER %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
+		</dl>
+	</fieldset>
+
+	<h1>{{ lang('PWA_THEME_COLOURS') }}</h1>
+	<p>{{ lang('PWA_THEME_COLOURS_EXPLAIN') }}</p>
+	<fieldset>
+		<legend>{{ lang('PWA_COLOURS') }}</legend>
+		<dl>
+			<dt><label>{{ lang('ACP_STYLES') ~ lang('COLON') }}</label></dt>
+			<dd>
+				<span class="color-pickers">{{ lang('PWA_THEME_COLOUR') }}</span>
+				<span class="color-pickers">{{ lang('PWA_BACKGROUND_COLOUR') }}</span>
+			</dd>
+		</dl>
+		{% for style in STYLES %}
+			<dl>
+				<dt><label for="pwa_theme_color_{{ style.style_id }}">{{ style.style_name ~ lang('COLON') }}</label></dt>
+				<dd>
+					<span class="color-pickers">
+						<input type="text" id="pwa_theme_color_{{ style.style_id }}" name="pwa_theme_color_{{ style.style_id }}" size="8" value="{{ style.pwa_theme_color }}" placeholder="{{ constant('phpbb\\webpushnotifications\\ext::PWA_THEME_COLOR') }}">
+						<input type="color" id="pwa_theme_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_THEME_COLOUR') }}" value="{{ style.pwa_theme_color|default(default_color) }}">
+					</span>
+					<span class="color-pickers">
+						<input type="text" id="pwa_bg_color_{{ style.style_id }}" name="pwa_bg_color_{{ style.style_id }}" size="8" value="{{ style.pwa_bg_color }}" placeholder="{{ constant('phpbb\\webpushnotifications\\ext::PWA_BG_COLOR') }}">
+						<input type="color" id="pwa_bg_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_BACKGROUND_COLOUR') }}" value="{{ style.pwa_bg_color|default(default_color) }}">
+					</span>
+				</dd>
+			</dl>
+		{% endfor %}
+	</fieldset>
+
+	<fieldset class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">&nbsp;
+		<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}">
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
+
+{% include 'overall_footer.html' %}

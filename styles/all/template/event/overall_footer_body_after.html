@@ -16,3 +16,24 @@
 	}
 </script>
 {% endif %}
+
+{% if S_PWA_SHOW_BANNER %}
+	{% INCLUDEJS '@phpbb_webpushnotifications/pwa_install_banner.js' %}
+	{% INCLUDECSS '@phpbb_webpushnotifications/phpbb_pwa.css' %}
+	<div id="pwa-install-banner" class="pwa-install-banner" hidden>
+		<div class="pwa-install-banner__content">
+			{% if U_TOUCH_ICON %}
+				<img class="pwa-install-banner__icon" src="{{ ROOT_PATH ~ U_TOUCH_ICON }}" alt="{{ SITENAME }}">
+			{% endif %}
+			<div class="pwa-install-banner__text">
+				<div class="pwa-install-banner__title">{{ SITENAME }}</div>
+				<div id="pwa-install-subtitle-default" class="pwa-install-banner__subtitle">{{ lang('PWA_INSTALL_SUBTITLE') }}</div>
+				<div id="pwa-install-subtitle-ios" class="pwa-install-banner__subtitle" hidden>{{ lang('PWA_INSTALL_SUBTITLE_IOS') }}</div>
+			</div>
+		</div>
+		<div class="pwa-install-banner__actions">
+			<button id="pwa-btn-dismiss" class="pwa-install-banner__dismiss" type="button">{{ lang('PWA_INSTALL_DISMISS') }}</button>
+			<button id="pwa-btn-install" class="pwa-install-banner__install" type="button">{{ lang('PWA_INSTALL_BUTTON') }}</button>
+		</div>
+	</div>
+{% endif %}

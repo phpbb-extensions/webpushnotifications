@@ -56,14 +56,14 @@ $lang = array_merge($lang, [
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'На данной конференции не применяется защищённый протокол SSL/HTTPS, без которого использование браузерных push—уведомлений невозможно, либо соответствующие переменные серверного окружения неверно сконфигурированы. Убедитесь, что значения переменных серверного окружения <em>HTTPS</em> и/или <em>HEADER_CLIENT_PROTO</em> заданы верно.',
 
 	// PWA Settings
-	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App behaviour, including app manifest metadata and install banner display.',
+	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App (PWA) features, including app metadata, icons, theme colours, and install prompts.',
 	'PWA_SHORT_NAME'			=> 'Short site name',
 	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
 	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',
 	'PWA_ICON_SMALL'			=> 'Small mobile device icon',
-	'PWA_ICON_SMALL_EXPLAIN'	=> 'File name of a 192px x 192px PNG image. This file must be uploaded to your board’s <samp>' . \phpbb\webpushnotifications\ext::PWA_ICON_DIR . '</samp> directory.',
+	'PWA_ICON_SMALL_EXPLAIN'	=> 'File name of a 192px x 192px PNG image. This file must be uploaded to your board’s <samp>%s</samp> directory.',
 	'PWA_ICON_LARGE'			=> 'Large mobile device icon',
-	'PWA_ICON_LARGE_EXPLAIN'	=> 'File name of a 512px x 512px PNG image. This file must be uploaded to your board’s <samp>' . \phpbb\webpushnotifications\ext::PWA_ICON_DIR . '</samp> directory.',
+	'PWA_ICON_LARGE_EXPLAIN'	=> 'File name of a 512px x 512px PNG image. This file must be uploaded to your board’s <samp>%s</samp> directory.',
 	'PWA_ICON_SIZE_INVALID'		=> '“%s” does not have the correct image dimensions.',
 	'PWA_ICON_MIME_INVALID'		=> '“%s” must be a PNG image file.',
 	'PWA_ICON_INVALID'			=> '“%s” is not a valid image file or is missing from the expected location. Verify the file name and location are correct.',
@@ -74,6 +74,6 @@ $lang = array_merge($lang, [
 	'PWA_THEME_COLOUR'			=> 'Theme colour',
 	'PWA_BACKGROUND_COLOUR'		=> 'Background colour',
 	'PWA_INVALID_COLOUR'		=> 'The colour code “<samp>%s</samp>” is not a valid hex code.',
-	'PWA_SHOW_INSTALL_BANNER'	=> 'Show install banner',
-	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a mobile install prompt when the browser reports that your board can be installed as an app.',
+	'PWA_SHOW_INSTALL_BANNER'	=> 'Show app install banner',
+	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a prompt on supported mobile devices inviting users to install your board as an app.',
 ]);

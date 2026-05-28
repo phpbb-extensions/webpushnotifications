@@ -13,6 +13,8 @@
 	</div>
 {% endif %}
 
+{% set iconDir = constant('phpbb\\webpushnotifications\\ext::PWA_ICON_DIR') %}
+
 <form id="webpushnotifications_pwa_settings" method="post" action="{{ U_ACTION }}">
 	<fieldset>
 		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
@@ -21,12 +23,12 @@
 			<dd><input id="pwa_short_name" type="text" size="40" maxlength="12" name="config[pwa_short_name]" value="{{ PWA_SHORT_NAME }}"></dd>
 		</dl>
 		<dl>
-			<dt><label for="pwa_icon_small">{{ lang('PWA_ICON_SMALL') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_SMALL_EXPLAIN') }}</span></dt>
-			<dd>{{ constant('phpbb\\webpushnotifications\\ext::PWA_ICON_DIR') }}/<input id="pwa_icon_small" type="text" size="40" maxlength="255" name="config[pwa_icon_small]" value="{{ PWA_ICON_SMALL }}"></dd>
+			<dt><label for="pwa_icon_small">{{ lang('PWA_ICON_SMALL') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_SMALL_EXPLAIN', iconDir) }}</span></dt>
+			<dd>{{ iconDir }}/<input id="pwa_icon_small" type="text" size="40" maxlength="255" name="config[pwa_icon_small]" value="{{ PWA_ICON_SMALL }}"></dd>
 		</dl>
 		<dl>
-			<dt><label for="pwa_icon_large">{{ lang('PWA_ICON_LARGE') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_LARGE_EXPLAIN') }}</span></dt>
-			<dd>{{ constant('phpbb\\webpushnotifications\\ext::PWA_ICON_DIR') }}/<input id="pwa_icon_large" type="text" size="40" maxlength="255" name="config[pwa_icon_large]" value="{{ PWA_ICON_LARGE }}"></dd>
+			<dt><label for="pwa_icon_large">{{ lang('PWA_ICON_LARGE') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_LARGE_EXPLAIN', iconDir) }}</span></dt>
+			<dd>{{ iconDir }}/<input id="pwa_icon_large" type="text" size="40" maxlength="255" name="config[pwa_icon_large]" value="{{ PWA_ICON_LARGE }}"></dd>
 		</dl>
 		<dl>
 			<dt><label>{{ lang('PWA_SHOW_INSTALL_BANNER') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_SHOW_INSTALL_BANNER_EXPLAIN') }}</span></dt>

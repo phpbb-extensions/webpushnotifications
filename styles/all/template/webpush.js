@@ -479,19 +479,29 @@ function PhpbbWebpush() {
 			},
 			body: getFormData({ endpoint: subscription.endpoint }),
 		})
-			.then(() => {
-				loadingIndicator.fadeOut(phpbb.alertTime);
-				return subscription.unsubscribe();
-			})
-			.then(unsubscribed => {
+			.then(async(response) => {
+				let data = null;
+				try {
+					data = await response.json();
+				} catch (e) {
+					// Ignore JSON parsing failures and fall back below.
+				}
+				if (!response.ok || !data || !data.success) {
+					throw new Error(data && data.message ? data.message : 'Unsubscribe failed.');
+				}
+
+				const unsubscribed = await subscription.unsubscribe();
+
 				if (unsubscribed) {
 					removeStoredSubscription(subscription.endpoint);
 					setSubscriptionState(false);
 				}
 			})
 			.catch(error => {
+				phpbb.alert(ajaxErrorTitle, error.message || error);
+			})
+			.finally(() => {
 				loadingIndicator.fadeOut(phpbb.alertTime);
-				phpbb.alert(ajaxErrorTitle, error);
 			});
 	}
 

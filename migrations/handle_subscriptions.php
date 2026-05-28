@@ -89,17 +89,32 @@ class handle_subscriptions extends migration
 		$wpn_notification_push_table = $this->table_prefix . 'wpn_notification_push';
 		$wpn_push_subscriptions_table = $this->table_prefix . 'wpn_push_subscriptions';
 
-		/*
-		 * If webpush notification method exists in phpBB core,
-		 * copy all subscriptions data over the corresponding core tables.
-		 */
-		foreach ([
-				$core_notification_push_table => $wpn_notification_push_table,
-				$core_push_subscriptions_table => $wpn_push_subscriptions_table
-			] as $core_table => $ext_table)
+		// Copy push table data
+		$sql = 'INSERT INTO ' . $core_notification_push_table . '
+    			(notification_type_id, item_id, item_parent_id, user_id, push_data, notification_time, push_token)
+    		SELECT notification_type_id, item_id, item_parent_id, user_id, push_data, notification_time, push_token
+    		FROM ' . $wpn_notification_push_table;
+		$this->db->sql_query($sql);
+
+		// Turn on identity insert on mssql to be able to insert into
+		// identity columns (e.g. id)
+		if (strpos($this->db->get_sql_layer(), 'mssql') !== false)
 		{
-			$sql = 'INSERT INTO ' . $core_table . '
-					SELECT * FROM ' . $ext_table;
+			$sql = 'SET IDENTITY_INSERT ' . $core_push_subscriptions_table . ' ON';
+			$this->db->sql_query($sql);
+		}
+
+		// Copy subscription table data
+		$sql = 'INSERT INTO ' . $core_push_subscriptions_table . '
+    			(subscription_id, user_id, endpoint, expiration_time, p256dh, auth)
+    		SELECT subscription_id, user_id, endpoint, expiration_time, p256dh, auth
+    		FROM ' . $wpn_push_subscriptions_table;
+		$this->db->sql_query($sql);
+
+		// Disable identity insert on mssql again
+		if (strpos($this->db->get_sql_layer(), 'mssql') !== false)
+		{
+			$sql = 'SET IDENTITY_INSERT ' . $core_push_subscriptions_table . ' OFF';
 			$this->db->sql_query($sql);
 		}
 	}

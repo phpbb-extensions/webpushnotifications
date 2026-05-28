@@ -158,7 +158,7 @@ class webpush extends base implements extended_method_interface
 			];
 			$data = self::clean_data($data);
 			$insert_buffer->insert($data);
-			$this->push_token_map[$notification->notification_type_id][$notification->item_id] = $data['push_token'];
+			$this->push_token_map[$notification->notification_type_id][$notification->item_id][$notification->user_id] = $data['push_token'];
 		}
 
 		$insert_buffer->flush();
@@ -196,8 +196,11 @@ class webpush extends base implements extended_method_interface
 
 		// Load all the users we need
 		$notify_users = array_diff($user_ids, $banned_users);
+
+		// If we have no users (e.g. all recipients are banned) empty queue and exit
 		if (empty($notify_users))
 		{
+			$this->empty_queue();
 			return;
 		}
 
@@ -239,7 +242,7 @@ class webpush extends base implements extended_method_interface
 				'type_id'	=> $notification->notification_type_id,
 				'user_id'	=> $notification->user_id,
 				'version'	=> $this->config['assets_version'],
-				'token'		=> hash('sha256', $user['user_form_salt'] . $this->push_token_map[$notification->notification_type_id][$notification->item_id]),
+				'token'		=> hash('sha256', $user['user_form_salt'] . $this->push_token_map[$notification->notification_type_id][$notification->item_id][$notification->user_id]),
 			];
 			$json_data = json_encode($data);
 
@@ -531,6 +534,6 @@ class webpush extends base implements extended_method_interface
 	protected function is_endpoint_permanently_removed(string $endpoint): bool
 	{
 		$host = parse_url($endpoint, PHP_URL_HOST);
-		return $host !== null && substr($host, -strlen('.invalid')) === '.invalid';
+		return is_string($host) && substr($host, -strlen('.invalid')) === '.invalid';
 	}
 }

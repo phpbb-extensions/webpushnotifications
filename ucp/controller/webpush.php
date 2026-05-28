@@ -306,7 +306,7 @@ class webpush
 	{
 		$host = parse_url($endpoint, PHP_URL_HOST);
 
-		if (empty($host))
+		if (!is_string($host) || empty($host))
 		{
 			return false;
 		}
@@ -411,8 +411,13 @@ class webpush
 	 */
 	protected function get_subscription_write_data(array $data): array
 	{
-		$p256dh = is_string($data['keys']['p256dh'] ?? null) ? $data['keys']['p256dh'] : '';
-		$auth = is_string($data['keys']['auth'] ?? null) ? $data['keys']['auth'] : '';
+		$keys = $data['keys'] ?? [];
+		if (!is_array($keys))
+		{
+			$keys = [];
+		}
+		$p256dh = is_string($keys['p256dh'] ?? null) ? $keys['p256dh'] : '';
+		$auth = is_string($keys['auth'] ?? null) ? $keys['auth'] : '';
 
 		if ($p256dh === '' || $auth === '')
 		{
@@ -460,7 +465,7 @@ class webpush
 
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
 
-		$endpoint = $data['endpoint'];
+		$endpoint = is_string($data['endpoint'] ?? null) ? $data['endpoint'] : '';
 
 		$sql = 'DELETE FROM ' . $this->push_subscriptions_table . '
 			WHERE user_id = ' . (int) $this->user->id() . "

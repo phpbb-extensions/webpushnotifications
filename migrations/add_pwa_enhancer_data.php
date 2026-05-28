@@ -12,7 +12,7 @@ namespace phpbb\webpushnotifications\migrations;
 
 use phpbb\db\migration\migration;
 
-class add_pwa_enhancer_configs extends migration
+class add_pwa_enhancer_data extends migration
 {
 	public function effectively_installed(): bool
 	{

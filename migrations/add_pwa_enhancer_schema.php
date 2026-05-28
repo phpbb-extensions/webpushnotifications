@@ -16,7 +16,7 @@ class add_pwa_enhancer_schema extends migration
 {
 	public static function depends_on()
 	{
-		return ['\phpbb\webpushnotifications\migrations\add_pwa_enhancer_configs'];
+		return ['\phpbb\webpushnotifications\migrations\add_pwa_enhancer_data'];
 	}
 
 	public function effectively_installed(): bool

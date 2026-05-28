@@ -27,7 +27,7 @@ class add_pwa_enhancer_configs extends migration
 	public function update_data(): array
 	{
 		return [
-			['config.add', ['pwa_show_install_banner', false]],
+			['config.add', ['pwa_show_install_banner', 0]],
 			['module.add', ['acp', 'ACP_CLIENT_COMMUNICATION', [
 				'module_basename'	=> '\phpbb\webpushnotifications\acp\wpn_acp_module',
 				'module_langname'	=> 'ACP_WEBPUSH_PWA_SETTINGS',

@@ -56,7 +56,7 @@ $lang = array_merge($lang, [
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'На данной конференции не применяется защищённый протокол SSL/HTTPS, без которого использование браузерных push—уведомлений невозможно, либо соответствующие переменные серверного окружения неверно сконфигурированы. Убедитесь, что значения переменных серверного окружения <em>HTTPS</em> и/или <em>HEADER_CLIENT_PROTO</em> заданы верно.',
 
 	// PWA Settings
-	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App (PWA) features, including app metadata, icons, theme colours, and install prompts.',
+	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Progressive Web Apps (PWAs) allow users to install your board on their mobile device and use it like an app. These settings control the app name, icons, colours, and install prompts shown to users.',
 	'PWA_SHORT_NAME'			=> 'Short site name',
 	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
 	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',

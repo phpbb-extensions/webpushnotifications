@@ -39,7 +39,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	// Web push settings
-	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To enable push notifications on Apple mobile devices, your site needs to function as a Progressive Web Application (PWA). This requires users to add your site to their device’s home screen. Configure app metadata and install behaviour under <strong>PWA settings</strong>.',
+	'ACP_WEBPUSH_SETTINGS_EXPLAIN'	=> 'Here you can enable Web Push for board notifications. Web Push is a protocol for the real-time delivery of events to user agents, commonly referred to as push messages. It is compatible with the majority of modern browsers on both desktop and mobile devices. Users can opt to receive Web Push alerts in their browser by subscribing and enabling their preferred notifications in the UCP.<br><br>To support push notifications on Apple mobile devices, your site must function as a Progressive Web App (PWA). Apple requires users to add the site to their device’s home screen before push notifications can be enabled. Configure app appearance under <strong>PWA settings</strong>.',
 	'WEBPUSH_ENABLE'				=> 'Enable Web Push',
 	'WEBPUSH_ENABLE_EXPLAIN'		=> 'Allow users to receive notifications in their browser or device via Web Push. To utilise Web Push, you must input or generate valid VAPID identification keys.',
 	'WEBPUSH_GENERATE_VAPID_KEYS'	=> 'Generate Identification keys',
@@ -56,7 +56,7 @@ $lang = array_merge($lang, [
 	'WEBPUSH_INSECURE_SERVER_ERROR' => 'This board is not using a secure SSL/HTTPS protocol, which is required for enabling web push notifications. Alternatively, the server environment might be misconfigured. Ensure that the <em>HTTPS</em> and <em>HEADER_CLIENT_PROTO</em> server environment variables are correctly configured.',
 
 	// PWA Settings
-	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Here you can configure Progressive Web App (PWA) features, including app metadata, icons, theme colours, and install prompts.',
+	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Progressive Web Apps (PWAs) allow users to install your board on their mobile device and use it like an app. These settings control the app name, icons, colours, and install prompts shown to users.',
 	'PWA_SHORT_NAME'			=> 'Short site name',
 	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
 	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',

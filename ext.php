@@ -20,12 +20,6 @@ class ext extends \phpbb\extension\base
 	 */
 	public const PWA_ICON_DIR = 'images/site_icons';
 
-	/** @var string PWA theme color */
-	public const PWA_THEME_COLOR = '#000000';
-
-	/** @var string PWA background color */
-	public const PWA_BG_COLOR = '#ffffff';
-
 	/**
 	 * Require phpBB 3.3.12 due to new template and core events.
 	 */

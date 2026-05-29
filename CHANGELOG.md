@@ -5,11 +5,10 @@
 - Added a new **PWA settings** section to the ACP alongside the existing Web Push settings.
   - Moved the PWA short name and app icon settings into this section.
   - Added options to configure PWA theme colours for each installed board style.
-  - Added an option to display a mobile install prompt inviting users to install the board as an app for PWA functionality.
+  - Added an option to display a prompt inviting mobile-device users to install the board as an app for PWA and push notification functionality.
 - Added validation to ensure push subscriptions are only accepted from recognised push notification services.
 - Improved error handling for failed or rejected subscription requests, avoiding misleading messages and cleaning up failed browser-side subscriptions.
 - Automatically removes subscriptions for endpoints that are expired, unauthorized, or permanently unavailable.
-- Added common language loading to ensure extension language entries are available where needed.
 
 ### 1.0.4 - 2026-02-20
 

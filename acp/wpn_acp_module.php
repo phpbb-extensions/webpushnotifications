@@ -379,7 +379,7 @@ class wpn_acp_module
 			FROM ' . STYLES_TABLE . '
 			WHERE style_active = 1
 			ORDER BY style_name';
-		$result = $this->db->sql_query($sql, 3600);
+		$result = $this->db->sql_query($sql);
 
 		$rows = $this->db->sql_fetchrowset($result);
 		$this->db->sql_freeresult($result);

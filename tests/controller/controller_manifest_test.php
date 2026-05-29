@@ -36,6 +36,8 @@ class controller_manifest_test extends \phpbb_test_case
 		$lang_loader = new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx);
 		$language = new \phpbb\language\language($lang_loader);
 		$user = $this->user = new \phpbb\user($language, '\phpbb\datetime');
+		$this->user->style['pwa_theme_color'] = '#000000';
+		$this->user->style['pwa_bg_color'] = '#ffffff';
 
 		$this->manifest = new \phpbb\webpushnotifications\controller\manifest($this->config, $this->user);
 	}

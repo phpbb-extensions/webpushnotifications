@@ -349,8 +349,8 @@ class listener_test extends \phpbb_database_test_case
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
-				'PWA_THEME_COLOR'	=> ext::PWA_THEME_COLOR,
-				'PWA_BG_COLOR'		=> ext::PWA_BG_COLOR,
+				'PWA_THEME_COLOR'	=> '',
+				'PWA_BG_COLOR'		=> '',
 				'S_PWA_SHOW_BANNER'	=> false,
 			]);
 

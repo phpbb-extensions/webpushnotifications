@@ -133,6 +133,8 @@ class functional_test extends \phpbb_functional_test_case
 
 		$form_data = [
 			'config[pwa_short_name]'	=> $expected['short_name'],
+			'pwa_theme_color_1'	=> $expected['theme_color'],
+			'pwa_bg_color_1'	=> $expected['background_color'],
 		];
 		$form = $crawler->selectButton('submit')->form($form_data);
 		$crawler = self::submit($form);

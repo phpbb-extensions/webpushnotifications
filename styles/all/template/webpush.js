@@ -541,7 +541,7 @@ function PhpbbWebpush() {
 			})
 			.catch(error => {
 				loadingIndicator.fadeOut(phpbb.alertTime);
-				phpbb.alert(ajaxErrorTitle, error);
+				phpbb.alert(ajaxErrorTitle, error.message || error);
 			});
 	}
 

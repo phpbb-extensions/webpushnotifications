@@ -547,6 +547,46 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->controller->subscribe($symfony_request);
 	}
 
+	public function data_subscribe_missing_endpoint(): array
+	{
+		return [
+			'missing_endpoint'	=> [[
+				'expiration_time'	=> 0,
+				'keys'				=> ['p256dh' => 'test_p256dh', 'auth' => 'test_auth'],
+			]],
+			'null_endpoint'		=> [[
+				'endpoint'			=> null,
+				'expiration_time'	=> 0,
+				'keys'				=> ['p256dh' => 'test_p256dh', 'auth' => 'test_auth'],
+			]],
+			'array_endpoint'	=> [[
+				'endpoint'			=> ['https://fcm.googleapis.com/fcm/send/test_endpoint'],
+				'expiration_time'	=> 0,
+				'keys'				=> ['p256dh' => 'test_p256dh', 'auth' => 'test_auth'],
+			]],
+		];
+	}
+
+	/**
+	 * @dataProvider data_subscribe_missing_endpoint
+	 */
+	public function test_subscribe_missing_endpoint(array $payload): void
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+
+		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
+		$symfony_request->method('get')->willReturn(json_encode($payload));
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+
+		$this->controller->subscribe($symfony_request);
+	}
+
 	public function data_is_valid_endpoint(): array
 	{
 		return [

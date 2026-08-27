@@ -76,20 +76,27 @@ namespace phpbb\webpushnotifications\tests\notification
 
 		private function create_method($log = null, $user_loader = null, $assets_version = 1): testable_webpush
 		{
-			global $phpbb_root_path, $phpEx;
+			global $config, $phpbb_root_path, $phpEx, $user;
 
 			$config = new \phpbb\config\config([
 				'wpn_webpush_vapid_public' => notification_method_webpush_test::VAPID_KEYS['publicKey'],
 				'wpn_webpush_vapid_private' => notification_method_webpush_test::VAPID_KEYS['privateKey'],
 				'assets_version' => $assets_version,
+				'force_server_vars' => true,
+				'server_protocol' => 'https://',
+				'server_name' => 'example.com',
+				'server_port' => 443,
+				'script_path' => '',
+				'cookie_secure' => true,
 			]);
+			$user = $this->createMock(\phpbb\user::class);
 
 			return new testable_webpush(
 				$config,
 				$this->createMock(\phpbb\db\driver\driver_interface::class),
 				$log ?: $this->createMock(\phpbb\log\log_interface::class),
 				$user_loader ?: $this->createMock(\phpbb\user_loader::class),
-				$this->createMock(\phpbb\user::class),
+				$user,
 				$phpbb_root_path,
 				$phpEx,
 				'phpbb_wpn_notification_push',

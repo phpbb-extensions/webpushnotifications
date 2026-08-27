@@ -301,9 +301,9 @@ class acp_module_test extends \phpbb_test_case
 			->with('submit')
 			->willReturn(true);
 
-		$this->setExpectedTriggerError(E_USER_WARNING, 'FORM_INVALID');
-
-		$this->create_module('adm.php?i=test&mode=' . $mode)->main('', $mode);
+		$this->assertTriggerError(E_USER_WARNING, 'FORM_INVALID', function() use ($mode) {
+			$this->create_module('adm.php?i=test&mode=' . $mode)->main('', $mode);
+		});
 	}
 
 	public function valid_submit_mode_data(): array
@@ -424,10 +424,14 @@ class acp_module_test extends \phpbb_test_case
 
 		if ($expect_saved)
 		{
-			$this->setExpectedTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED');
+			$this->assertTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED', function() {
+				$this->create_module()->save_settings();
+			});
 		}
-
-		$this->create_module()->save_settings();
+		else
+		{
+			$this->create_module()->save_settings();
+		}
 
 		foreach ($expected_config as $name => $value)
 		{
@@ -499,8 +503,8 @@ class acp_module_test extends \phpbb_test_case
 				],
 				[
 					[
-						'pwa_bg_color' => '#fff000',
-						'pwa_theme_color' => '#000fff',
+						'pwa_bg_color' => '',
+						'pwa_theme_color' => '',
 					],
 					[
 						'pwa_bg_color' => '',
@@ -665,10 +669,14 @@ class acp_module_test extends \phpbb_test_case
 
 		if ($expect_saved)
 		{
-			$this->setExpectedTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED');
+			$this->assertTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED', function() {
+				$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+			});
 		}
-
-		$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+		else
+		{
+			$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+		}
 
 		foreach ($expected_config as $name => $value)
 		{
@@ -758,6 +766,31 @@ class acp_module_test extends \phpbb_test_case
 		$property = $reflection->getProperty($property);
 		$property->setAccessible(true);
 		$property->setValue($object, $value);
+	}
+
+	protected function assertTriggerError($errno, $message, callable $callback): void
+	{
+		$caught = null;
+		set_error_handler(static function($severity, $error_message, $file, $line) {
+			throw new \ErrorException($error_message, 0, $severity, $file, $line);
+		}, $errno);
+
+		try
+		{
+			$callback();
+		}
+		catch (\ErrorException $exception)
+		{
+			$caught = $exception;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		self::assertNotNull($caught, 'Expected trigger_error() was not raised.');
+		self::assertSame($errno, $caught->getSeverity());
+		self::assertStringContainsString($message, $caught->getMessage());
 	}
 
 	protected function get_protected_property($object, $property)

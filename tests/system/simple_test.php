@@ -50,4 +50,37 @@ class simple_test extends \phpbb_test_case
 
 		self::assertTrue($ext->is_enableable(), 'Asserting that the extension is enable-able.');
 	}
+
+	public function test_enable_errors_are_localised()
+	{
+		$language = $this->createMock(\phpbb\language\language::class);
+		$language->expects(self::once())->method('add_lang')->with('install', 'phpbb/webpushnotifications');
+		$language->method('lang')->willReturnCallback(function () {
+			return implode(':', func_get_args());
+		});
+		$this->container->method('get')->with('language')->willReturn($language);
+
+		$ext = new testable_ext($this->container, $this->extension_finder, $this->migrator, 'phpbb/webpushnotifications', '');
+		$ext->set_errors(['PHPBB_VERSION_MIN_ERROR', ['PHP_EXT_MISSING', 'curl']]);
+
+		self::assertSame(['PHPBB_VERSION_MIN_ERROR', 'PHP_EXT_MISSING:curl'], $ext->get_result());
+	}
+
+	public function test_decode_entities()
+	{
+		self::assertSame('A&B "quote"', \phpbb\webpushnotifications\ext::decode_entities('A&amp;B &quot;quote&quot;', ENT_QUOTES));
+	}
+}
+
+class testable_ext extends \phpbb\webpushnotifications\ext
+{
+	public function set_errors(array $errors): void
+	{
+		$this->errors = $errors;
+	}
+
+	public function get_result()
+	{
+		return $this->result();
+	}
 }

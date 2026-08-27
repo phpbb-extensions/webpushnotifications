@@ -306,6 +306,28 @@ class acp_module_test extends \phpbb_test_case
 		$this->create_module('adm.php?i=test&mode=' . $mode)->main('', $mode);
 	}
 
+	public function valid_submit_mode_data(): array
+	{
+		return [
+			'webpush' => ['webpush', 'save_settings'],
+			'pwa' => ['pwa', 'save_pwa_settings'],
+		];
+	}
+
+	/**
+	 * @dataProvider valid_submit_mode_data
+	 */
+	public function test_main_routes_valid_submission($mode, $expected_method): void
+	{
+		$this->request->method('is_set_post')->with('submit')->willReturn(true);
+		$module = new \phpbb\webpushnotifications\acp\routing_acp_module();
+		$module->u_action = 'adm.php?i=test&mode=' . $mode;
+
+		$module->main('', $mode);
+
+		self::assertSame([$expected_method], $module->calls);
+	}
+
 	public function webpush_save_data(): array
 	{
 		$valid = [
@@ -825,4 +847,27 @@ function add_form_key()
 function check_form_key()
 {
 	return \phpbb\webpushnotifications\tests\acp\acp_module_test::$valid_form;
+}
+
+class routing_acp_module extends wpn_acp_module
+{
+	public $calls = [];
+
+	public function save_settings()
+	{
+		$this->calls[] = __FUNCTION__;
+	}
+
+	public function save_pwa_settings()
+	{
+		$this->calls[] = __FUNCTION__;
+	}
+
+	public function display_settings()
+	{
+	}
+
+	public function display_pwa_settings()
+	{
+	}
 }

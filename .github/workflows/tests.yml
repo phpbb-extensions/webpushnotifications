@@ -16,8 +16,10 @@ jobs:
         uses: phpbb-extensions/test-framework/.github/workflows/tests.yml@3.3.x
         with:
             EXTNAME: phpbb/webpushnotifications # Your extension vendor/package name
-            EXECUTABLE_FILES: 0
             RUN_NPM_INSTALL: 1
             RUN_COMPOSER_INSTALL: 1
             PHP_VERSION_MATRIX: '["7.3", "7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]'
             PRIMARY_PHP_VERSION: '7.3'
+            CODECOV: 1           # Run code coverage via codecov? 1 or 0
+        secrets:
+            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} # Do not change this

@@ -624,6 +624,83 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals($expected, $this->controller->is_valid_endpoint($endpoint));
 	}
 
+	public function test_current_notification_data_is_rendered(): void
+	{
+		$notification = $this->createMock(\phpbb\notification\type\type_interface::class);
+		$notification->method('users_to_query')->willReturn([]);
+		$notification->method('get_title')->willReturn('A &amp; <b>title</b>');
+		$notification->method('get_reference')->willReturn('A &quot;reference&quot;');
+		$notification->method('get_url')->willReturn('viewtopic.php?p=1&amp;x=2');
+		$notification->method('get_avatar')->willReturn('<img src="phpBB/images/avatar.png" alt="">');
+		$this->notification_manager->expects(self::once())
+			->method('get_item_type_class')
+			->with('notification.type.test', self::isType('array'))
+			->willReturn($notification);
+
+		$method = new ReflectionMethod($this->controller, 'get_notification_data');
+		$method->setAccessible(true);
+		$data = json_decode($method->invoke($this->controller, json_encode([
+			'notification_type_name' => 'notification.type.test',
+		])), true);
+
+		self::assertSame('yourdomain.com', $data['heading']);
+		self::assertSame('A & title', $data['title']);
+		self::assertSame('A &quot;reference&quot;', $data['text']);
+		self::assertSame('viewtopic.php?p=1&x=2', $data['url']);
+		self::assertStringEndsWith('/images/avatar.png', $data['avatar']['src']);
+	}
+
+	public function subscription_write_data(): array
+	{
+		return [
+			'legacy seconds' => [['expiration_time' => 42, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 42],
+			'empty browser timestamp' => [['expirationTime' => null, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 0],
+			'browser milliseconds' => [['expirationTime' => 42000, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 42],
+		];
+	}
+
+	/**
+	 * @dataProvider subscription_write_data
+	 */
+	public function test_subscription_write_data_normalizes_expiration(array $data, $expected): void
+	{
+		$method = new ReflectionMethod($this->controller, 'get_subscription_write_data');
+		$method->setAccessible(true);
+
+		self::assertSame($expected, $method->invoke($this->controller, $data)['expiration_time']);
+	}
+
+	public function test_subscription_write_data_rejects_non_array_keys(): void
+	{
+		$method = new ReflectionMethod($this->controller, 'get_subscription_write_data');
+		$method->setAccessible(true);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('AJAX_ERROR_TEXT');
+		$method->invoke($this->controller, ['keys' => 'invalid']);
+	}
+
+	public function avatar_data(): array
+	{
+		return [
+			'empty' => ['', ''],
+			'plain url' => ['https://example.com/avatar.png', 'https://example.com/avatar.png'],
+			'multiple sources use final source' => ['<img src="phpBB/fallback.png" data-src="phpBB/avatar.png">', 'avatar.png'],
+		];
+	}
+
+	/**
+	 * @dataProvider avatar_data
+	 */
+	public function test_prepare_avatar($avatar, $expected_suffix): void
+	{
+		$method = new ReflectionMethod($this->controller, 'prepare_avatar');
+		$method->setAccessible(true);
+		$actual = $method->invoke($this->controller, $avatar);
+
+		self::assertStringEndsWith($expected_suffix, $actual['src']);
+	}
+
 	public function test_toggle_popup_enable_to_disable()
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(true);

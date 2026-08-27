@@ -73,8 +73,6 @@ class listener_test extends \phpbb_database_test_case
 		$form_request->enable_super_globals();
 		$this->request = $this->getMockBuilder('\phpbb\request\request_interface')
 			->getMock();
-		$this->request->method('server')
-			->willReturn('');
 		$user = new \phpbb\user($this->language, '\phpbb\datetime');
 		$this->user = $user;
 		$this->user->data['user_form_salt'] = '';
@@ -357,6 +355,38 @@ class listener_test extends \phpbb_database_test_case
 		$dispatcher = new \phpbb\event\dispatcher();
 		$dispatcher->addListener('core.acp_main_notice', [$this->listener, 'pwa_manifest']);
 		$dispatcher->trigger_event('core.acp_main_notice');
+	}
+
+	public function test_load_template_data_returns_when_notifications_unavailable()
+	{
+		$this->config['wpn_webpush_enable'] = false;
+		$this->user->data['user_id'] = ANONYMOUS;
+		$this->notifications->expects(self::never())->method('get_subscription_methods');
+
+		$this->set_listener();
+		$this->listener->load_template_data();
+	}
+
+	public function test_pwa_manifest_builds_fallback_name_and_mobile_banner()
+	{
+		$this->config['sitename'] = 'Long &amp; Mobile Site';
+		$this->user->style = [
+			'pwa_theme_color' => '#112233',
+			'pwa_bg_color' => '#445566',
+		];
+		$this->request->method('server')->with('HTTP_USER_AGENT', '')->willReturn('Mozilla/5.0 iPhone Mobile');
+
+		$this->template->expects(self::once())->method('assign_vars')->with([
+			'U_MANIFEST_URL' => $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
+			'U_TOUCH_ICON' => null,
+			'SHORT_SITE_NAME' => 'Long &amp; Mobil',
+			'PWA_THEME_COLOR' => '#112233',
+			'PWA_BG_COLOR' => '#445566',
+			'S_PWA_SHOW_BANNER' => true,
+		]);
+
+		$this->set_listener();
+		$this->listener->pwa_manifest();
 	}
 
 	public function test_wpn_faq()

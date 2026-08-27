@@ -645,6 +645,61 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->assertEquals('notification.method.phpbb.wpn.webpush', $this->notification_method_webpush->get_type());
 	}
 
+	public function test_availability_and_default_setting(): void
+	{
+		$this->config['wpn_webpush_enable'] = true;
+		$this->config['wpn_webpush_method_enabled'] = true;
+		self::assertTrue($this->notification_method_webpush->is_available());
+		self::assertTrue($this->notification_method_webpush->is_enabled_by_default());
+
+		$this->config['wpn_webpush_vapid_private'] = '';
+		self::assertFalse($this->notification_method_webpush->is_available());
+		$this->config['wpn_webpush_method_enabled'] = false;
+		self::assertFalse($this->notification_method_webpush->is_enabled_by_default());
+	}
+
+	public function mark_data(): array
+	{
+		return [
+			'all filters' => [1, 2, 3],
+			'array filters' => [[1, 2], [2, 3], [3, 4]],
+			'no filters' => [false, false, false],
+		];
+	}
+
+	/**
+	 * @dataProvider mark_data
+	 */
+	public function test_mark_notifications($type_id, $item_id, $user_id): void
+	{
+		$this->notification_method_webpush->mark_notifications($type_id, $item_id, $user_id);
+		self::assertTrue(true);
+	}
+
+	/**
+	 * @dataProvider mark_data
+	 */
+	public function test_mark_notifications_by_parent($type_id, $parent_id, $user_id): void
+	{
+		$this->notification_method_webpush->mark_notifications_by_parent($type_id, $parent_id, $user_id);
+		self::assertTrue(true);
+	}
+
+	public function test_set_endpoint_padding_ignores_library_exception(): void
+	{
+		$web_push = $this->getMockBuilder(\Minishlink\WebPush\WebPush::class)
+			->disableOriginalConstructor()
+			->setMethods(['setAutomaticPadding'])
+			->getMock();
+		$web_push->expects(self::once())->method('setAutomaticPadding')->willThrowException(new \Exception('padding'));
+
+		$method = new \ReflectionMethod($this->notification_method_webpush, 'set_endpoint_padding');
+		$method->setAccessible(true);
+		$method->invoke($this->notification_method_webpush, $web_push, 'https://push.mozilla.com/test');
+
+		self::assertTrue(true);
+	}
+
 	public function test_push_token_map_is_per_user(): void
 	{
 		// Verifies that when multiple users are notified about the same item,

@@ -3,6 +3,7 @@
 This is the repository for the development of the phpBB Browser Push Notifications extension.
 
 [![Build Status](https://github.com/phpbb-extensions/webpushnotifications/actions/workflows/tests.yml/badge.svg)](https://github.com/phpbb-extensions/webpushnotifications/actions)
+[![codecov](https://codecov.io/gh/phpbb-extensions/webpushnotifications/graph/badge.svg?token=TKEZM2VFKI)](https://codecov.io/gh/phpbb-extensions/webpushnotifications)
 
 An official phpBB extension that allows board users to receive browser-based push notifications.
 

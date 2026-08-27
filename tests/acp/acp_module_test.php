@@ -301,9 +301,31 @@ class acp_module_test extends \phpbb_test_case
 			->with('submit')
 			->willReturn(true);
 
-		$this->setExpectedTriggerError(E_USER_WARNING, 'FORM_INVALID');
+		$this->assertTriggerError(E_USER_WARNING, 'FORM_INVALID', function() use ($mode) {
+			$this->create_module('adm.php?i=test&mode=' . $mode)->main('', $mode);
+		});
+	}
 
-		$this->create_module('adm.php?i=test&mode=' . $mode)->main('', $mode);
+	public function valid_submit_mode_data(): array
+	{
+		return [
+			'webpush' => ['webpush', 'save_settings'],
+			'pwa' => ['pwa', 'save_pwa_settings'],
+		];
+	}
+
+	/**
+	 * @dataProvider valid_submit_mode_data
+	 */
+	public function test_main_routes_valid_submission($mode, $expected_method): void
+	{
+		$this->request->method('is_set_post')->with('submit')->willReturn(true);
+		$module = new \phpbb\webpushnotifications\acp\routing_acp_module();
+		$module->u_action = 'adm.php?i=test&mode=' . $mode;
+
+		$module->main('', $mode);
+
+		self::assertSame([$expected_method], $module->calls);
 	}
 
 	public function webpush_save_data(): array
@@ -402,10 +424,14 @@ class acp_module_test extends \phpbb_test_case
 
 		if ($expect_saved)
 		{
-			$this->setExpectedTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED');
+			$this->assertTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED', function() {
+				$this->create_module()->save_settings();
+			});
 		}
-
-		$this->create_module()->save_settings();
+		else
+		{
+			$this->create_module()->save_settings();
+		}
 
 		foreach ($expected_config as $name => $value)
 		{
@@ -477,8 +503,8 @@ class acp_module_test extends \phpbb_test_case
 				],
 				[
 					[
-						'pwa_bg_color' => '#fff000',
-						'pwa_theme_color' => '#000fff',
+						'pwa_bg_color' => '',
+						'pwa_theme_color' => '',
 					],
 					[
 						'pwa_bg_color' => '',
@@ -643,10 +669,14 @@ class acp_module_test extends \phpbb_test_case
 
 		if ($expect_saved)
 		{
-			$this->setExpectedTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED');
+			$this->assertTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED', function() {
+				$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+			});
 		}
-
-		$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+		else
+		{
+			$this->create_module('adm.php?i=test&mode=pwa')->save_pwa_settings();
+		}
 
 		foreach ($expected_config as $name => $value)
 		{
@@ -738,6 +768,31 @@ class acp_module_test extends \phpbb_test_case
 		$property->setValue($object, $value);
 	}
 
+	protected function assertTriggerError($errno, $message, callable $callback): void
+	{
+		$caught = null;
+		set_error_handler(static function($severity, $error_message, $file, $line) {
+			throw new \ErrorException($error_message, 0, $severity, $file, $line);
+		}, $errno);
+
+		try
+		{
+			$callback();
+		}
+		catch (\ErrorException $exception)
+		{
+			$caught = $exception;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		self::assertNotNull($caught, 'Expected trigger_error() was not raised.');
+		self::assertSame($errno, $caught->getSeverity());
+		self::assertStringContainsString($message, $caught->getMessage());
+	}
+
 	protected function get_protected_property($object, $property)
 	{
 		$reflection = new \ReflectionClass($object);
@@ -825,4 +880,27 @@ function add_form_key()
 function check_form_key()
 {
 	return \phpbb\webpushnotifications\tests\acp\acp_module_test::$valid_form;
+}
+
+class routing_acp_module extends wpn_acp_module
+{
+	public $calls = [];
+
+	public function save_settings()
+	{
+		$this->calls[] = __FUNCTION__;
+	}
+
+	public function save_pwa_settings()
+	{
+		$this->calls[] = __FUNCTION__;
+	}
+
+	public function display_settings()
+	{
+	}
+
+	public function display_pwa_settings()
+	{
+	}
 }

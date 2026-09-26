@@ -28,11 +28,6 @@ input[type="color"]::-moz-color-swatch {
 	width: 120px;
 }
 
-.pwa-detect-status {
-	color: #BC2A4D;
-	margin-left: 6px;
-}
-
 .pwa-colour-preview {
 	position: fixed;
 	left: -10000px;

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	'use strict';
 
 	const HEX_REGEX = /^#([A-Fa-f0-9]{6})$/;
-	const DETECTION_TIMEOUT = 10000;
+	const DETECTION_TIMEOUT = 30000;
 
 	const colorPickers = document.querySelectorAll('input[type="color"]');
 
@@ -137,9 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			iframe.addEventListener('load', () => {
 				try {
 					const themeColor = detectPageColor(iframe);
-					const backgroundColor = relativeLuminance(themeColor) > 0.179
-						? '#FFFFFF'
-						: '#000000';
+					const backgroundColor = relativeLuminance(themeColor) > 0.179 ? '#ffffff' : '#000000';
 
 					setColor(button.dataset.styleId, 'theme', toHex(themeColor));
 					setColor(button.dataset.styleId, 'bg', backgroundColor);
@@ -151,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 			iframe.addEventListener('error', () => finish(true));
 			previewUrl.searchParams.set('style', button.dataset.styleId);
-			iframe.src = previewUrl;
+			iframe.src = previewUrl.href;
 			document.body.appendChild(iframe);
 		});
 	});

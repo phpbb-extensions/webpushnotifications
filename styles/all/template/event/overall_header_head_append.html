@@ -1,13 +1,14 @@
-<!-- Android / Chrome PWA support -->
+
 <meta name="mobile-web-app-capable" content="yes">
-{% if PWA_THEME_COLOR %}<style>:root { --pwa-theme-colour: {{ PWA_THEME_COLOR }}; }</style>{% endif %}
-<!-- iOS PWA support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="{{ SHORT_SITE_NAME }}">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+{% if PWA_THEME_COLOR %}
+<meta name="theme-color" content="{{ PWA_THEME_COLOR }}">
+<style>:root { --pwa-theme-colour: {{ PWA_THEME_COLOR }}; }</style>
+{% endif %}
 
 <link rel="manifest" href="{{ U_MANIFEST_URL }}" crossorigin="use-credentials">
-
 {% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ ROOT_PATH ~ U_TOUCH_ICON }}">{% endif %}
 
 {% if NOTIFICATIONS_WEBPUSH_ENABLE %}

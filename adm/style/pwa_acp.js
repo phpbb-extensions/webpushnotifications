@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		syncColors(colorText, colorPicker);
 	});
 
+	// Read an element's computed background colour as RGBA values.
 	const readColor = (view, element) => {
 		const value = view.getComputedStyle(element).backgroundColor;
 		const canvas = document.createElement('canvas');
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return Array.from(context.getImageData(0, 0, 1, 1).data);
 	};
 
+	// Blend a foreground colour over a background colour.
 	const compositeColor = (foreground, background) => {
 		const alpha = foreground[3] / 255;
 
@@ -62,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		];
 	};
 
+	// Resolve the visible page colour from the preview's HTML and body backgrounds.
 	const detectPageColor = iframe => {
 		const previewDocument = iframe.contentDocument;
 		const previewWindow = iframe.contentWindow;
@@ -76,11 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		return compositeColor(bodyColor, canvasColor);
 	};
 
+	// Convert RGB values to a six-digit hexadecimal colour.
 	const toHex = color => '#' + color.slice(0, 3)
 		.map(channel => channel.toString(16).padStart(2, '0'))
 		.join('')
 		.toUpperCase();
 
+	// Calculate relative luminance to classify a colour as light or dark.
 	const relativeLuminance = color => {
 		const channels = color.slice(0, 3).map(channel => {
 			const value = channel / 255;
@@ -90,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
 	};
 
+	// Update a style's text field and synchronize its colour picker.
 	const setColor = (styleId, name, value) => {
 		const colorText = document.getElementById(`pwa_${name}_color_${styleId}`);
 
@@ -97,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		colorText.dispatchEvent(new Event('input', { bubbles: true }));
 	};
 
+	// Attach colour detection to each installed style's button.
 	document.querySelectorAll('.pwa-detect-colours').forEach(button => {
 		button.addEventListener('click', () => {
 			const originalLabel = button.value;
@@ -104,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const iframe = document.createElement('iframe');
 			let finished = false;
 
+			// Remove the preview and restore the detector button after completion.
 			const finish = error => {
 				if (finished) {
 					return;

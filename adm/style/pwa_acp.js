@@ -82,8 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Convert RGB values to a six-digit hexadecimal colour.
 	const toHex = color => '#' + color.slice(0, 3)
 		.map(channel => channel.toString(16).padStart(2, '0'))
-		.join('')
-		.toUpperCase();
+		.join('');
 
 	// Calculate relative luminance to classify a colour as light or dark.
 	const relativeLuminance = color => {
@@ -109,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const originalLabel = button.value;
 			const status = button.closest('dd').querySelector('.pwa-detect-status');
 			const iframe = document.createElement('iframe');
+			const previewUrl = new URL(button.dataset.previewUrl, window.location.href);
 			let finished = false;
 
 			// Remove the preview and restore the detector button after completion.
@@ -150,7 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			});
 			iframe.addEventListener('error', () => finish(true));
-			iframe.src = button.dataset.previewUrl;
+			previewUrl.searchParams.set('style', button.dataset.styleId);
+			iframe.src = previewUrl;
 			document.body.appendChild(iframe);
 		});
 	});

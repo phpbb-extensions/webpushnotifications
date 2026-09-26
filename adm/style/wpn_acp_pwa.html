@@ -63,11 +63,11 @@
 					<input
 						type="button"
 						class="button2 pwa-detect-colours"
-						value="{{ lang('PWA_DETECT_COLOURS') }}"
-						data-style-id="{{ style.style_id }}"
-						data-preview-url="{{ ROOT_PATH }}index.php?style={{ style.style_id }}"
-						data-detecting-label="{{ lang('PWA_DETECTING_COLOURS') }}"
-						data-error-message="{{ lang('PWA_DETECT_COLOURS_FAILED') }}">
+						value="{{ lang('PWA_DETECT_COLOURS')|e('html_attr') }}"
+						data-style-id="{{ style.style_id|e('html_attr') }}"
+						data-preview-url="{{ U_INDEX }}"
+						data-detecting-label="{{ lang('PWA_DETECTING_COLOURS')|e('html_attr') }}"
+						data-error-message="{{ lang('PWA_DETECT_COLOURS_FAILED')|e('html_attr') }}">
 					<span class="pwa-detect-status" role="status"></span>
 				</dd>
 			</dl>

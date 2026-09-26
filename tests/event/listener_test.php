@@ -348,7 +348,6 @@ class listener_test extends \phpbb_database_test_case
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
 				'PWA_THEME_COLOR'	=> '',
-				'PWA_BG_COLOR'		=> '',
 				'S_PWA_SHOW_BANNER'	=> false,
 			]);
 
@@ -381,7 +380,6 @@ class listener_test extends \phpbb_database_test_case
 			'U_TOUCH_ICON' => null,
 			'SHORT_SITE_NAME' => 'Long &amp; Mobil',
 			'PWA_THEME_COLOR' => '#112233',
-			'PWA_BG_COLOR' => '#445566',
 			'S_PWA_SHOW_BANNER' => true,
 		]);
 

@@ -60,6 +60,15 @@
 						<input type="text" id="pwa_bg_color_{{ style.style_id }}" name="pwa_bg_color_{{ style.style_id }}" size="8" value="{{ style.pwa_bg_color }}" placeholder="#ffffff">
 						<input type="color" id="pwa_bg_color_picker_{{ style.style_id }}" aria-label="{{ lang('PWA_BACKGROUND_COLOUR') }}" value="{{ style.pwa_bg_color|default(default_color) }}">
 					</span>
+					<input
+						type="button"
+						class="button2 pwa-detect-colours"
+						value="{{ lang('PWA_DETECT_COLOURS') }}"
+						data-style-id="{{ style.style_id }}"
+						data-preview-url="{{ ROOT_PATH }}index.php?style={{ style.style_id }}"
+						data-detecting-label="{{ lang('PWA_DETECTING_COLOURS') }}"
+						data-error-message="{{ lang('PWA_DETECT_COLOURS_FAILED') }}">
+					<span class="pwa-detect-status" role="status"></span>
 				</dd>
 			</dl>
 		{% endfor %}

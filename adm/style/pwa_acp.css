@@ -27,3 +27,18 @@ input[type="color"]::-moz-color-swatch {
 	display: inline-block;
 	width: 120px;
 }
+
+.pwa-detect-status {
+	color: #BC2A4D;
+	margin-left: 6px;
+}
+
+.pwa-colour-preview {
+	position: fixed;
+	left: -10000px;
+	top: 0;
+	visibility: hidden;
+	width: 1280px;
+	height: 800px;
+	border: 0;
+}

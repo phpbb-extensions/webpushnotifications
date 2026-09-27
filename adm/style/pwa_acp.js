@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const bodyColor = readColor(previewWindow, previewDocument.body);
 
 		if (htmlColor[3] === 0 && bodyColor[3] === 0) {
-			throw new Error('Style has no HTML or body background colour.');
+			return null;
 		}
 
 		const canvasColor = compositeColor(htmlColor, [ 255, 255, 255, 255 ]);
@@ -137,6 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			iframe.addEventListener('load', () => {
 				try {
 					const themeColor = detectPageColor(iframe);
+
+					if (!themeColor) {
+						throw new Error(button.dataset.noBackgroundMessage);
+					}
+
 					const backgroundColor = relativeLuminance(themeColor) > 0.179 ? '#ffffff' : '#000000';
 
 					setColor(button.dataset.styleId, 'theme', toHex(themeColor));

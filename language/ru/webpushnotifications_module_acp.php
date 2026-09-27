@@ -76,6 +76,7 @@ $lang = array_merge($lang, [
 	'PWA_DETECT_COLOURS'		=> 'Определить цвета',
 	'PWA_DETECTING_COLOURS'		=> 'Определение…',
 	'PWA_DETECT_COLOURS_FAILED'	=> 'Не удалось определить цвет фона этого стиля.',
+	'PWA_DETECT_COLOURS_NO_BG'	=> 'Для элементов HTML и body этого стиля не задан цвет фона.',
 	'PWA_INVALID_COLOUR'		=> 'Код цвета «<samp>%s</samp>» не является допустимым шестнадцатеричным кодом.',
 	'PWA_SHOW_INSTALL_BANNER'	=> 'Показывать баннер установки приложения',
 	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Показывать на поддерживаемых мобильных устройствах приглашение установить конференцию как приложение.',

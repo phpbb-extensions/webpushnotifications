@@ -76,6 +76,7 @@ $lang = array_merge($lang, [
 	'PWA_DETECT_COLOURS'		=> 'Detect colours',
 	'PWA_DETECTING_COLOURS'		=> 'Detecting…',
 	'PWA_DETECT_COLOURS_FAILED'	=> 'Could not detect this style’s background colour.',
+	'PWA_DETECT_COLOURS_NO_BG'	=> 'The style has no HTML or body background colour.',
 	'PWA_INVALID_COLOUR'		=> 'The colour code “<samp>%s</samp>” is not a valid hex code.',
 	'PWA_SHOW_INSTALL_BANNER'	=> 'Show app install banner',
 	'PWA_SHOW_INSTALL_BANNER_EXPLAIN'	=> 'Display a prompt on supported mobile devices inviting users to install your board as an app.',

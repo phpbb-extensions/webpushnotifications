@@ -156,7 +156,6 @@ class listener implements EventSubscriberInterface
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),
 			'PWA_THEME_COLOR'	=> $this->user->style['pwa_theme_color'] ?? '',
-			'PWA_BG_COLOR'		=> $this->user->style['pwa_bg_color'] ?? '',
 			'S_PWA_SHOW_BANNER'	=> !empty($this->config['pwa_show_install_banner']) && $this->is_mobile_phone(),
 		]);
 	}

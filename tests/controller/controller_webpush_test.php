@@ -322,7 +322,20 @@ class controller_webpush_test extends \phpbb_database_test_case
 	 */
 	public function test_worker()
 	{
-		$this->template->method('render')->willReturn('rendered_content');
+		$this->config['force_server_vars'] = true;
+		$this->config['server_protocol'] = 'https://';
+		$this->config['server_name'] = 'example.com';
+		$this->config['server_port'] = 443;
+		$this->config['script_path'] = '/forum';
+		$this->config['cookie_secure'] = true;
+		$this->template->expects(self::once())
+			->method('render')
+			->with('@phpbb_webpushnotifications/push_worker.js.twig', [
+				'U_WEBPUSH_GET_NOTIFICATION' => 'test_route',
+				'U_BOARD_URL' => 'https://example.com/forum',
+				'ASSETS_VERSION' => '1.0',
+			])
+			->willReturn('rendered_content');
 		$this->controller_helper->method('route')->willReturn('test_route');
 		$this->config['assets_version'] = '1.0';
 

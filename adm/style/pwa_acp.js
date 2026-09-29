@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	'use strict';
 
 	const HEX_REGEX = /^#([A-Fa-f0-9]{6})$/;
+	const DETECTION_TIMEOUT = 30000;
 
 	const colorPickers = document.querySelectorAll('input[type="color"]');
 
@@ -34,5 +35,117 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		syncColors(colorText, colorPicker);
+	});
+
+	// Read an element's computed background colour as RGBA values.
+	const readColor = (view, element) => {
+		const value = view.getComputedStyle(element).backgroundColor;
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+
+		canvas.width = 1;
+		canvas.height = 1;
+		context.clearRect(0, 0, 1, 1);
+		context.fillStyle = value;
+		context.fillRect(0, 0, 1, 1);
+
+		return Array.from(context.getImageData(0, 0, 1, 1).data);
+	};
+
+	// Blend a foreground colour over a background colour.
+	const compositeColor = (foreground, background) => {
+		const alpha = foreground[3] / 255;
+
+		return [
+			Math.round(foreground[0] * alpha + background[0] * (1 - alpha)),
+			Math.round(foreground[1] * alpha + background[1] * (1 - alpha)),
+			Math.round(foreground[2] * alpha + background[2] * (1 - alpha)),
+			255,
+		];
+	};
+
+	// Resolve the visible page colour from the preview's HTML and body backgrounds.
+	const detectPageColor = iframe => {
+		const previewDocument = iframe.contentDocument;
+		const previewWindow = iframe.contentWindow;
+		const htmlColor = readColor(previewWindow, previewDocument.documentElement);
+		const bodyColor = readColor(previewWindow, previewDocument.body);
+
+		if (htmlColor[3] === 0 && bodyColor[3] === 0) {
+			return null;
+		}
+
+		const canvasColor = compositeColor(htmlColor, [ 255, 255, 255, 255 ]);
+		return compositeColor(bodyColor, canvasColor);
+	};
+
+	// Convert RGB values to a six-digit hexadecimal colour.
+	const toHex = color => '#' + color.slice(0, 3)
+		.map(channel => channel.toString(16).padStart(2, '0'))
+		.join('');
+
+	// Update a style's text field and synchronize its colour picker.
+	const setColor = (styleId, name, value) => {
+		const colorText = document.getElementById(`pwa_${name}_color_${styleId}`);
+
+		colorText.value = value;
+		colorText.dispatchEvent(new Event('input', { bubbles: true }));
+	};
+
+	// Attach colour detection to each installed style's button.
+	document.querySelectorAll('.pwa-detect-colours').forEach(button => {
+		button.addEventListener('click', () => {
+			const originalLabel = button.value;
+			const status = button.closest('dd').querySelector('.pwa-detect-status');
+			const iframe = document.createElement('iframe');
+			const previewUrl = new URL(button.dataset.previewUrl, window.location.href);
+			let finished = false;
+
+			// Remove the preview and restore the detector button after completion.
+			const finish = error => {
+				if (finished) {
+					return;
+				}
+
+				finished = true;
+				clearTimeout(timeout);
+				iframe.remove();
+				button.disabled = false;
+				button.value = originalLabel;
+				status.textContent = error ? button.dataset.errorMessage : '';
+			};
+
+			const timeout = setTimeout(() => finish(true), DETECTION_TIMEOUT);
+
+			button.disabled = true;
+			button.value = button.dataset.detectingLabel;
+			status.textContent = '';
+			status.title = '';
+			iframe.className = 'pwa-colour-preview';
+			iframe.setAttribute('aria-hidden', 'true');
+			iframe.setAttribute('sandbox', 'allow-same-origin');
+			iframe.addEventListener('load', () => {
+				try {
+					const themeColor = detectPageColor(iframe);
+
+					if (!themeColor) {
+						throw new Error(button.dataset.noBackgroundMessage);
+					}
+
+					const pageColor = toHex(themeColor);
+
+					setColor(button.dataset.styleId, 'theme', pageColor);
+					setColor(button.dataset.styleId, 'bg', pageColor);
+					finish(false);
+				} catch (error) {
+					status.title = error.message;
+					finish(true);
+				}
+			});
+			iframe.addEventListener('error', () => finish(true));
+			previewUrl.searchParams.set('style', button.dataset.styleId);
+			iframe.src = previewUrl.href;
+			document.body.appendChild(iframe);
+		});
 	});
 });

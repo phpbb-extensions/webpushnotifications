@@ -84,16 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		.map(channel => channel.toString(16).padStart(2, '0'))
 		.join('');
 
-	// Calculate relative luminance to classify a colour as light or dark.
-	const relativeLuminance = color => {
-		const channels = color.slice(0, 3).map(channel => {
-			const value = channel / 255;
-			return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
-		});
-
-		return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
-	};
-
 	// Update a style's text field and synchronize its colour picker.
 	const setColor = (styleId, name, value) => {
 		const colorText = document.getElementById(`pwa_${name}_color_${styleId}`);
@@ -142,10 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
 						throw new Error(button.dataset.noBackgroundMessage);
 					}
 
-					const backgroundColor = relativeLuminance(themeColor) > 0.179 ? '#ffffff' : '#000000';
+					const pageColor = toHex(themeColor);
 
-					setColor(button.dataset.styleId, 'theme', toHex(themeColor));
-					setColor(button.dataset.styleId, 'bg', backgroundColor);
+					setColor(button.dataset.styleId, 'theme', pageColor);
+					setColor(button.dataset.styleId, 'bg', pageColor);
 					finish(false);
 				} catch (error) {
 					status.title = error.message;

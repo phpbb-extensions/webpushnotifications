@@ -34,30 +34,29 @@ To run this extension from the repo (and not from a pre-built package) on a loca
 
 ## Browser Support
 
-| Web Browser         | Platform | Web Push Notification Support | Background Notification Support (When Browser Closed) |
-|---------------------|----------|-------------------------------|-------------------------------------------------------|
-| **Google Chrome**   | macOS    | ✅ Yes                         | ❌ No (unless running in the background)               |
-|                     | Windows  | ✅ Yes                         | ❌ No (unless running in the background)               |
-|                     | iOS      | ❌ No                          | ❌ No                                                  |
-|                     | Android  | ✅ Yes                         | ✅ Yes                                                 |
-| **Safari**          | macOS    | ✅ Yes                         | ✅ Yes                                                 |
-|                     | iOS      | ✅ Yes                         | ✅ Yes (site must be added to Home Screen first)       |
-| **Microsoft Edge**  | macOS    | ✅ Yes                         | ❌ No (unless running in the background)               |
-|                     | Windows  | ✅ Yes                         | ❌ No (unless running in the background)               |
-|                     | iOS      | ❌ No                          | ❌ No                                                  |
-|                     | Android  | ✅ Yes                         | ✅ Yes                                                 |
-| **Mozilla Firefox** | macOS    | ✅ Yes                         | ❌ No                                                  |
-|                     | Windows  | ✅ Yes                         | ❌ No                                                  |
-|                     | iOS      | ❌ No                          | ❌ No                                                  |
-|                     | Android  | ✅ Yes                         | ❌ No                                                  |
-| **Opera**           | macOS    | ✅ Yes                         | ❌ No                                                  |
-|                     | Windows  | ✅ Yes                         | ❌ No                                                  |
-|                     | iOS      | ❌ No                          | ❌ No                                                  |
-|                     | Android  | ✅ Yes                         | ❌ No                                                  |
+The table covers current stable browsers using the standards-based [Push API](https://w3c.github.io/push-api/), [Notifications API](https://notifications.spec.whatwg.org/), and [Service Workers](https://w3c.github.io/ServiceWorker/). “Background delivery” means delivery when the site is not open. A fully quit desktop browser is called out separately. Last reviewed September 2026.
 
-*(unless running in the background)* means the browsers have background processes running (they’re not fully quit).
+| Web browser             | Platform                              | Web Push support                              | Background delivery                                                          |
+|-------------------------|---------------------------------------|-----------------------------------------------|------------------------------------------------------------------------------|
+| **Google Chrome**       | Windows, macOS, Linux                 | ✅ Yes                                        | ⚠️ Only while Chrome or its background process is running                    |
+|                         | ChromeOS                              | ✅ Yes                                        | ✅ Yes, while the device is running                                          |
+|                         | Android                               | ✅ Yes                                        | ✅ Yes, unless the app is force-stopped or background activity is restricted |
+| **Safari**              | macOS Ventura or later (Safari 16.1+) | ✅ Yes                                        | ✅ Yes, even when Safari is not running                                      |
+| **Microsoft Edge**      | Windows, macOS, Linux                 | ✅ Yes                                        | ✅ Yes, subject to browser and OS background settings                        |
+|                         | Android                               | ✅ Yes                                        | ✅ Yes, unless the app is force-stopped or background activity is restricted |
+| **Mozilla Firefox**     | Windows, macOS, Linux                 | ✅ Yes                                        | ❌ No after Firefox is fully quit                                            |
+|                         | Android                               | ✅ Yes                                        | ✅ Yes, unless the app is force-stopped or background activity is restricted |
+| **Opera**               | Windows, macOS, Linux                 | ✅ Yes                                        | ⚠️ Only while Opera or its background process is running                     |
+|                         | Android                               | ✅ Yes                                        | ✅ Yes, unless the app is force-stopped or background activity is restricted |
+| **Samsung Internet**    | Android                               | ✅ Yes                                        | ✅ Yes, unless the app is force-stopped or background activity is restricted |
+| **Home Screen web app** | iOS/iPadOS 16.4+                      | ✅ Yes, after installation to the Home Screen | ✅ Yes                                                                       |
+| **Opera Mini**          | Mobile                                | ❌ No                                         | ❌ No                                                                        |
 
-More info here https://caniuse.com/push-api
+On iOS and iPadOS, Web Push is not available to a normal browser tab. It belongs to an installed Home Screen web app and works regardless of which browser added that app to the Home Screen. The extension provides the required `standalone` web app manifest. Notification permission must be requested from a direct user interaction.
+
+All supported platforms require user permission and a secure context (`https://`, with `http://localhost` allowed for development). Private browsing, enterprise policy, notification settings, Focus/Do Not Disturb modes, power-saving features, and OS background restrictions can prevent delivery.
+
+References: [Push API compatibility](https://caniuse.com/push-api), [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API), [Web Push on iOS and iPadOS](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/), [Web Push on macOS](https://webkit.org/blog/12945/meet-web-push/), [Edge website notifications](https://support.microsoft.com/en-us/edge/manage-website-notifications-in-microsoft-edge), and [Firefox Web Push notifications](https://support.mozilla.org/en-US/kb/push-notifications-firefox).
 
 ## Testing Push Notifications
 

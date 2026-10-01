@@ -52,7 +52,7 @@ class form_helper
 	public function get_form_tokens(string $form_name, ?int &$now = 0, ?string &$token_sid = '', ?string &$token = ''): array
 	{
 		$now = time();
-		$token_sid = ($this->user->data['user_id'] == ANONYMOUS && !empty($this->config['form_token_sid_guests'])) ? $this->user->session_id : '';
+		$token_sid = ((int) $this->user->data['user_id'] === ANONYMOUS && !empty($this->config['form_token_sid_guests'])) ? $this->user->session_id : '';
 		$token = sha1($now . $this->user->data['user_form_salt'] . $form_name . $token_sid);
 
 		return [
@@ -73,7 +73,7 @@ class form_helper
 		if ($timespan === null)
 		{
 			// we enforce a minimum value of half a minute here.
-			$timespan = ($this->config['form_token_lifetime'] == -1) ? -1 : max(30, $this->config['form_token_lifetime']);
+			$timespan = ((int) $this->config['form_token_lifetime'] === -1) ? -1 : max(30, $this->config['form_token_lifetime']);
 		}
 
 		if ($this->request->is_set_post('creation_time') && $this->request->is_set_post('form_token'))
@@ -83,10 +83,10 @@ class form_helper
 
 			$diff = time() - $creation_time;
 
-			// If creation_time and the time() now is zero we can assume it was not a human doing this (the check for if ($diff)...
-			if (defined('DEBUG_TEST') || $diff && ($diff <= $timespan || $timespan === -1))
+			// If creation_time and the time() now is zero we can assume it was not a human doing this (the check for if ($diff)...)
+			if (defined('DEBUG_TEST') || ($diff && ($diff <= $timespan || $timespan === -1)))
 			{
-				$token_sid = ($this->user->data['user_id'] == ANONYMOUS && !empty($this->config['form_token_sid_guests'])) ? $this->user->session_id : '';
+				$token_sid = ((int) $this->user->data['user_id'] === ANONYMOUS && !empty($this->config['form_token_sid_guests'])) ? $this->user->session_id : '';
 				$key = sha1($creation_time . $this->user->data['user_form_salt'] . $form_name . $token_sid);
 
 				if (hash_equals($key, $token))

@@ -19,7 +19,7 @@ class handle_subscriptions extends migration
 		return ['\phpbb\webpushnotifications\migrations\add_webpush'];
 	}
 
-	public function effectively_installed(): bool
+	public function effectively_installed()
 	{
 		return !$this->db_tools->sql_table_exists($this->table_prefix . 'wpn_notification_push');
 	}

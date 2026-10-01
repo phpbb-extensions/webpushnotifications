@@ -14,7 +14,7 @@ use phpbb\db\migration\migration;
 
 class add_user_popup_preference extends migration
 {
-	public function effectively_installed(): bool
+	public function effectively_installed()
 	{
 		return $this->db_tools->sql_column_exists($this->table_prefix . 'users', 'user_wpn_popup_disabled');
 	}
@@ -24,7 +24,7 @@ class add_user_popup_preference extends migration
 		return ['\phpbb\webpushnotifications\migrations\add_popup_prompt'];
 	}
 
-	public function update_schema(): array
+	public function update_schema()
 	{
 		return [
 			'add_columns'	=> [
@@ -35,7 +35,7 @@ class add_user_popup_preference extends migration
 		];
 	}
 
-	public function revert_schema(): array
+	public function revert_schema()
 	{
 		return [
 			'drop_columns'	=> [

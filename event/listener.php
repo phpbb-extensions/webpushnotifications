@@ -82,6 +82,7 @@ class listener implements EventSubscriberInterface
 			'core.ucp_display_module_before'		=> 'load_language',
 			'core.acp_main_notice'					=> 'compatibility_notice',
 			'core.help_manager_add_block_after'		=> 'wpn_faq',
+			'core.page_footer' 						=> 'append_agreement',
 		];
 	}
 
@@ -196,6 +197,28 @@ class listener implements EventSubscriberInterface
 
 			$this->template->assign_block_vars_array('faq_block.faq_row', $faq_rows);
 		}
+	}
+
+	/**
+	 * Append language to privacy agreement.
+	 *
+	 * @return void
+	 */
+	public function append_agreement()
+	{
+		if (!$this->config['wpn_webpush_enable']
+			|| !$this->template->retrieve_var('S_AGREEMENT')
+			|| $this->template->retrieve_var('AGREEMENT_TITLE') !== $this->language->lang('PRIVACY'))
+		{
+			return;
+		}
+
+		if (!$this->language->is_set('NOTIFY_WEBPUSH_PRIVACY_POLICY'))
+		{
+			$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+		}
+
+		$this->template->append_var('AGREEMENT_TEXT', $this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY', $this->config['sitename']));
 	}
 
 	/**

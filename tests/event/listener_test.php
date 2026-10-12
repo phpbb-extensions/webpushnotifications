@@ -158,6 +158,7 @@ class listener_test extends \phpbb_database_test_case
 			'core.ucp_display_module_before',
 			'core.acp_main_notice',
 			'core.help_manager_add_block_after',
+			'core.page_footer',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
 	}
 
@@ -417,6 +418,52 @@ class listener_test extends \phpbb_database_test_case
 
 		$this->set_listener();
 		$this->listener->wpn_faq($event);
+	}
+
+	/**
+	 * Data for test_append_agreement
+	 *
+	 * @return array
+	 */
+	public function append_agreement_data()
+	{
+		return [
+			'no agreement' => [true, false, 'PRIVACY', 0],
+			'terms page' => [true, true, 'TERMS', 0],
+			'privacy page but disabled' => [false, true, 'PRIVACY', 0],
+			'privacy page, enabled' => [true, true, 'PRIVACY', 1],
+		];
+	}
+
+	/**
+	 * Test the append_agreement method
+	 *
+	 * @dataProvider append_agreement_data
+	 * @param bool $show_agreement Whether to display agreement text
+	 * @param mixed $s_agreement S_AGREEMENT template variable value
+	 * @param mixed $agreement_title AGREEMENT_TITLE template variable value
+	 * @param int $expected_append_calls Expected append_var calls
+	 */
+	public function test_append_agreement($show_agreement, $s_agreement, $agreement_title, $expected_append_calls)
+	{
+		$this->config['wpn_webpush_enable'] = $show_agreement;
+		$this->config['sitename'] = 'Test Board';
+
+		$this->template->expects(self::atMost(2))
+			->method('retrieve_var')
+			->withConsecutive(['S_AGREEMENT'], ['AGREEMENT_TITLE'])
+			->willReturnOnConsecutiveCalls($s_agreement, $this->language->lang($agreement_title));
+
+		$this->template->expects($expected_append_calls ? self::once() : self::never())
+			->method('append_var')
+			->with('AGREEMENT_TEXT', self::callback(function ($agreement_text) {
+				self::assertTrue($this->language->is_set('NOTIFY_WEBPUSH_PRIVACY_POLICY'));
+				self::assertSame($this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY', 'Test Board'), $agreement_text);
+				return true;
+			}));
+
+		$this->set_listener();
+		$this->listener->append_agreement();
 	}
 
 	private function lang($string)

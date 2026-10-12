@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
 	<table name="phpbb_wpn_notification_push">
+		<column>notification_type_id</column>
+		<column>item_id</column>
+		<column>item_parent_id</column>
+		<column>user_id</column>
+		<column>push_data</column>
+		<column>notification_time</column>
+		<column>push_token</column>
+		<row>
+			<value>1</value>
+			<value>1</value>
+			<value>0</value>
+			<value>2</value>
+			<value>{}</value>
+			<value>1</value>
+			<value>token2</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>2</value>
+			<value>0</value>
+			<value>3</value>
+			<value>{}</value>
+			<value>2</value>
+			<value>token3</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>3</value>
+			<value>0</value>
+			<value>4</value>
+			<value>{}</value>
+			<value>3</value>
+			<value>token4</value>
+		</row>
 	</table>
 	<table name="phpbb_wpn_push_subscriptions">
 		<column>subscription_id</column>
@@ -31,6 +65,54 @@
 			<value>https://web.push.test.localhost/foo4</value>
 			<value></value>
 			<value></value>
+			<value>0</value>
+		</row>
+	</table>
+	<table name="phpbb_users">
+		<column>user_id</column>
+		<column>username</column>
+		<column>username_clean</column>
+		<column>user_permissions</column>
+		<column>user_sig</column>
+		<column>user_type</column>
+		<column>user_avatar</column>
+		<column>user_avatar_type</column>
+		<column>user_inactive_reason</column>
+		<column>user_posts</column>
+		<row>
+			<value>2</value>
+			<value>User 2</value>
+			<value>user 2</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>User 3</value>
+			<value>user 3</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>4</value>
+			<value>User 4</value>
+			<value>user 4</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
+			<value></value>
+			<value></value>
+			<value>0</value>
 			<value>0</value>
 		</row>
 	</table>

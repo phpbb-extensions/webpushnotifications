@@ -20,6 +20,9 @@ services:
             - '@template'
             - '@user'
             - '@notification_manager'
+            - '@dbal.conn'
+            - '%tables.phpbb.wpn.notification_push%'
+            - '%tables.phpbb.wpn.push_subscriptions%'
         tags:
             - { name: event.listener }
 

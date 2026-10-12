@@ -12,6 +12,7 @@ namespace phpbb\webpushnotifications\event;
 
 use phpbb\config\config;
 use phpbb\controller\helper as controller_helper;
+use phpbb\db\driver\driver_interface;
 use phpbb\language\language;
 use phpbb\notification\manager;
 use phpbb\request\request_interface;
@@ -50,6 +51,15 @@ class listener implements EventSubscriberInterface
 	/** @var manager */
 	protected $phpbb_notifications;
 
+	/** @var driver_interface */
+	protected $db;
+
+	/** @var string */
+	protected $notification_webpush_table;
+
+	/** @var string */
+	protected $push_subscriptions_table;
+
 	/**
 	 * Constructor
 	 *
@@ -61,8 +71,11 @@ class listener implements EventSubscriberInterface
 	 * @param template $template Template object
 	 * @param user $user
 	 * @param manager $phpbb_notifications Notifications manager object
+	 * @param driver_interface $db Database connection
+	 * @param string $notification_webpush_table Web Push notification table
+	 * @param string $push_subscriptions_table Web Push subscriptions table
 	 */
-	public function __construct(config $config, controller_helper $controller_helper, form_helper $form_helper, language $language, request_interface $request, template $template, user $user, manager $phpbb_notifications)
+	public function __construct(config $config, controller_helper $controller_helper, form_helper $form_helper, language $language, request_interface $request, template $template, user $user, manager $phpbb_notifications, driver_interface $db, $notification_webpush_table, $push_subscriptions_table)
 	{
 		$this->config = $config;
 		$this->controller_helper = $controller_helper;
@@ -72,6 +85,9 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->phpbb_notifications = $phpbb_notifications;
+		$this->db = $db;
+		$this->notification_webpush_table = $notification_webpush_table;
+		$this->push_subscriptions_table = $push_subscriptions_table;
 	}
 
 	public static function getSubscribedEvents()
@@ -83,6 +99,7 @@ class listener implements EventSubscriberInterface
 			'core.acp_main_notice'					=> 'compatibility_notice',
 			'core.help_manager_add_block_after'		=> 'wpn_faq',
 			'core.page_footer' 						=> 'append_agreement',
+			'core.delete_user_before'				=> 'delete_user_data',
 		];
 	}
 
@@ -219,6 +236,29 @@ class listener implements EventSubscriberInterface
 		}
 
 		$this->template->append_var('AGREEMENT_TEXT', $this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY', $this->config['sitename']));
+	}
+
+	/**
+	 * Delete Web Push data belonging to deleted users
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function delete_user_data($event)
+	{
+		$user_ids = array_map('intval', $event['user_ids']);
+
+		if (!$user_ids)
+		{
+			return;
+		}
+
+		foreach ([$this->notification_webpush_table, $this->push_subscriptions_table] as $table)
+		{
+			$sql = 'DELETE FROM ' . $table . '
+				WHERE ' . $this->db->sql_in_set('user_id', $user_ids);
+			$this->db->sql_query($sql);
+		}
 	}
 
 	/**

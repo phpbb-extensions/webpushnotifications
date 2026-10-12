@@ -13,6 +13,7 @@ namespace phpbb\webpushnotifications\tests\event;
 use phpbb\webpushnotifications\ext;
 
 require_once __DIR__ . '/../../../../../includes/functions_acp.php';
+require_once __DIR__ . '/../../../../../includes/functions_user.php';
 
 class listener_test extends \phpbb_database_test_case
 {
@@ -100,6 +101,8 @@ class listener_test extends \phpbb_database_test_case
 			'pwa_icon_small' => '',
 			'pwa_icon_large' => '',
 			'pwa_short_name' => '',
+			'num_users' => 3,
+			'newest_user_id' => 4,
 		]);
 
 		$this->form_helper = new \phpbb\webpushnotifications\form\form_helper(
@@ -140,7 +143,10 @@ class listener_test extends \phpbb_database_test_case
 			$this->request,
 			$this->template,
 			$this->user,
-			$this->notifications
+			$this->notifications,
+			$this->db,
+			'phpbb_wpn_notification_push',
+			'phpbb_wpn_push_subscriptions'
 		);
 	}
 
@@ -159,7 +165,42 @@ class listener_test extends \phpbb_database_test_case
 			'core.acp_main_notice',
 			'core.help_manager_add_block_after',
 			'core.page_footer',
+			'core.delete_user_before',
 		], array_keys(\phpbb\webpushnotifications\event\listener::getSubscribedEvents()));
+	}
+
+	public function test_user_deletion_removes_webpush_data()
+	{
+		global $cache, $config, $db, $phpbb_container, $phpbb_dispatcher;
+
+		$this->set_listener();
+
+		$config = $this->config;
+		$db = $this->db;
+		$cache = new \phpbb\cache\driver\dummy();
+		$phpbb_container = new \phpbb_mock_container_builder();
+		$phpbb_container->set('auth.provider_collection', new \phpbb\auth\provider_collection($phpbb_container, $this->config));
+		$phpbb_container->set('notification_manager', new \phpbb_mock_notification_manager());
+		$phpbb_container->setParameter('tables.auth_provider_oauth_token_storage', 'phpbb_oauth_tokens');
+		$phpbb_container->setParameter('tables.auth_provider_oauth_states', 'phpbb_oauth_states');
+		$phpbb_container->setParameter('tables.auth_provider_oauth_account_assoc', 'phpbb_oauth_accounts');
+		$phpbb_container->setParameter('tables.user_notifications', 'phpbb_user_notifications');
+
+		$phpbb_dispatcher = new \phpbb\event\dispatcher();
+		$phpbb_dispatcher->addSubscriber($this->listener);
+
+		user_delete('retain', [2, 3], true);
+
+		$this->assertSqlResultEquals([
+			['user_id' => '4'],
+		], 'SELECT user_id FROM phpbb_users ORDER BY user_id');
+
+		$this->assertSqlResultEquals([
+			['user_id' => '4'],
+		], 'SELECT user_id FROM phpbb_wpn_notification_push ORDER BY user_id');
+		$this->assertSqlResultEquals([
+			['user_id' => '4'],
+		], 'SELECT user_id FROM phpbb_wpn_push_subscriptions ORDER BY user_id');
 	}
 
 	public function test_load_language_on_setup($lang_set_ext = [])

@@ -57,4 +57,5 @@ $lang = array_merge($lang, [
 	'NOTIFY_WEBPUSH_POPUP_DISABLE_EXPLAIN'	=> 'We show a reminder asking you to allow browser notifications when they are not currently enabled or when we cannot detect them. Turn this off to permanently stop these reminder pop-ups on all your devices. If you turn this off, you will not be warned if your browser notifications stop working in the future.',
 	'NOTIFY_WEBPUSH_POPUP_ENABLER'	=> 'Enable reminders',
 	'NOTIFY_WEBPUSH_POPUP_DISABLER'	=> 'Disable reminders',
+	'NOTIFY_WEBPUSH_PRIVACY_POLICY' => '<br><br><h3>Push Notifications</h3>If you enable push notifications, “%1$s” stores a browser subscription linked to your account. Notifications are routed through a third-party push service used by your browser or device (such as Google, Mozilla, Apple, or Microsoft), which processes the subscription identifier and delivery metadata. Push messages are encrypted, and notification details are retrieved directly from “%1$s”. You can disable push notifications at any time through your board or browser settings.',
 ]);

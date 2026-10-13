@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.1.1 - 2026-10-13
+
+- Added automatic PWA theme and background colour detection from installed board styles.
+- Added Web Push disclosure to the board privacy policy.
+- Added automatic removal of push subscriptions and notification data when users are deleted.
+- Improved JavaScript escaping and notification-link validation.
+
 ### 1.1.0 - 2026-05-28
 
 - Added a new **PWA settings** section to the ACP alongside the existing Web Push settings.

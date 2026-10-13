@@ -1,5 +1,18 @@
 # Changelog
 
+### 1.2.0 - 2026-10-18
+
+- Added automatic PWA theme and background colour detection from installed board styles.
+- Added automatic VAPID key generation during installation.
+- Redesigned VAPID credential management in the ACP to better protect private keys and warn administrators before rotating keys.
+- Added Web Push disclosure to the board privacy policy.
+- Added automatic removal of push subscriptions and notification data when users are deleted.
+- Synchronised Web Push subscription controls across the notification dropdown, UCP, and subscription prompt.
+- Strengthened validation of push-service endpoints, subscription keys, request payloads, and ACP settings.
+- Improved handling and cleanup of malformed subscriptions without interrupting delivery to other subscribers.
+- Improved error handling for malformed requests, subscription changes, missing notification dropdowns, and form tokens.
+- Improved JavaScript escaping and notification-link validation.
+
 ### 1.1.0 - 2026-05-28
 
 - Added a new **PWA settings** section to the ACP alongside the existing Web Push settings.

@@ -17,6 +17,10 @@
 </script>
 {% endif %}
 
+{% if NOTIFICATIONS_WEBPUSH_ENABLE %}
+	{% include '@phpbb_webpushnotifications/webpush_popup.html' %}
+{% endif %}
+
 {% if S_PWA_SHOW_BANNER %}
 	{% INCLUDEJS '@phpbb_webpushnotifications/pwa_install_banner.js' %}
 	{% INCLUDECSS '@phpbb_webpushnotifications/phpbb_pwa.css' %}

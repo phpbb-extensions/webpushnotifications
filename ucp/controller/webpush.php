@@ -19,6 +19,7 @@ use phpbb\notification\manager;
 use phpbb\webpushnotifications\ext;
 use phpbb\webpushnotifications\form\form_helper;
 use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
+use phpbb\webpushnotifications\subscription\validator as subscription_validator;
 use phpbb\path_helper;
 use phpbb\request\request_interface;
 use phpbb\symfony_request;
@@ -305,14 +306,18 @@ class webpush
 	 */
 	public function is_valid_endpoint(string $endpoint): bool
 	{
-		$host = parse_url($endpoint, PHP_URL_HOST);
+		$parts = parse_url($endpoint);
 
-		if (!is_string($host) || empty($host))
+		if (!is_array($parts)
+			|| strtolower($parts['scheme'] ?? '') !== 'https'
+			|| (isset($parts['port']) && $parts['port'] !== 443)
+			|| !is_string($parts['host'] ?? null)
+			|| empty($parts['host']))
 		{
 			return false;
 		}
 
-		$host = strtolower($host);
+		$host = strtolower($parts['host']);
 
 		if (in_array($host, self::PUSH_SERVICE_WHITELIST, true))
 		{
@@ -420,7 +425,7 @@ class webpush
 		$p256dh = is_string($keys['p256dh'] ?? null) ? $keys['p256dh'] : '';
 		$auth = is_string($keys['auth'] ?? null) ? $keys['auth'] : '';
 
-		if ($p256dh === '' || $auth === '')
+		if (!subscription_validator::is_valid($p256dh, $auth))
 		{
 			throw new http_exception(Response::HTTP_BAD_REQUEST, 'AJAX_ERROR_TEXT');
 		}
@@ -467,7 +472,7 @@ class webpush
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
 
 		$endpoint = is_string($data['endpoint'] ?? null) ? $data['endpoint'] : '';
-		if (!$this->is_valid_endpoint($endpoint))
+		if ($endpoint === '')
 		{
 			throw new http_exception(Response::HTTP_BAD_REQUEST, 'WEBPUSH_INVALID_ENDPOINT');
 		}

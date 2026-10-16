@@ -57,7 +57,7 @@ namespace phpbb\webpushnotifications\tests\notification
 				'user_ip' => '127.0.0.1',
 				'username' => 'Tester',
 			]);
-			$method = $this->create_method($log, $user_loader, str_repeat('x', 5000));
+			$method = $this->create_method($log, $user_loader);
 			$method->subscriptions = [
 				2 => [[
 					'subscription_id' => 9,
@@ -67,11 +67,47 @@ namespace phpbb\webpushnotifications\tests\notification
 				]],
 			];
 			$method->add_to_queue($this->create_notification(2));
-			$method->set_push_token(1, 10, 2, 'token');
+			$method->add_to_queue($this->create_notification(2, 11));
 
 			$method->send_queued_notifications();
 
 			self::assertSame([9], $method->removed_subscriptions);
+		}
+
+		public function test_oversized_payload_logs_failure_without_removing_subscription(): void
+		{
+			$GLOBALS['phpbb_wpn_test_banned_users'] = [];
+			$log = $this->createMock(\phpbb\log\log_interface::class);
+			$log->expects(self::once())->method('add')->with(
+				'critical',
+				ANONYMOUS,
+				'',
+				'LOG_WEBPUSH_MESSAGE_FAIL'
+			);
+			$user_loader = $this->createMock(\phpbb\user_loader::class);
+			$user_loader->method('get_user')->with(2)->willReturn([
+				'user_id' => 2,
+				'user_type' => USER_NORMAL,
+				'user_inactive_reason' => 0,
+				'user_form_salt' => 'salt',
+				'user_ip' => '127.0.0.1',
+				'username' => 'Tester',
+			]);
+			$method = $this->create_method($log, $user_loader, str_repeat('x', 5000));
+			$method->subscriptions = [
+				2 => [[
+					'subscription_id' => 9,
+					'endpoint' => 'https://updates.push.services.mozilla.com/test',
+					'p256dh' => notification_method_webpush_test::VAPID_KEYS['publicKey'],
+					'auth' => 'AAAAAAAAAAAAAAAAAAAAAA',
+				]],
+			];
+			$method->add_to_queue($this->create_notification(2));
+			$method->set_push_token(1, 10, 2, 'token');
+
+			$method->send_queued_notifications();
+
+			self::assertSame([], $method->removed_subscriptions);
 		}
 
 		private function create_method($log = null, $user_loader = null, $assets_version = 1): testable_webpush
@@ -104,12 +140,12 @@ namespace phpbb\webpushnotifications\tests\notification
 			);
 		}
 
-		private function create_notification($user_id)
+		private function create_notification($user_id, $item_id = 10)
 		{
 			$notification = $this->createMock(\phpbb\notification\type\type_interface::class);
 			$notification->user_id = $user_id;
 			$notification->notification_type_id = 1;
-			$notification->item_id = 10;
+			$notification->item_id = $item_id;
 			return $notification;
 		}
 	}

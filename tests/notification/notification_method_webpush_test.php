@@ -752,6 +752,41 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		}
 	}
 
+	public function test_invalid_subscription_does_not_interrupt_valid_delivery(): void
+	{
+		$valid_subscription = $this->create_subscription_for_user(2);
+		$push_subscriptions_table = $this->container->getParameter('tables.phpbb.wpn.push_subscriptions');
+		$invalid_endpoint = 'https://fcm.googleapis.com/fcm/send/invalid-key-test';
+		$sql = 'INSERT INTO ' . $push_subscriptions_table . ' ' . $this->db->sql_build_array('INSERT', [
+			'user_id' => 2,
+			'endpoint' => $invalid_endpoint,
+			'p256dh' => 'a',
+			'auth' => 'a',
+		]);
+		$this->db->sql_query($sql);
+
+		$this->notifications->add_notifications('notification.type.post', [
+			'post_time' => 1349413322,
+			'poster_id' => 1,
+			'topic_title' => '',
+			'post_subject' => '',
+			'post_username' => '',
+			'forum_name' => '',
+			'forum_id' => '1',
+			'post_id' => '2',
+			'topic_id' => '1',
+		]);
+
+		$this->assertNotEmpty($this->get_messages_for_subscription($valid_subscription['clientHash']));
+
+		$sql = 'SELECT COUNT(*) AS subscription_count
+			FROM ' . $push_subscriptions_table . "
+			WHERE endpoint = '" . $this->db->sql_escape($invalid_endpoint) . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertSame(0, (int) $this->db->sql_fetchfield('subscription_count'));
+		$this->db->sql_freeresult($result);
+	}
+
 	public function test_get_ucp_template_data_uses_millisecond_expiration_time(): void
 	{
 		$this->user->data['user_id'] = 2;

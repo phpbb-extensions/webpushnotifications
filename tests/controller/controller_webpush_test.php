@@ -437,6 +437,40 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEmpty($this->get_subscription_data());
 	}
 
+	public function scalar_json_data(): array
+	{
+		return [
+			'boolean' => ['true'],
+			'number' => ['42'],
+			'string' => ['"subscription"'],
+			'null' => ['null'],
+		];
+	}
+
+	/**
+	 * @dataProvider scalar_json_data
+	 */
+	public function test_subscribe_rejects_scalar_json(string $payload): void
+	{
+		$symfony_request = $this->create_subscription_request($payload);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+		$this->controller->subscribe($symfony_request);
+	}
+
+	/**
+	 * @dataProvider scalar_json_data
+	 */
+	public function test_unsubscribe_rejects_scalar_json(string $payload): void
+	{
+		$symfony_request = $this->create_subscription_request($payload);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+		$this->controller->unsubscribe($symfony_request);
+	}
+
 	public function test_subscribe_replaces_previous_subscription()
 	{
 		$this->form_helper->method('check_form_tokens')->willReturn(true);

@@ -49,6 +49,6 @@ class sanitizer
 	public static function decode(string $json) : array
 	{
 		$data = json_decode($json, true);
-		return !empty($data) ? self::sanitize($data) : [];
+		return is_array($data) && !empty($data) ? self::sanitize($data) : [];
 	}
 }

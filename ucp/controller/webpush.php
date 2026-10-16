@@ -467,6 +467,10 @@ class webpush
 		$data = json_sanitizer::decode($symfony_request->get('data', ''));
 
 		$endpoint = is_string($data['endpoint'] ?? null) ? $data['endpoint'] : '';
+		if (!$this->is_valid_endpoint($endpoint))
+		{
+			throw new http_exception(Response::HTTP_BAD_REQUEST, 'WEBPUSH_INVALID_ENDPOINT');
+		}
 
 		$sql = 'DELETE FROM ' . $this->push_subscriptions_table . '
 			WHERE user_id = ' . (int) $this->user->id() . "

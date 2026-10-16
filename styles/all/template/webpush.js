@@ -104,9 +104,7 @@ function PhpbbWebpush() {
 		subscribeButton.disabled = true;
 
 		const notificationList = document.getElementById('notification_list');
-		const subscribeToggle = notificationList
-			? notificationList.querySelector('.wpn-notification-dropdown-footer')
-			: null;
+		const subscribeToggle = notificationList ? notificationList.querySelector('.wpn-notification-dropdown-footer') : null;
 
 		if (subscribeToggle) {
 			subscribeToggle.style.display = 'none';

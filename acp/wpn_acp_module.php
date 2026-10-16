@@ -139,11 +139,11 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_WEBPUSH_ENABLE'				=> $this->config['wpn_webpush_enable'],
 			'WEBPUSH_VAPID_PUBLIC'			=> $this->config['wpn_webpush_vapid_public'],
-			'S_VAPID_KEYS_CONFIGURED'		=> (bool) ($this->config['wpn_webpush_vapid_public'] && $this->config['wpn_webpush_vapid_private']),
+			'S_VAPID_KEYS_CONFIGURED'		=> $this->config['wpn_webpush_vapid_public'] && $this->config['wpn_webpush_vapid_private'],
 			'S_VAPID_PRIVATE_CONFIGURED'	=> (bool) $this->config['wpn_webpush_vapid_private'],
-			'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> $this->config['wpn_webpush_dropdown_subscribe'],
-			'S_WEBPUSH_METHOD_ENABLED' 		=> $this->config['wpn_webpush_method_enabled'],
-			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'],
+			'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> (bool) $this->config['wpn_webpush_dropdown_subscribe'],
+			'S_WEBPUSH_METHOD_ENABLED' 		=> (bool) $this->config['wpn_webpush_method_enabled'],
+			'S_WEBPUSH_POPUP_PROMPT'		=> (bool) $this->config['wpn_webpush_popup_prompt'],
 			'U_ACTION'						=> $this->u_action,
 		]);
 

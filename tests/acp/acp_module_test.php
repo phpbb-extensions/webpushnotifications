@@ -843,6 +843,7 @@ class acp_module_test extends \phpbb_test_case
 	protected function default_config(): array
 	{
 		return [
+			'sitename' => 'Board &amp; &#x1F600; Forum',
 			'wpn_webpush_enable' => 1,
 			'wpn_webpush_vapid_public' => 'existing-public-key',
 			'wpn_webpush_vapid_private' => 'existing-private-key',
@@ -893,6 +894,7 @@ class acp_module_test extends \phpbb_test_case
 		return [
 			'S_PWA_SHOW_INSTALL_BANNER' => true,
 			'PWA_SHORT_NAME' => 'Old',
+			'PWA_SHORT_NAME_PLACEHOLDER' => 'Board & 😀 Fo',
 			'PWA_ICON_SMALL' => 'old-small.png',
 			'PWA_ICON_LARGE' => 'old-large.png',
 			'STYLES' => $this->style_rows(),

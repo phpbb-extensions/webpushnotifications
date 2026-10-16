@@ -207,6 +207,7 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_PWA_SHOW_INSTALL_BANNER'	=> (bool) $this->config['pwa_show_install_banner'],
 			'PWA_SHORT_NAME'			=> $this->config['pwa_short_name'],
+			'PWA_SHORT_NAME_PLACEHOLDER'=> utf8_substr(ext::decode_entities($this->config['sitename'], ENT_QUOTES), 0, 12),
 			'PWA_ICON_SMALL'			=> $this->config['pwa_icon_small'],
 			'PWA_ICON_LARGE'			=> $this->config['pwa_icon_large'],
 			'STYLES'					=> $this->get_styles(),

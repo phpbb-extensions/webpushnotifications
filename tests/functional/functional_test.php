@@ -137,6 +137,7 @@ class functional_test extends \phpbb_functional_test_case
 		$this->admin_login();
 
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=pwa&sid=' . $this->sid);
+		$this->assertSame(utf8_substr($expected['name'], 0, 12), $crawler->filter('#pwa_short_name')->attr('placeholder'));
 
 		$form_data = [
 			'config[pwa_short_name]'	=> $expected['short_name'],

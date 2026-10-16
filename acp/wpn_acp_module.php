@@ -178,7 +178,7 @@ class wpn_acp_module
 			unset($display_settings['wpn_webpush_vapid_private'], $config_array['wpn_webpush_vapid_private']);
 		}
 
-		if ($config_array['wpn_webpush_enable'])
+		if (!empty($config_array['wpn_webpush_enable']))
 		{
 			// Validate config values
 			validate_config_vars($display_settings, $config_array, $this->errors);
@@ -191,9 +191,12 @@ class wpn_acp_module
 
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_CONFIG_WEBPUSH');
 
-		foreach ($config_array as $config_name => $config_value)
+		foreach (array_keys($display_settings) as $config_name)
 		{
-			$this->config->set($config_name, $config_value);
+			if (array_key_exists($config_name, $config_array))
+			{
+				$this->config->set($config_name, $config_array[$config_name]);
+			}
 		}
 
 		trigger_error($this->lang->lang('CONFIG_UPDATED') . adm_back_link($this->u_action), E_USER_NOTICE);

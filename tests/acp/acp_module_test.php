@@ -468,6 +468,28 @@ class acp_module_test extends \phpbb_test_case
 		self::assertSame('', $this->config['wpn_webpush_vapid_private']);
 	}
 
+	public function test_save_settings_ignores_unrelated_config(): void
+	{
+		$this->config['allow_privmsg'] = 1;
+		$this->request->method('variable')
+			->with('config', ['' => ''], true)
+			->willReturn([
+				'wpn_webpush_enable' => 0,
+				'wpn_webpush_vapid_public' => 'existing-public-key',
+				'wpn_webpush_vapid_private' => '',
+				'wpn_webpush_dropdown_subscribe' => 1,
+				'wpn_webpush_method_enabled' => 1,
+				'wpn_webpush_popup_prompt' => 1,
+				'allow_privmsg' => 0,
+			]);
+
+		$this->assertTriggerError(E_USER_NOTICE, 'CONFIG_UPDATED', function() {
+			$this->create_module()->save_settings();
+		});
+
+		self::assertSame(1, $this->config['allow_privmsg']);
+	}
+
 	public function pwa_save_data(): array
 	{
 		$valid = [

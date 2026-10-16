@@ -42,7 +42,10 @@ class functional_test extends \phpbb_functional_test_case
 
 		$this->assertContainsLang('ACP_WEBPUSH_EXT_SETTINGS', $crawler->filter('div.main > h1')->text());
 		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->html());
-		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('#generate-vapid-keys')->text());
+		$this->assertContainsLang('WEBPUSH_REGENERATE_VAPID_KEYS', $crawler->filter('#generate-vapid-keys')->text());
+		$this->assertContainsLang('WEBPUSH_VAPID_KEYS_CONFIGURED', $crawler->filter('#vapid-status-badge')->text());
+		$this->assertNotSame('', $crawler->filter('input[name="config[wpn_webpush_vapid_public]"]')->attr('value'));
+		$this->assertSame('', $crawler->filter('input[name="config[wpn_webpush_vapid_private]"]')->attr('value'));
 		$confirm_template = $crawler->filter('#vapid-rotation-confirm-template');
 		$this->assertCount(1, $confirm_template);
 		$this->assertContainsLang('WEBPUSH_ROTATE_VAPID_KEYS_TITLE', $confirm_template->filter('h3')->text());

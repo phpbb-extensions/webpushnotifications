@@ -24,6 +24,9 @@ function PhpbbWebpush() {
 	/** @type {string} Title of an error message */
 	let ajaxErrorTitle = '';
 
+	/** @type {string} Fallback unsubscribe error message */
+	let unsubscribeError = '';
+
 	/** @type {string} VAPID public key */
 	let vapidPublicKey = '';
 
@@ -55,6 +58,7 @@ function PhpbbWebpush() {
 		this.formTokens = options.formTokens;
 		subscriptions = options.subscriptions;
 		ajaxErrorTitle = options.ajaxErrorTitle;
+		unsubscribeError = options.unsubscribeError;
 		vapidPublicKey = options.vapidPublicKey;
 
 		subscribeButton = document.querySelector('#subscribe_webpush');
@@ -487,7 +491,7 @@ function PhpbbWebpush() {
 					// Ignore JSON parsing failures and fall back below.
 				}
 				if (!response.ok || !data || !data.success) {
-					throw new Error(data && data.message ? data.message : 'Unsubscribe failed.');
+					throw new Error(data && data.message ? data.message : unsubscribeError);
 				}
 
 				const unsubscribed = await subscription.unsubscribe();

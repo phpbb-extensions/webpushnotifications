@@ -20,7 +20,7 @@
 		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
 		<dl>
 			<dt><label for="pwa_short_name">{{ lang('PWA_SHORT_NAME') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_SHORT_NAME_EXPLAIN') }}</span></dt>
-			<dd><input id="pwa_short_name" type="text" size="40" maxlength="12" name="config[pwa_short_name]" value="{{ PWA_SHORT_NAME }}"></dd>
+			<dd><input id="pwa_short_name" type="text" size="40" maxlength="12" name="config[pwa_short_name]" value="{{ PWA_SHORT_NAME }}" placeholder="{{ PWA_SHORT_NAME_PLACEHOLDER|e('html_attr') }}"></dd>
 		</dl>
 		<dl>
 			<dt><label for="pwa_icon_small">{{ lang('PWA_ICON_SMALL') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_ICON_SMALL_EXPLAIN', iconDir) }}</span></dt>

@@ -1,4 +1,5 @@
 {% include 'overall_header.html' %}
+{% INCLUDECSS '@phpbb_webpushnotifications/wpn_acp.css' %}
 {% INCLUDEJS '@phpbb_webpushnotifications/wpn_acp.js' %}
 
 <h1>{{ lang('ACP_WEBPUSH_EXT_SETTINGS') }}</h1>
@@ -18,16 +19,7 @@
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_ENABLE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_ENABLE_EXPLAIN') }}</span></dt>
 			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="1" {% if S_WEBPUSH_ENABLE %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="0"{% if not S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('NO') }}</label>
-				<input class="button2" data-ajax="generate_vapid_keys" type="button" name="config[wpn_webpush_enable]" value="{{ lang('WEBPUSH_GENERATE_VAPID_KEYS') }}"></dd>
-		</dl>
-		<dl>
-			<dt><label for="webpush_vapid_public">{{ lang('WEBPUSH_VAPID_PUBLIC') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PUBLIC_EXPLAIN') }}</span></dt>
-			<dd><label><input id="webpush_vapid_public" type="text" name="config[wpn_webpush_vapid_public]" size="25" maxlength="255" value="{{ WEBPUSH_VAPID_PUBLIC }}"></label></dd>
-		</dl>
-		<dl>
-			<dt><label for="webpush_vapid_private">{{ lang('WEBPUSH_VAPID_PRIVATE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PRIVATE_EXPLAIN') }}</span></dt>
-			<dd><label><input id="webpush_vapid_private" type="password" name="config[wpn_webpush_vapid_private]" size="25" maxlength="255" autocomplete="off" value="{{ WEBPUSH_VAPID_PRIVATE }}"></label></dd>
+				<label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="0"{% if not S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_DROPDOWN_SUBSCRIBE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_DROPDOWN_SUBSCRIBE_EXPLAIN') }}</span></dt>
@@ -45,11 +37,91 @@
 				<label><input type="radio" class="radio" name="config[wpn_webpush_popup_prompt]" value="0"{% if not S_WEBPUSH_POPUP_PROMPT %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
 	</fieldset>
+
+	<fieldset>
+		<legend>{{ lang('WEBPUSH_VAPID_CREDENTIALS') }}</legend>
+		<div class="vapid-credentials" id="vapid-credentials" data-keys-configured="{{ S_VAPID_KEYS_CONFIGURED ? 'true' : 'false' }}">
+			<div class="vapid-credentials-header">
+				<span class="vapid-credentials-icon"><i class="icon fa-key fa-fw" aria-hidden="true"></i></span>
+				<div class="vapid-credentials-summary">
+					<h2>{{ lang('WEBPUSH_VAPID_CREDENTIALS') }}</h2>
+					<span id="vapid-status-badge" class="vapid-status-badge {{ S_VAPID_KEYS_CONFIGURED ? 'is-configured' : 'needs-setup' }}">
+						{{ S_VAPID_KEYS_CONFIGURED ? lang('WEBPUSH_VAPID_KEYS_CONFIGURED') : lang('WEBPUSH_VAPID_KEYS_REQUIRED') }}
+					</span>
+					<p>{{ lang('WEBPUSH_VAPID_CREDENTIALS_EXPLAIN') }}</p>
+				</div>
+				<button
+					type="button"
+					class="button1 vapid-generate-button"
+					id="generate-vapid-keys"
+					data-generated-message="{{ lang('WEBPUSH_VAPID_KEYS_GENERATED')|e('html_attr') }}"
+					data-generated-label="{{ lang('WEBPUSH_VAPID_KEYS_PENDING')|e('html_attr') }}"
+					data-error-message="{{ lang('WEBPUSH_VAPID_KEYS_GENERATION_FAILED')|e('html_attr') }}">
+					<i class="icon fa-refresh fa-fw" aria-hidden="true"></i>
+					<span>{{ S_VAPID_KEYS_CONFIGURED ? lang('WEBPUSH_REGENERATE_VAPID_KEYS') : lang('WEBPUSH_GENERATE_VAPID_KEYS') }}</span>
+				</button>
+			</div>
+
+			<div id="vapid-generation-status" class="vapid-generation-status" role="status" aria-live="polite"></div>
+
+			<div class="vapid-credentials-fields">
+				<dl>
+					<dt><label for="webpush_vapid_public">{{ lang('WEBPUSH_VAPID_PUBLIC') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PUBLIC_EXPLAIN') }}</span></dt>
+					<dd><input id="webpush_vapid_public" type="text" name="config[wpn_webpush_vapid_public]" size="40" maxlength="255" spellcheck="false" autocapitalize="none" value="{{ WEBPUSH_VAPID_PUBLIC }}"></dd>
+				</dl>
+				<dl>
+					<dt><label for="webpush_vapid_private">{{ lang('WEBPUSH_VAPID_PRIVATE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_VAPID_PRIVATE_EXPLAIN') }}</span></dt>
+					<dd>
+						<div class="vapid-private-field">
+							<input
+								id="webpush_vapid_private"
+								type="password"
+								name="config[wpn_webpush_vapid_private]"
+								size="40"
+								maxlength="255"
+								autocomplete="off"
+								spellcheck="false"
+								autocapitalize="none"
+								placeholder="{{ (S_VAPID_PRIVATE_CONFIGURED ? lang('WEBPUSH_VAPID_PRIVATE_KEEP') : lang('WEBPUSH_VAPID_PRIVATE_ENTER'))|e('html_attr') }}"
+								value="">
+							<button
+								type="button"
+								class="button2 vapid-toggle-private"
+								id="toggle-vapid-private"
+								aria-controls="webpush_vapid_private"
+								aria-pressed="false"
+								aria-label="{{ lang('WEBPUSH_SHOW_PRIVATE_KEY')|e('html_attr') }}"
+								data-show-label="{{ lang('WEBPUSH_SHOW_PRIVATE_KEY')|e('html_attr') }}"
+								data-hide-label="{{ lang('WEBPUSH_HIDE_PRIVATE_KEY')|e('html_attr') }}">
+								<i class="icon fa-eye fa-fw" aria-hidden="true"></i>
+							</button>
+						</div>
+					</dd>
+				</dl>
+			</div>
+
+			<p class="vapid-rotation-warning"><i class="icon fa-exclamation-triangle fa-fw" aria-hidden="true"></i> {{ lang('WEBPUSH_VAPID_ROTATION_WARNING') }}</p>
+		</div>
+	</fieldset>
 	<fieldset class="submit-buttons">
 		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">&nbsp;
 		<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}">
 		{{ S_FORM_TOKEN }}
 	</fieldset>
 </form>
+
+<template id="vapid-rotation-confirm-template">
+	<div class="vapid-confirm-message">
+		<span class="vapid-confirm-icon"><i class="icon fa-exclamation-triangle fa-fw" aria-hidden="true"></i></span>
+		<div>
+			<h3 id="vapid-confirm-title">{{ lang('WEBPUSH_ROTATE_VAPID_KEYS_TITLE') }}</h3>
+			<p>{{ lang('WEBPUSH_ROTATE_VAPID_KEYS_CONFIRM') }}</p>
+		</div>
+	</div>
+	<fieldset class="submit-buttons vapid-confirm-actions">
+		<input type="button" name="confirm" value="{{ lang('YES')|e('html_attr') }}" class="button1">
+		<input type="button" name="cancel" value="{{ lang('NO')|e('html_attr') }}" class="button2">
+	</fieldset>
+</template>
 
 {% include 'overall_footer.html' %}

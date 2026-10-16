@@ -353,9 +353,9 @@ class acp_module_test extends \phpbb_test_case
 				],
 				true,
 			],
-			'masked existing private key is preserved' => [
+			'blank existing private key is preserved' => [
 				array_merge($valid, [
-					'wpn_webpush_vapid_private' => wpn_acp_module::MASKED_PRIVATE_KEY,
+					'wpn_webpush_vapid_private' => '',
 				]),
 				[
 					'S_ERROR' => false,
@@ -395,7 +395,7 @@ class acp_module_test extends \phpbb_test_case
 				[
 					'wpn_webpush_enable' => 0,
 					'wpn_webpush_vapid_public' => '',
-					'wpn_webpush_vapid_private' => '',
+					'wpn_webpush_vapid_private' => 'existing-private-key',
 				],
 				true,
 			],
@@ -437,6 +437,35 @@ class acp_module_test extends \phpbb_test_case
 		{
 			self::assertSame($value, $this->config[$name]);
 		}
+	}
+
+	public function test_save_settings_requires_private_key_when_none_is_stored(): void
+	{
+		$this->config['wpn_webpush_vapid_public'] = '';
+		$this->config['wpn_webpush_vapid_private'] = '';
+
+		$this->request->method('variable')
+			->with('config', ['' => ''], true)
+			->willReturn([
+				'wpn_webpush_enable' => 1,
+				'wpn_webpush_vapid_public' => str_repeat('a', 25),
+				'wpn_webpush_vapid_private' => '',
+				'wpn_webpush_dropdown_subscribe' => 1,
+				'wpn_webpush_method_enabled' => 0,
+				'wpn_webpush_popup_prompt' => 1,
+			]);
+
+		$this->template->expects($this->once())
+			->method('assign_vars')
+			->with([
+				'S_ERROR' => true,
+				'ERROR_MSG' => 'SETTING_TOO_SHORT',
+			]);
+		$this->log->expects($this->never())->method('add');
+
+		$this->create_module()->save_settings();
+
+		self::assertSame('', $this->config['wpn_webpush_vapid_private']);
 	}
 
 	public function pwa_save_data(): array
@@ -814,6 +843,7 @@ class acp_module_test extends \phpbb_test_case
 	protected function default_config(): array
 	{
 		return [
+			'sitename' => 'Board &amp; &#x1F600; Forum',
 			'wpn_webpush_enable' => 1,
 			'wpn_webpush_vapid_public' => 'existing-public-key',
 			'wpn_webpush_vapid_private' => 'existing-private-key',
@@ -850,7 +880,8 @@ class acp_module_test extends \phpbb_test_case
 		return [
 			'S_WEBPUSH_ENABLE' => 1,
 			'WEBPUSH_VAPID_PUBLIC' => 'existing-public-key',
-			'WEBPUSH_VAPID_PRIVATE' => wpn_acp_module::MASKED_PRIVATE_KEY,
+			'S_VAPID_KEYS_CONFIGURED' => true,
+			'S_VAPID_PRIVATE_CONFIGURED' => true,
 			'S_WEBPUSH_DROPDOWN_SUBSCRIBE' => 1,
 			'S_WEBPUSH_METHOD_ENABLED' => 1,
 			'S_WEBPUSH_POPUP_PROMPT' => 1,
@@ -863,6 +894,7 @@ class acp_module_test extends \phpbb_test_case
 		return [
 			'S_PWA_SHOW_INSTALL_BANNER' => true,
 			'PWA_SHORT_NAME' => 'Old',
+			'PWA_SHORT_NAME_PLACEHOLDER' => 'Board & 😀 Fo',
 			'PWA_ICON_SMALL' => 'old-small.png',
 			'PWA_ICON_LARGE' => 'old-large.png',
 			'STYLES' => $this->style_rows(),

@@ -1,0 +1,256 @@
+.vapid-credentials {
+	background: #f7fbff;
+	border: 1px solid #b8d3e6;
+	border-radius: 7px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+}
+
+.vapid-credentials-header {
+	display: flex;
+	align-items: center;
+	padding: 18px;
+	gap: 14px;
+}
+
+.vapid-credentials-icon {
+	font-size: 18px;
+	background: #105289;
+	border-radius: 50%;
+	color: #ffffff;
+	display: flex;
+	flex: 0 0 42px;
+	justify-content: center;
+	align-items: center;
+	height: 42px;
+}
+
+.vapid-credentials-summary {
+	flex: 1 1 auto;
+}
+
+.vapid-credentials-summary h2 {
+	font-size: 1.25rem;
+	color: #115098;
+	display: inline;
+	margin: 0 8px 0 0;
+}
+
+.vapid-credentials-summary p {
+	line-height: 1.45;
+	color: #536471;
+	margin: 7px 0 0;
+}
+
+.vapid-status-badge {
+	font-size: 72%;
+	font-weight: bold;
+	vertical-align: 2px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	border-radius: 10px;
+	display: inline-block;
+	padding: 3px 8px;
+}
+
+.vapid-status-badge.is-configured {
+	background: #d9ead3;
+	color: #276221;
+}
+
+.vapid-status-badge.needs-setup {
+	background: #fff0c2;
+	color: #725400;
+}
+
+.vapid-status-badge.is-pending {
+	background: #d8eafa;
+	color: #105289;
+}
+
+.vapid-generate-button,
+.vapid-toggle-private {
+	font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+	width: auto;
+	cursor: pointer;
+}
+
+.vapid-generate-button {
+	font-size: 90%;
+	font-weight: bold;
+	background: linear-gradient(#2f82bd, #1d6397);
+	border: 1px solid #174f7a;
+	border-radius: 4px;
+	color: #ffffff;
+	flex: 0 0 auto;
+	padding: 8px 12px;
+}
+
+.vapid-generate-button:hover,
+.vapid-generate-button:focus {
+	background: linear-gradient(#368fcf, #246fa5);
+	border-color: #0e3f65;
+	outline: 2px solid #b8d3e6;
+}
+
+.vapid-generate-button:disabled {
+	opacity: 0.65;
+	cursor: wait;
+}
+
+.vapid-generation-status {
+	background: #e5f3df;
+	border-left: 3px solid #4f8a3c;
+	color: #276221;
+	display: none;
+	margin: 0 18px 14px 74px;
+	padding: 8px 10px;
+}
+
+.vapid-generation-status.has-message {
+	display: block;
+}
+
+.vapid-generation-status.error {
+	background: #f8e1e1;
+	border-left-color: #bc2a4d;
+	color: #8a1f39;
+}
+
+.vapid-credentials-fields {
+	background: #ffffff;
+	border-top: 1px solid #d7e5ef;
+	padding: 12px 18px 2px;
+}
+
+.vapid-credentials-fields dl:last-child {
+	margin-bottom: 4px;
+}
+
+.vapid-credentials-fields input[type="text"],
+.vapid-credentials-fields input[type="password"] {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 520px;
+}
+
+.vapid-private-field {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.vapid-private-field input {
+	flex: 1 1 auto;
+}
+
+.vapid-toggle-private {
+	background: #efefef;
+	border: 1px solid #666666;
+	border-radius: 3px;
+	color: #333333;
+	flex: 0 0 auto;
+	padding: 3px 7px;
+}
+
+.vapid-toggle-private:hover,
+.vapid-toggle-private:focus {
+	border-color: #bc2a4d;
+	color: #bc2a4d;
+}
+
+.vapid-rotation-warning {
+	font-size: 85%;
+	background: #fff8df;
+	border-top: 1px solid #eadca7;
+	color: #6b5712;
+	margin: 0;
+	padding: 10px 18px;
+}
+
+.phpbb_alert.vapid-confirm-dialog {
+	border-radius: 7px;
+	top: 12vh;
+	overflow: hidden;
+	box-sizing: border-box;
+	width: 520px;
+	max-width: calc(100% - 40px);
+	max-height: calc(100vh - 40px);
+	padding: 0;
+}
+
+.vapid-confirm-dialog .alert_close {
+	position: absolute;
+	z-index: 1;
+	top: 14px;
+	right: 14px;
+	margin: 0;
+}
+
+.vapid-confirm-dialog .alert_text {
+	overflow-y: auto;
+	box-sizing: border-box;
+	max-height: calc(100vh - 40px);
+	padding: 24px;
+}
+
+.vapid-confirm-message {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+}
+
+.vapid-confirm-icon {
+	font-size: 18px;
+	background: #fff0c2;
+	border-radius: 50%;
+	color: #8a6500;
+	display: flex;
+	flex: 0 0 42px;
+	justify-content: center;
+	align-items: center;
+	height: 42px;
+}
+
+.vapid-confirm-message h3 {
+	font-size: 1.1rem;
+	color: #333333;
+	margin: 2px 28px 8px 0;
+}
+
+.vapid-confirm-message p {
+	line-height: 1.5;
+	color: #536471;
+	margin: 0;
+	padding: 0;
+}
+
+.vapid-confirm-dialog fieldset.vapid-confirm-actions {
+	border-top: 1px solid #d7e5ef;
+	margin-top: 20px;
+	padding-top: 16px;
+}
+
+.vapid-confirm-actions input {
+	min-width: 72px;
+	margin: 0 3px;
+}
+
+@media only screen and (max-width: 700px), only screen and (max-device-width: 700px) {
+	.vapid-credentials-header {
+		flex-wrap: wrap;
+		align-items: flex-start;
+	}
+
+	.vapid-credentials-summary {
+		flex-basis: calc(100% - 60px);
+	}
+
+	.vapid-generate-button {
+		width: 100%;
+	}
+
+	.vapid-generation-status {
+		margin-left: 18px;
+	}
+}

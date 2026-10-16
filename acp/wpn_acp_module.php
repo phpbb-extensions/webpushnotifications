@@ -61,9 +61,6 @@ class wpn_acp_module
 	/** @var array $errors */
 	protected $errors = [];
 
-	/** @var string Hide/replace private key with asterisks */
-	public const MASKED_PRIVATE_KEY = '********';
-
 	/**
 	 * Main ACP module
 	 *
@@ -142,7 +139,8 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_WEBPUSH_ENABLE'				=> $this->config['wpn_webpush_enable'],
 			'WEBPUSH_VAPID_PUBLIC'			=> $this->config['wpn_webpush_vapid_public'],
-			'WEBPUSH_VAPID_PRIVATE'			=> $this->config['wpn_webpush_vapid_private'] ? self::MASKED_PRIVATE_KEY : '',
+			'S_VAPID_KEYS_CONFIGURED'		=> (bool) ($this->config['wpn_webpush_vapid_public'] && $this->config['wpn_webpush_vapid_private']),
+			'S_VAPID_PRIVATE_CONFIGURED'	=> (bool) $this->config['wpn_webpush_vapid_private'],
 			'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> $this->config['wpn_webpush_dropdown_subscribe'],
 			'S_WEBPUSH_METHOD_ENABLED' 		=> $this->config['wpn_webpush_method_enabled'],
 			'S_WEBPUSH_POPUP_PROMPT'		=> $this->config['wpn_webpush_popup_prompt'],
@@ -174,8 +172,8 @@ class wpn_acp_module
 			'wpn_webpush_popup_prompt' => ['validate' => 'bool'],
 		];
 
-		// Do not validate and update private key field if the content is ******** and the key was already set
-		if ($config_array['wpn_webpush_vapid_private'] === self::MASKED_PRIVATE_KEY && $this->config['wpn_webpush_vapid_private'])
+		// An empty private key keeps the stored credential. Stored private keys are never sent to the browser.
+		if (($config_array['wpn_webpush_vapid_private'] ?? '') === '' && $this->config['wpn_webpush_vapid_private'])
 		{
 			unset($display_settings['wpn_webpush_vapid_private'], $config_array['wpn_webpush_vapid_private']);
 		}
@@ -209,6 +207,7 @@ class wpn_acp_module
 		$this->template->assign_vars([
 			'S_PWA_SHOW_INSTALL_BANNER'	=> (bool) $this->config['pwa_show_install_banner'],
 			'PWA_SHORT_NAME'			=> $this->config['pwa_short_name'],
+			'PWA_SHORT_NAME_PLACEHOLDER'=> utf8_substr(ext::decode_entities($this->config['sitename'], ENT_QUOTES), 0, 12),
 			'PWA_ICON_SMALL'			=> $this->config['pwa_icon_small'],
 			'PWA_ICON_LARGE'			=> $this->config['pwa_icon_large'],
 			'STYLES'					=> $this->get_styles(),

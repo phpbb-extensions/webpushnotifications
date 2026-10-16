@@ -1,7 +1,5 @@
 /* global phpbb */
 
-'use strict';
-
 /**
  * Convert raw key ArrayBuffer to base64 string.
  *
@@ -9,6 +7,7 @@
  * @returns {string} Base64 encoded raw key string
  */
 phpbb.rawKeyToBase64 = (rawKey) => {
+	'use strict';
 	const keyBuffer = new Uint8Array(rawKey);
 	let keyText = '';
 	const keyLength = keyBuffer.byteLength;
@@ -26,6 +25,7 @@ phpbb.rawKeyToBase64 = (rawKey) => {
  * @returns {string} Base64URL encoded string
  */
 phpbb.base64UrlEncode = (base64String) => {
+	'use strict';
 	return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
@@ -35,6 +35,7 @@ phpbb.base64UrlEncode = (base64String) => {
  * @returns {Promise<{privateKey: string, publicKey: string}>}
  */
 phpbb.generateVAPIDKeys = async() => {
+	'use strict';
 	const keyPair = await window.crypto.subtle.generateKey(
 		{
 			name: 'ECDH',
@@ -54,6 +55,7 @@ phpbb.generateVAPIDKeys = async() => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+	'use strict';
 	const credentials = document.querySelector('#vapid-credentials');
 	const generateButton = document.querySelector('#generate-vapid-keys');
 	const publicKeyInput = document.querySelector('#webpush_vapid_public');
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			phpbb.confirm(confirmationTemplate.innerHTML, (confirmed) => {
 				if (confirmed) {
-					generateAndDisplayKeys();
+					void generateAndDisplayKeys();
 				}
 			});
 
@@ -133,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
-		generateAndDisplayKeys();
+		void generateAndDisplayKeys();
 	});
 
 	settingsForm.addEventListener('reset', () => {

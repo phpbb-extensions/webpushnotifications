@@ -42,7 +42,12 @@ class functional_test extends \phpbb_functional_test_case
 
 		$this->assertContainsLang('ACP_WEBPUSH_EXT_SETTINGS', $crawler->filter('div.main > h1')->text());
 		$this->assertContainsLang('ACP_WEBPUSH_SETTINGS_EXPLAIN', $crawler->filter('div.main > p')->html());
-		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('input[type="button"]')->attr('value'));
+		$this->assertContainsLang('WEBPUSH_GENERATE_VAPID_KEYS', $crawler->filter('#generate-vapid-keys')->text());
+		$confirm_template = $crawler->filter('#vapid-rotation-confirm-template');
+		$this->assertCount(1, $confirm_template);
+		$this->assertContainsLang('WEBPUSH_ROTATE_VAPID_KEYS_TITLE', $confirm_template->filter('h3')->text());
+		$this->assertSame($this->lang('YES'), $confirm_template->filter('input[name="confirm"]')->attr('value'));
+		$this->assertSame($this->lang('NO'), $confirm_template->filter('input[name="cancel"]')->attr('value'));
 
 		$form_data = [
 			'config[wpn_webpush_enable]'	=> 1,
@@ -55,11 +60,10 @@ class functional_test extends \phpbb_functional_test_case
 
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
 
-		foreach ($form_data as $config_name => $config_value)
-		{
-			$config_value = ($config_name === 'config[wpn_webpush_vapid_private]') ? \phpbb\webpushnotifications\acp\wpn_acp_module::MASKED_PRIVATE_KEY : $config_value;
-			$this->assertEquals($config_value, $crawler->filter('input[name="' . $config_name . '"]')->attr('value'));
-		}
+		$this->assertEquals($form_data['config[wpn_webpush_enable]'], $crawler->filter('input[name="config[wpn_webpush_enable]"][checked]')->attr('value'));
+		$this->assertEquals($form_data['config[wpn_webpush_vapid_public]'], $crawler->filter('input[name="config[wpn_webpush_vapid_public]"]')->attr('value'));
+		$this->assertSame('', $crawler->filter('input[name="config[wpn_webpush_vapid_private]"]')->attr('value'));
+		$this->assertContainsLang('WEBPUSH_VAPID_KEYS_CONFIGURED', $crawler->filter('#vapid-status-badge')->text());
 	}
 
 	public function test_ucp_module()

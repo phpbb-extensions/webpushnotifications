@@ -316,6 +316,7 @@ class listener_test extends \phpbb_database_test_case
 				$this->callback(function($arg) use ($subscriptions) {
 					$expectedValues = [
 						'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
+						'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> true,
 						'U_WEBPUSH_SUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 						'U_WEBPUSH_UNSUBSCRIBE'			=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 						'VAPID_PUBLIC_KEY'				=> $this->config['wpn_webpush_vapid_public'],

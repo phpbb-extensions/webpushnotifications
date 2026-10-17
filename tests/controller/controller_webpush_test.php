@@ -20,8 +20,13 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 class controller_webpush_test extends \phpbb_database_test_case
 {
+	private const VALID_PUBLIC_KEY = 'BGsX0fLhLEJH-Lzm5WOkQPJ3A32BLeszoPShOUXYmMKWT-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU';
+	private const VALID_AUTH_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAA';
+
 	protected $auth;
 	protected $avatar_helper;
 	protected $config;
@@ -411,7 +416,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$symfony_request->method('get')->willReturn(json_encode([
 			'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
 			'expiration_time' => 0,
-			'keys' => ['p256dh' => 'test_p256dh', 'auth' => 'test_auth']
+			'keys' => ['p256dh' => self::VALID_PUBLIC_KEY, 'auth' => self::VALID_AUTH_TOKEN]
 		]));
 
 		$response = $this->controller->subscribe($symfony_request);
@@ -422,8 +427,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals([
 			'user_id' => '2',
 			'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
-			'p256dh' => 'test_p256dh',
-			'auth' => 'test_auth',
+			'p256dh' => self::VALID_PUBLIC_KEY,
+			'auth' => self::VALID_AUTH_TOKEN,
 			'expiration_time' => '0',
 			'subscription_id' => '1',
 		], $this->get_subscription_data());
@@ -435,6 +440,55 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals(['success' => true, 'form_tokens' => $this->form_helper->get_form_tokens(webpush::FORM_TOKEN_UCP)], json_decode($response->getContent(), true));
 
 		$this->assertEmpty($this->get_subscription_data());
+	}
+
+	public function test_unsubscribe_removes_legacy_endpoint(): void
+	{
+		$endpoint = 'http://fcm.googleapis.com/fcm/send/legacy_endpoint';
+		$sql = 'INSERT INTO phpbb_wpn_push_subscriptions ' . $this->db->sql_build_array('INSERT', [
+			'user_id' => 2,
+			'endpoint' => $endpoint,
+		]);
+		$this->db->sql_query($sql);
+
+		$response = $this->controller->unsubscribe($this->create_subscription_request(json_encode(['endpoint' => $endpoint])));
+
+		self::assertInstanceOf(JsonResponse::class, $response);
+		self::assertEmpty($this->get_subscription_data());
+	}
+
+	public function scalar_json_data(): array
+	{
+		return [
+			'boolean' => ['true'],
+			'number' => ['42'],
+			'string' => ['"subscription"'],
+			'null' => ['null'],
+		];
+	}
+
+	/**
+	 * @dataProvider scalar_json_data
+	 */
+	public function test_subscribe_rejects_scalar_json(string $payload): void
+	{
+		$symfony_request = $this->create_subscription_request($payload);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+		$this->controller->subscribe($symfony_request);
+	}
+
+	/**
+	 * @dataProvider scalar_json_data
+	 */
+	public function test_unsubscribe_rejects_scalar_json(string $payload): void
+	{
+		$symfony_request = $this->create_subscription_request($payload);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('WEBPUSH_INVALID_ENDPOINT');
+		$this->controller->unsubscribe($symfony_request);
 	}
 
 	public function test_subscribe_replaces_previous_subscription()
@@ -459,7 +513,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
 			'previous_endpoint' => 'https://fcm.googleapis.com/fcm/send/old_endpoint',
 			'expirationTime' => 42000,
-			'keys' => ['p256dh' => 'new_p256dh', 'auth' => 'new_auth']
+			'keys' => ['p256dh' => self::VALID_PUBLIC_KEY, 'auth' => self::VALID_AUTH_TOKEN]
 		]));
 
 		$response = $this->controller->subscribe($symfony_request);
@@ -472,8 +526,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals([
 			'user_id' => '2',
 			'endpoint' => 'https://fcm.googleapis.com/fcm/send/new_endpoint',
-			'p256dh' => 'new_p256dh',
-			'auth' => 'new_auth',
+			'p256dh' => self::VALID_PUBLIC_KEY,
+			'auth' => self::VALID_AUTH_TOKEN,
 			'expiration_time' => '42',
 			'subscription_id' => '2',
 		], $subscriptions[0]);
@@ -615,6 +669,11 @@ class controller_webpush_test extends \phpbb_database_test_case
 			// Wildcard *.push.apple.com
 			['https://api.push.apple.com/3/device/test', true],
 			['https://api.development.push.apple.com/3/device/test', true],
+			['https://fcm.googleapis.com:443/fcm/send/test', true],
+			// Invalid: insecure transport or nonstandard port
+			['http://fcm.googleapis.com/fcm/send/test', false],
+			['https://fcm.googleapis.com:80/fcm/send/test', false],
+			['https://fcm.googleapis.com:8443/fcm/send/test', false],
 			// Invalid: disallowed host
 			['https://evil.example.com/push/endpoint', false],
 			// Invalid: subdomain spoofing
@@ -666,9 +725,9 @@ class controller_webpush_test extends \phpbb_database_test_case
 	public function subscription_write_data(): array
 	{
 		return [
-			'legacy seconds' => [['expiration_time' => 42, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 42],
-			'empty browser timestamp' => [['expirationTime' => null, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 0],
-			'browser milliseconds' => [['expirationTime' => 42000, 'keys' => ['p256dh' => 'key', 'auth' => 'auth']], 42],
+			'legacy seconds' => [['expiration_time' => 42, 'keys' => ['p256dh' => self::VALID_PUBLIC_KEY, 'auth' => self::VALID_AUTH_TOKEN]], 42],
+			'empty browser timestamp' => [['expirationTime' => null, 'keys' => ['p256dh' => self::VALID_PUBLIC_KEY, 'auth' => self::VALID_AUTH_TOKEN]], 0],
+			'browser milliseconds' => [['expirationTime' => 42000, 'keys' => ['p256dh' => self::VALID_PUBLIC_KEY, 'auth' => self::VALID_AUTH_TOKEN]], 42],
 		];
 	}
 
@@ -691,6 +750,16 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->expectException(http_exception::class);
 		$this->expectExceptionMessage('AJAX_ERROR_TEXT');
 		$method->invoke($this->controller, ['keys' => 'invalid']);
+	}
+
+	public function test_subscription_write_data_rejects_invalid_keys(): void
+	{
+		$method = new ReflectionMethod($this->controller, 'get_subscription_write_data');
+		$method->setAccessible(true);
+
+		$this->expectException(http_exception::class);
+		$this->expectExceptionMessage('AJAX_ERROR_TEXT');
+		$method->invoke($this->controller, ['keys' => ['p256dh' => 'a', 'auth' => 'a']]);
 	}
 
 	public function avatar_data(): array
@@ -804,6 +873,19 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->expectExceptionMessage('NO_AUTH_OPERATION');
 
 		$this->controller->toggle_popup();
+	}
+
+	private function create_subscription_request(string $payload): \phpbb\symfony_request
+	{
+		$this->form_helper->method('check_form_tokens')->willReturn(true);
+		$this->request->method('is_ajax')->willReturn(true);
+		$this->user->data['user_id'] = 2;
+		$this->user->data['is_bot'] = false;
+		$this->user->data['user_type'] = USER_NORMAL;
+
+		$symfony_request = $this->createMock(\phpbb\symfony_request::class);
+		$symfony_request->method('get')->willReturn($payload);
+		return $symfony_request;
 	}
 
 	private function get_subscription_data()

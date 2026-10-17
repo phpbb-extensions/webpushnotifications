@@ -21,6 +21,7 @@ use phpbb\user;
 use phpbb\user_loader;
 use phpbb\webpushnotifications\form\form_helper;
 use phpbb\webpushnotifications\json\sanitizer as json_sanitizer;
+use phpbb\webpushnotifications\subscription\validator as subscription_validator;
 
 /**
 * Web Push notification method class
@@ -208,6 +209,27 @@ class webpush extends base implements extended_method_interface
 
 		// Get subscriptions for users
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);
+		$invalid_subscriptions = [];
+
+		// Validate each stored subscription once so malformed keys cannot interrupt the delivery batch.
+		foreach ($user_subscription_map as $user_id => $subscriptions)
+		{
+			$valid_subscriptions = [];
+			$user = $this->user_loader->get_user($user_id);
+			foreach ($subscriptions as $subscription)
+			{
+				if (!is_string($subscription['p256dh'] ?? null)
+					|| !is_string($subscription['auth'] ?? null)
+					|| !subscription_validator::is_valid($subscription['p256dh'], $subscription['auth']))
+				{
+					$invalid_subscriptions[$subscription['subscription_id']] = $user;
+					continue;
+				}
+
+				$valid_subscriptions[] = $subscription;
+			}
+			$user_subscription_map[$user_id] = $valid_subscriptions;
+		}
 
 		$auth = [
 			'VAPID' => [
@@ -220,7 +242,6 @@ class webpush extends base implements extended_method_interface
 		$web_push = new \Minishlink\WebPush\WebPush($auth);
 
 		$number_of_notifications = 0;
-		$remove_subscriptions = [];
 
 		// Time to go through the queue and send notifications
 		/** @var type_interface $notification */
@@ -263,17 +284,11 @@ class webpush extends base implements extended_method_interface
 				}
 				catch (\ErrorException $exception)
 				{
-					$remove_subscriptions[] = $subscription['subscription_id'];
-					$this->log->add('user', $user['user_id'], $user['user_ip'] ?? '', 'LOG_WEBPUSH_SUBSCRIPTION_REMOVED', false, [
-						'reportee_id' => $user['user_id'],
-						$user['username'],
-					]);
+					$this->log->add('critical', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$exception->getMessage()]);
+					break;
 				}
 			}
 		}
-
-		// Remove any subscriptions that couldn't be queued, i.e. that have invalid data
-		$this->remove_subscriptions($remove_subscriptions);
 
 		// List to fill with expired subscriptions based on return
 		$expired_endpoints = [];
@@ -300,15 +315,17 @@ class webpush extends base implements extended_method_interface
 				}
 			}
 		}
-		catch (\ErrorException $exception)
+		catch (\Throwable $exception)
 		{
 			$this->log->add('critical', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$exception->getMessage()]);
 		}
 
-		$this->clean_expired_subscriptions($user_subscription_map, $expired_endpoints);
-
 		// We're done, empty the queue
 		$this->empty_queue();
+
+		// Perform subscription cleanup only after valid notifications have been delivered.
+		$this->remove_invalid_subscriptions($invalid_subscriptions);
+		$this->clean_expired_subscriptions($user_subscription_map, $expired_endpoints);
 	}
 
 	/**
@@ -393,7 +410,8 @@ class webpush extends base implements extended_method_interface
 		}
 
 		return [
-			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> ($this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe']) || stripos($this->user->page['page'], 'notification_options'),
+			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
+			'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> $this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe'],
 			'U_WEBPUSH_SUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 			'U_WEBPUSH_UNSUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 			'U_WEBPUSH_TOGGLE_POPUP'		=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_toggle_popup_controller'),
@@ -444,6 +462,25 @@ class webpush extends base implements extended_method_interface
 			$sql = 'DELETE FROM ' . $this->push_subscriptions_table . '
 					WHERE ' . $this->db->sql_in_set('subscription_id', $subscription_ids);
 			$this->db->sql_query($sql);
+		}
+	}
+
+	/**
+	 * Remove invalid subscriptions and record their removal
+	 *
+	 * @param array $invalid_subscriptions User data keyed by subscription id
+	 * @return void
+	 */
+	protected function remove_invalid_subscriptions(array $invalid_subscriptions): void
+	{
+		$this->remove_subscriptions(array_keys($invalid_subscriptions));
+
+		foreach ($invalid_subscriptions as $user)
+		{
+			$this->log->add('user', ANONYMOUS, '', 'LOG_WEBPUSH_SUBSCRIPTION_REMOVED', false, [
+				'reportee_id' => $user['user_id'],
+				$user['username'],
+			]);
 		}
 	}
 

@@ -476,7 +476,7 @@ class webpush extends base implements extended_method_interface
 
 		foreach ($invalid_subscriptions as $user)
 		{
-			$this->log->add('user', $user['user_id'], $user['user_ip'] ?? '', 'LOG_WEBPUSH_SUBSCRIPTION_REMOVED', false, [
+			$this->log->add('user', ANONYMOUS, '', 'LOG_WEBPUSH_SUBSCRIPTION_REMOVED', false, [
 				'reportee_id' => $user['user_id'],
 				$user['username'],
 			]);

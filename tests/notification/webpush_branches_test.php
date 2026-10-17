@@ -44,8 +44,8 @@ namespace phpbb\webpushnotifications\tests\notification
 			$log = $this->createMock(\phpbb\log\log_interface::class);
 			$log->expects(self::once())->method('add')->with(
 				'user',
-				2,
-				'127.0.0.1',
+				ANONYMOUS,
+				'',
 				'LOG_WEBPUSH_SUBSCRIPTION_REMOVED'
 			);
 			$user_loader = $this->createMock(\phpbb\user_loader::class);

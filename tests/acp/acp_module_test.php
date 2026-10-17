@@ -557,11 +557,32 @@ class acp_module_test extends \phpbb_test_case
 						'pwa_bg_color' => '',
 						'pwa_theme_color' => '',
 					],
-					[
-						'pwa_bg_color' => '',
-						'pwa_theme_color' => '',
-					],
 				],
+				true,
+			],
+			'unchanged style colours skipped' => [
+				$valid,
+				[
+					'pwa_bg_color_1' => '#fff000',
+					'pwa_theme_color_1' => '#000fff',
+					'pwa_bg_color_2' => '',
+					'pwa_theme_color_2' => '',
+				],
+				[
+					'icon192.png' => ['width' => 192, 'height' => 192, 'type' => IMAGETYPE_PNG],
+					'icon512.png' => ['width' => 512, 'height' => 512, 'type' => IMAGETYPE_PNG],
+				],
+				[
+					'S_ERROR' => false,
+					'ERROR_MSG' => '',
+				],
+				[
+					'pwa_short_name' => 'Forum',
+					'pwa_icon_small' => 'icon192.png',
+					'pwa_icon_large' => 'icon512.png',
+					'pwa_show_install_banner' => 1,
+				],
+				[],
 				true,
 			],
 			'too long short name rejected after entity decoding' => [

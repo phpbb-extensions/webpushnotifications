@@ -244,10 +244,15 @@ class wpn_acp_module
 			$pwa_bg_color		= $this->request->variable('pwa_bg_color_' . $style_id, '');
 			$pwa_theme_color	= $this->request->variable('pwa_theme_color_' . $style_id, '');
 
-			$updates[$style_id] = [
+			$update = [
 				'pwa_bg_color'		=> $this->validate_hex_color($pwa_bg_color) ? $pwa_bg_color : $row['pwa_bg_color'],
 				'pwa_theme_color'	=> $this->validate_hex_color($pwa_theme_color) ? $pwa_theme_color : $row['pwa_theme_color'],
 			];
+
+			if ($update['pwa_bg_color'] !== $row['pwa_bg_color'] || $update['pwa_theme_color'] !== $row['pwa_theme_color'])
+			{
+				$updates[$style_id] = $update;
+			}
 		}
 
 		if ($this->display_errors())

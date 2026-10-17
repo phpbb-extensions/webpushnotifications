@@ -36,9 +36,11 @@ class form_helper_test extends \phpbb_test_case
 	public function check_data(): array
 	{
 		return [
+			'same-second token' => [2, 60, null, 0, true, true, true],
 			'valid user token' => [2, 60, null, 10, true, true, true],
 			'valid guest token with sid' => [ANONYMOUS, 60, null, 10, true, true, true],
 			'unlimited lifetime' => [2, -1, null, 3600, true, true, true],
+			'future-dated token' => [2, 60, null, -1, true, true, false],
 			'minimum lifetime enforced' => [2, 1, null, 31, true, true, false],
 			'explicit lifetime' => [2, 60, 5, 10, true, true, false],
 			'missing creation time' => [2, 60, null, 10, false, true, false],

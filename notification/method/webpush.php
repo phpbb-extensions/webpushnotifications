@@ -410,7 +410,8 @@ class webpush extends base implements extended_method_interface
 		}
 
 		return [
-			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> ($this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe']) || stripos($this->user->page['page'], 'notification_options'),
+			'NOTIFICATIONS_WEBPUSH_ENABLE'	=> true,
+			'S_WEBPUSH_DROPDOWN_SUBSCRIBE'	=> $this->config['load_notifications'] && $this->config['allow_board_notifications'] && $this->config['wpn_webpush_dropdown_subscribe'],
 			'U_WEBPUSH_SUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_subscribe_controller'),
 			'U_WEBPUSH_UNSUBSCRIBE'			=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_unsubscribe_controller'),
 			'U_WEBPUSH_TOGGLE_POPUP'		=> $controller_helper->route('phpbb_webpushnotifications_ucp_push_toggle_popup_controller'),

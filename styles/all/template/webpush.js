@@ -30,11 +30,11 @@ function PhpbbWebpush() {
 	/** @type {string} VAPID public key */
 	let vapidPublicKey = '';
 
-	/** @type {HTMLElement} Subscribe button */
-	let subscribeButton;
+	/** @type {NodeListOf<HTMLElement>} Subscribe buttons */
+	let subscribeButtons;
 
-	/** @type {HTMLElement} Unsubscribe button */
-	let unsubscribeButton;
+	/** @type {NodeListOf<HTMLElement>} Unsubscribe buttons */
+	let unsubscribeButtons;
 
 	/** @type {HTMLElement} Toggle popup button */
 	let togglePopupButton;
@@ -61,8 +61,8 @@ function PhpbbWebpush() {
 		unsubscribeError = options.unsubscribeError;
 		vapidPublicKey = options.vapidPublicKey;
 
-		subscribeButton = document.querySelector('#subscribe_webpush');
-		unsubscribeButton = document.querySelector('#unsubscribe_webpush');
+		subscribeButtons = document.querySelectorAll('[data-wpn-action="subscribe"]');
+		unsubscribeButtons = document.querySelectorAll('[data-wpn-action="unsubscribe"]');
 		togglePopupButton = document.querySelector('#toggle_popup_prompt');
 
 		// Set up toggle popup button handler if it exists (on UCP settings page)
@@ -79,8 +79,8 @@ function PhpbbWebpush() {
 		if ('serviceWorker' in navigator && 'PushManager' in window) {
 			navigator.serviceWorker.register(serviceWorkerUrl)
 				.then(async() => {
-					subscribeButton.addEventListener('click', subscribeButtonHandler);
-					unsubscribeButton.addEventListener('click', unsubscribeButtonHandler);
+					subscribeButtons.forEach(button => button.addEventListener('click', subscribeButtonHandler));
+					unsubscribeButtons.forEach(button => button.addEventListener('click', unsubscribeButtonHandler));
 
 					await updateButtonState();
 					initPopupPrompt();
@@ -101,8 +101,6 @@ function PhpbbWebpush() {
 	 * @returns {void}
 	 */
 	function setDisabledState() {
-		subscribeButton.disabled = true;
-
 		const notificationList = document.getElementById('notification_list');
 		const subscribeToggle = notificationList ? notificationList.querySelector('.wpn-notification-dropdown-footer') : null;
 
@@ -110,9 +108,13 @@ function PhpbbWebpush() {
 			subscribeToggle.style.display = 'none';
 		}
 
-		if (subscribeButton.type === 'submit' || subscribeButton.classList.contains('button')) {
-			subscribeButton.value = subscribeButton.getAttribute('data-l-unsupported');
-		}
+		subscribeButtons.forEach(button => {
+			button.disabled = true;
+
+			if (button.type === 'submit' || button.classList.contains('button')) {
+				button.value = button.getAttribute('data-l-unsupported');
+			}
+		});
 	}
 
 	/**
@@ -190,19 +192,8 @@ function PhpbbWebpush() {
 			popup.style.display = 'flex';
 		}, 1000);
 
-		const allowBtn = document.getElementById('wpn_popup_allow');
 		const denyBtn = document.getElementById('wpn_popup_deny');
 		const overlay = document.getElementById('wpn_popup_prompt');
-
-		if (allowBtn) {
-			allowBtn.addEventListener('click', (event) => {
-				event.stopPropagation();
-				hidePopup(popup);
-				subscribeButtonHandler(event).catch(error => {
-					console.error('Subscription handler error:', error);
-				});
-			});
-		}
 
 		if (denyBtn) {
 			denyBtn.addEventListener('click', (event) => {
@@ -341,13 +332,8 @@ function PhpbbWebpush() {
 	 * @param {boolean} subscribed True if subscribed, false if not
 	 */
 	function setSubscriptionState(subscribed) {
-		if (subscribed) {
-			subscribeButton.classList.add('hidden');
-			unsubscribeButton.classList.remove('hidden');
-		} else {
-			subscribeButton.classList.remove('hidden');
-			unsubscribeButton.classList.add('hidden');
-		}
+		subscribeButtons.forEach(button => button.classList.toggle('hidden', subscribed));
+		unsubscribeButtons.forEach(button => button.classList.toggle('hidden', !subscribed));
 	}
 
 	/**
@@ -371,7 +357,7 @@ function PhpbbWebpush() {
 			const data = await response.json();
 
 			if (!data.success) {
-				throw new Error(data.message || subscribeButton.getAttribute('data-l-unsupported'));
+				throw new Error(data.message || subscribeButtons[0].getAttribute('data-l-unsupported'));
 			}
 
 			handleSubscribe(data, subscription, previousEndpoint);
@@ -419,13 +405,22 @@ function PhpbbWebpush() {
 	async function subscribeButtonHandler(event) {
 		event.preventDefault();
 
-		subscribeButton.removeEventListener('click', subscribeButtonHandler);
+		const button = event.currentTarget;
+		subscribeButtons.forEach(control => {
+			control.disabled = true;
+			control.removeEventListener('click', subscribeButtonHandler);
+		});
+
+		if (button.id === 'wpn_popup_allow') {
+			event.stopPropagation();
+			hidePopup(document.getElementById('wpn_popup_prompt'));
+		}
 
 		try {
 			// Prevent the user from clicking the subscribe button multiple times.
 			const result = await Notification.requestPermission();
 			if (result === 'denied') {
-				phpbb.alert(subscribeButton.getAttribute('data-l-err'), subscribeButton.getAttribute('data-l-msg'));
+				phpbb.alert(button.getAttribute('data-l-err'), button.getAttribute('data-l-msg'));
 				return;
 			}
 
@@ -434,7 +429,7 @@ function PhpbbWebpush() {
 			// We might already have a subscription that is unknown to this instance of phpBB.
 			// Unsubscribe before trying to subscribe again.
 			if (typeof registration === 'undefined') {
-				throw new Error(subscribeButton.getAttribute('data-l-unsupported'));
+				throw new Error(button.getAttribute('data-l-unsupported'));
 			}
 
 			try {
@@ -443,15 +438,18 @@ function PhpbbWebpush() {
 			} catch (error) {
 				promptDenied.set();
 				hidePopup(document.getElementById('wpn_popup_prompt'));
-				phpbb.alert(ajaxErrorTitle, error.message || subscribeButton.getAttribute('data-l-unsupported'));
+				phpbb.alert(ajaxErrorTitle, error.message || button.getAttribute('data-l-unsupported'));
 			}
 		} catch (error) {
 			promptDenied.set(); // deny the prompt on error to prevent repeated prompting
 			hidePopup(document.getElementById('wpn_popup_prompt'));
 			console.error('Push subscription error:', error);
-			phpbb.alert(subscribeButton.getAttribute('data-l-err'), error.message || subscribeButton.getAttribute('data-l-unsupported'));
+			phpbb.alert(button.getAttribute('data-l-err'), error.message || button.getAttribute('data-l-unsupported'));
 		} finally {
-			subscribeButton.addEventListener('click', subscribeButtonHandler);
+			subscribeButtons.forEach(control => {
+				control.disabled = false;
+				control.addEventListener('click', subscribeButtonHandler);
+			});
 		}
 	}
 

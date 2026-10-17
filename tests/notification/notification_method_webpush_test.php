@@ -815,12 +815,33 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 
 		$template_data = $this->notification_method_webpush->get_ucp_template_data($controller_helper, $form_helper);
 
+		$this->assertTrue($template_data['NOTIFICATIONS_WEBPUSH_ENABLE']);
+		$this->assertTrue($template_data['S_WEBPUSH_DROPDOWN_SUBSCRIBE']);
 		$this->assertSame([
 			[
 				'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
 				'expirationTime' => 42000,
 			],
 		], $template_data['SUBSCRIPTIONS']);
+	}
+
+	public function test_get_ucp_template_data_separates_webpush_availability_from_dropdown(): void
+	{
+		$this->user->data['user_id'] = 2;
+		$this->config['load_notifications'] = true;
+		$this->config['allow_board_notifications'] = true;
+		$this->config['wpn_webpush_dropdown_subscribe'] = false;
+
+		$controller_helper = $this->createMock(\phpbb\controller\helper::class);
+		$controller_helper->method('route')->willReturnArgument(0);
+
+		$form_helper = $this->createMock(\phpbb\webpushnotifications\form\form_helper::class);
+		$form_helper->method('get_form_tokens')->willReturn([]);
+
+		$template_data = $this->notification_method_webpush->get_ucp_template_data($controller_helper, $form_helper);
+
+		$this->assertTrue($template_data['NOTIFICATIONS_WEBPUSH_ENABLE']);
+		$this->assertFalse($template_data['S_WEBPUSH_DROPDOWN_SUBSCRIBE']);
 	}
 
 	/**

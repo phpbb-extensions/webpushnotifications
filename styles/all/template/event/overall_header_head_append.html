@@ -11,6 +11,6 @@
 <link rel="manifest" href="{{ U_MANIFEST_URL }}" crossorigin="use-credentials">
 {% if U_TOUCH_ICON %}<link rel="apple-touch-icon" href="{{ ROOT_PATH ~ U_TOUCH_ICON }}">{% endif %}
 
-{% if NOTIFICATIONS_WEBPUSH_ENABLE %}
+{% if NOTIFICATIONS_WEBPUSH_ENABLE and (notification_types is defined or S_WEBPUSH_DROPDOWN_SUBSCRIBE or (S_WEBPUSH_POPUP_PROMPT and not S_WEBPUSH_POPUP_DISABLED)) %}
 	{% include '@phpbb_webpushnotifications/ucp_notifications_webpush.html' %}
 {% endif %}

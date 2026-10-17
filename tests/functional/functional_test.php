@@ -112,12 +112,16 @@ class functional_test extends \phpbb_functional_test_case
 		// Assert subscribe dropdown is present
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
-		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #subscribe_webpush')->html());
-		$this->assertContainsLang('NOTIFY_WEBPUSH_UNSUBSCRIBE', $crawler->filter('.wpn-notification-dropdown-footer #unsubscribe_webpush')->html());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('#subscribe_webpush_dropdown')->html());
+		$this->assertContainsLang('NOTIFY_WEBPUSH_UNSUBSCRIBE', $crawler->filter('#unsubscribe_webpush_dropdown')->html());
 
-		// Assert subscribe button is not displayed in UCP when dropdown subscribe is present
+		// Assert dropdown and UCP controls coexist without duplicate IDs
 		$crawler = self::request('GET', 'ucp.php?i=ucp_notifications&mode=notification_options');
-		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
+		$this->assertCount(1, $crawler->filter('#subscribe_webpush'));
+		$this->assertCount(1, $crawler->filter('#unsubscribe_webpush'));
+		$this->assertCount(1, $crawler->filter('#subscribe_webpush_dropdown'));
+		$this->assertCount(1, $crawler->filter('#unsubscribe_webpush_dropdown'));
 	}
 
 	public function test_manifest()

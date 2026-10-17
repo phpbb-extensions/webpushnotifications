@@ -357,7 +357,7 @@ function PhpbbWebpush() {
 			const data = await response.json();
 
 			if (!data.success) {
-				throw new Error(data.message || subscribeButtons[0].getAttribute('data-l-unsupported'));
+				throw new Error(data.message);
 			}
 
 			handleSubscribe(data, subscription, previousEndpoint);

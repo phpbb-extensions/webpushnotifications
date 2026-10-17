@@ -106,12 +106,15 @@ class functional_test extends \phpbb_functional_test_case
 		// Assert subscribe dropdown is not present by default
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(0, $crawler->filter('.wpn-notification-dropdown-footer'));
+		$this->assertCount(1, $crawler->filter('script[src*="webpush.js"]'));
+		$this->assertCount(0, $crawler->filter('link[href*="phpbb_wpn.css"]'));
 
 		$this->set_acp_option('wpn_webpush_dropdown_subscribe', 1);
 
 		// Assert subscribe dropdown is present
 		$crawler = self::request('GET', 'index.php');
 		$this->assertCount(1, $crawler->filter('.wpn-notification-dropdown-footer'));
+		$this->assertCount(1, $crawler->filter('link[href*="phpbb_wpn.css"]'));
 		$this->assertContainsLang('NOTIFY_WEBPUSH_SUBSCRIBE', $crawler->filter('#subscribe_webpush_dropdown')->html());
 		$this->assertContainsLang('NOTIFY_WEBPUSH_UNSUBSCRIBE', $crawler->filter('#unsubscribe_webpush_dropdown')->html());
 

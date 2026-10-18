@@ -1,10 +1,10 @@
-{% if NOTIFICATIONS_WEBPUSH_ENABLE and notification_types is not defined %}
+{% if NOTIFICATIONS_WEBPUSH_ENABLE and S_WEBPUSH_DROPDOWN_SUBSCRIBE %}
 	<div class="wpn-notification-dropdown-footer" title="{{ lang('NOTIFY_WEBPUSH_DROPDOWN_TITLE') }}">
 		<span class="ellipsis-text">{{ lang('NOTIFY_WEBPUSH_ENABLE_SLIDER') ~ lang('COLON') }}</span>
-		<button id="subscribe_webpush" name="subscribe_webpush" data-l-err="{{ lang('INFORMATION')|e('html_attr') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED')|e('html_attr') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED')|e('html_attr') }}">
+		<button id="subscribe_webpush_dropdown" type="button" name="subscribe_webpush" data-wpn-action="subscribe" data-l-err="{{ lang('INFORMATION')|e('html_attr') }}" data-l-msg="{{ lang('NOTIFY_WEBPUSH_DENIED')|e('html_attr') }}" data-l-unsupported="{{ lang('NOTIFY_WEBPUSH_NOT_SUPPORTED')|e('html_attr') }}">
 			<i class="icon fa-toggle-off fa-fw icon-lightgray" aria-hidden="true" title="{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}"><span class="sr-only">{{ lang('NOTIFY_WEBPUSH_SUBSCRIBE') }}</span></i>
 		</button>
-		<button id="unsubscribe_webpush" name="unsubscribe_webpush" class="hidden">
+		<button id="unsubscribe_webpush_dropdown" type="button" name="unsubscribe_webpush" class="hidden" data-wpn-action="unsubscribe">
 			<i class="icon fa-toggle-on fa-fw icon-blue" aria-hidden="true" title="{{ lang('NOTIFY_WEBPUSH_UNSUBSCRIBE') }}"><span class="sr-only">{{ lang('NOTIFY_WEBPUSH_UNSUBSCRIBE') }}</span></i>
 		</button>
 	</div>

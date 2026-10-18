@@ -15,6 +15,11 @@
 		-->
 		<delete dir="${dir}/.github" />
 		<delete dir="${dir}/tests" />
+		<delete includeemptydirs="true">
+			<fileset dir="${dir}/vendor">
+				<include name="**/.github/**" />
+			</fileset>
+		</delete>
 
 		<delete file="${dir}/.gitignore" />
 		<delete file="${dir}/.gitattributes" />

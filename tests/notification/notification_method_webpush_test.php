@@ -752,6 +752,41 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		}
 	}
 
+	public function test_invalid_subscription_does_not_interrupt_valid_delivery(): void
+	{
+		$valid_subscription = $this->create_subscription_for_user(2);
+		$push_subscriptions_table = $this->container->getParameter('tables.phpbb.wpn.push_subscriptions');
+		$invalid_endpoint = 'https://fcm.googleapis.com/fcm/send/invalid-key-test';
+		$sql = 'INSERT INTO ' . $push_subscriptions_table . ' ' . $this->db->sql_build_array('INSERT', [
+			'user_id' => 2,
+			'endpoint' => $invalid_endpoint,
+			'p256dh' => 'a',
+			'auth' => 'a',
+		]);
+		$this->db->sql_query($sql);
+
+		$this->notifications->add_notifications('notification.type.post', [
+			'post_time' => 1349413322,
+			'poster_id' => 1,
+			'topic_title' => '',
+			'post_subject' => '',
+			'post_username' => '',
+			'forum_name' => '',
+			'forum_id' => '1',
+			'post_id' => '2',
+			'topic_id' => '1',
+		]);
+
+		$this->assertNotEmpty($this->get_messages_for_subscription($valid_subscription['clientHash']));
+
+		$sql = 'SELECT COUNT(*) AS subscription_count
+			FROM ' . $push_subscriptions_table . "
+			WHERE endpoint = '" . $this->db->sql_escape($invalid_endpoint) . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertSame(0, (int) $this->db->sql_fetchfield('subscription_count'));
+		$this->db->sql_freeresult($result);
+	}
+
 	public function test_get_ucp_template_data_uses_millisecond_expiration_time(): void
 	{
 		$this->user->data['user_id'] = 2;
@@ -780,12 +815,33 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 
 		$template_data = $this->notification_method_webpush->get_ucp_template_data($controller_helper, $form_helper);
 
+		$this->assertTrue($template_data['NOTIFICATIONS_WEBPUSH_ENABLE']);
+		$this->assertTrue($template_data['S_WEBPUSH_DROPDOWN_SUBSCRIBE']);
 		$this->assertSame([
 			[
 				'endpoint' => 'https://fcm.googleapis.com/fcm/send/test_endpoint',
 				'expirationTime' => 42000,
 			],
 		], $template_data['SUBSCRIPTIONS']);
+	}
+
+	public function test_get_ucp_template_data_separates_webpush_availability_from_dropdown(): void
+	{
+		$this->user->data['user_id'] = 2;
+		$this->config['load_notifications'] = true;
+		$this->config['allow_board_notifications'] = true;
+		$this->config['wpn_webpush_dropdown_subscribe'] = false;
+
+		$controller_helper = $this->createMock(\phpbb\controller\helper::class);
+		$controller_helper->method('route')->willReturnArgument(0);
+
+		$form_helper = $this->createMock(\phpbb\webpushnotifications\form\form_helper::class);
+		$form_helper->method('get_form_tokens')->willReturn([]);
+
+		$template_data = $this->notification_method_webpush->get_ucp_template_data($controller_helper, $form_helper);
+
+		$this->assertTrue($template_data['NOTIFICATIONS_WEBPUSH_ENABLE']);
+		$this->assertFalse($template_data['S_WEBPUSH_DROPDOWN_SUBSCRIBE']);
 	}
 
 	/**

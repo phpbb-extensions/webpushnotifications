@@ -28,7 +28,7 @@ class sanitizer
 	{
 		if (!empty($data))
 		{
-			$json_sanitizer = function (&$value)
+			$json_sanitizer = static function (&$value)
 			{
 				$type_cast_helper = new type_cast_helper();
 				$type_cast_helper->set_var($value, $value, gettype($value), true);
@@ -49,6 +49,6 @@ class sanitizer
 	public static function decode(string $json) : array
 	{
 		$data = json_decode($json, true);
-		return !empty($data) ? self::sanitize($data) : [];
+		return is_array($data) && !empty($data) ? self::sanitize($data) : [];
 	}
 }

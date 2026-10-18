@@ -217,7 +217,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Append language to privacy agreement.
+	 * Append Web Push disclosure to privacy agreement.
 	 *
 	 * @return void
 	 */
@@ -230,12 +230,15 @@ class listener implements EventSubscriberInterface
 			return;
 		}
 
-		if (!$this->language->is_set('NOTIFY_WEBPUSH_PRIVACY_POLICY'))
+		if (!$this->language->is_set('NOTIFY_WEBPUSH_PRIVACY_POLICY_TEXT'))
 		{
 			$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
 		}
 
-		$this->template->append_var('AGREEMENT_TEXT', $this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY', $this->config['sitename']));
+		$this->template->set_filenames([
+			'wpn_privacy_policy' => '@phpbb_webpushnotifications/privacy_policy.html',
+		]);
+		$this->template->append_var('AGREEMENT_TEXT', $this->template->assign_display('wpn_privacy_policy'));
 	}
 
 	/**

@@ -96,6 +96,24 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assert_checkbox_is_checked($wp_list, 'notification.type.pm_notification.method.phpbb.wpn.webpush');
 	}
 
+	public function test_privacy_policy()
+	{
+		$this->login();
+		$this->admin_login();
+		$this->add_lang_ext('phpbb/webpushnotifications', 'webpushnotifications_module_ucp');
+		$this->set_acp_option('wpn_webpush_enable', 1);
+
+		$crawler = self::request('GET', 'ucp.php?mode=privacy');
+		$agreement = $crawler->filter('.agreement');
+
+		$this->assertCount(1, $agreement->filter('h3'));
+		$this->assertContainsLang('NOTIFY_WEBPUSH_PRIVACY_POLICY_TITLE', $agreement->filter('h3')->text());
+		$this->assertStringContainsString(
+			$this->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY_TEXT', 'yourdomain.com'),
+			$agreement->text()
+		);
+	}
+
 	public function test_dropdown_subscribe_button()
 	{
 		$this->login();

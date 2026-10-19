@@ -489,7 +489,7 @@ class listener_test extends \phpbb_database_test_case
 	public function test_append_agreement($show_agreement, $s_agreement, $agreement_title, $expected_append_calls)
 	{
 		$this->config['wpn_webpush_enable'] = $show_agreement;
-		$this->config['sitename'] = 'Test Board';
+		$privacy_policy = '<br><br><h3>Push Notifications</h3>Privacy policy text';
 
 		$this->template->expects(self::atMost(2))
 			->method('retrieve_var')
@@ -497,15 +497,30 @@ class listener_test extends \phpbb_database_test_case
 			->willReturnOnConsecutiveCalls($s_agreement, $this->language->lang($agreement_title));
 
 		$this->template->expects($expected_append_calls ? self::once() : self::never())
+			->method('set_filenames')
+			->with([
+				'wpn_privacy_policy' => '@phpbb_webpushnotifications/privacy_policy.html',
+			]);
+
+		$this->template->expects($expected_append_calls ? self::once() : self::never())
+			->method('assign_display')
+			->with('wpn_privacy_policy')
+			->willReturn($privacy_policy);
+
+		$this->template->expects($expected_append_calls ? self::once() : self::never())
 			->method('append_var')
-			->with('AGREEMENT_TEXT', self::callback(function ($agreement_text) {
-				self::assertTrue($this->language->is_set('NOTIFY_WEBPUSH_PRIVACY_POLICY'));
-				self::assertSame($this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY', 'Test Board'), $agreement_text);
-				return true;
-			}));
+			->with('AGREEMENT_TEXT', $privacy_policy);
 
 		$this->set_listener();
 		$this->listener->append_agreement();
+	}
+
+	public function test_privacy_policy_language_has_no_markup()
+	{
+		$this->language->add_lang('webpushnotifications_module_ucp', 'phpbb/webpushnotifications');
+
+		self::assertStringNotContainsString('<', $this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY_TITLE'));
+		self::assertStringNotContainsString('<', $this->language->lang('NOTIFY_WEBPUSH_PRIVACY_POLICY_TEXT', 'Test Board'));
 	}
 
 	private function lang($string)

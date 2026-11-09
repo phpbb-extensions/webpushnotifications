@@ -98,6 +98,7 @@ class listener_test extends \phpbb_database_test_case
 			'sitename' => 'phpBB',
 			'cookie_name' => 'phpbb3',
 			'pwa_show_install_banner' => true,
+			'pwa_metadata_enabled' => true,
 			'pwa_icon_small' => '',
 			'pwa_icon_large' => '',
 			'pwa_short_name' => '',
@@ -387,6 +388,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->template->expects(self::once())
 			->method('assign_vars')
 			->with([
+				'S_PWA_METADATA_ENABLED' => true,
 				'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 				'U_TOUCH_ICON'		=> ext::PWA_ICON_DIR . '/icon-192x192.png',
 				'SHORT_SITE_NAME'	=> 'Test',
@@ -412,6 +414,7 @@ class listener_test extends \phpbb_database_test_case
 	public function test_pwa_manifest_builds_fallback_name_and_mobile_banner()
 	{
 		$this->config['sitename'] = 'Long &amp; Mobile Site';
+		$this->config['pwa_metadata_enabled'] = false;
 		$this->user->style = [
 			'pwa_theme_color' => '#112233',
 			'pwa_bg_color' => '#445566',
@@ -419,6 +422,7 @@ class listener_test extends \phpbb_database_test_case
 		$this->request->method('server')->with('HTTP_USER_AGENT', '')->willReturn('Mozilla/5.0 iPhone Mobile');
 
 		$this->template->expects(self::once())->method('assign_vars')->with([
+			'S_PWA_METADATA_ENABLED' => false,
 			'U_MANIFEST_URL' => $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON' => null,
 			'SHORT_SITE_NAME' => 'Long &amp; Mobil',

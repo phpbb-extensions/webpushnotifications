@@ -249,6 +249,7 @@ class acp_controller
 	protected function display_pwa_settings()
 	{
 		$this->template->assign_vars([
+			'S_PWA_METADATA_ENABLED'	=> (bool) $this->config['pwa_metadata_enabled'],
 			'S_PWA_SHOW_INSTALL_BANNER'	=> (bool) $this->config['pwa_show_install_banner'],
 			'PWA_SHORT_NAME'			=> $this->config['pwa_short_name'],
 			'PWA_SHORT_NAME_PLACEHOLDER'=> utf8_substr(ext::decode_entities($this->config['sitename'], ENT_QUOTES), 0, 12),
@@ -307,6 +308,7 @@ class acp_controller
 		$config_array['pwa_short_name'] = utf8_encode_ucr($config_array['pwa_short_name']);
 
 		foreach ([
+			'pwa_metadata_enabled',
 			'pwa_short_name',
 			'pwa_icon_small',
 			'pwa_icon_large',

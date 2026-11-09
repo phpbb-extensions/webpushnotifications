@@ -376,6 +376,7 @@ class controller_acp_test extends \phpbb_test_case
 	public function pwa_save_data(): array
 	{
 		$valid = [
+			'pwa_metadata_enabled' => 0,
 			'pwa_short_name' => 'Forum',
 			'pwa_icon_small' => 'icon192.png',
 			'pwa_icon_large' => 'icon512.png',
@@ -413,6 +414,7 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => '',
 				],
 				[
+					'pwa_metadata_enabled' => 0,
 					'pwa_short_name' => 'Forum',
 					'pwa_icon_small' => 'icon192.png',
 					'pwa_icon_large' => 'icon512.png',
@@ -430,6 +432,7 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => '',
 				],
 				[
+					'pwa_metadata_enabled' => 0,
 					'pwa_short_name' => '',
 					'pwa_icon_small' => '',
 					'pwa_icon_large' => '',
@@ -460,6 +463,7 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => '',
 				],
 				[
+					'pwa_metadata_enabled' => 0,
 					'pwa_short_name' => 'Forum',
 					'pwa_icon_small' => 'icon192.png',
 					'pwa_icon_large' => 'icon512.png',
@@ -770,6 +774,7 @@ class controller_acp_test extends \phpbb_test_case
 			'wpn_webpush_method_enabled' => 1,
 			'wpn_webpush_popup_prompt' => 1,
 			'pwa_show_install_banner' => 1,
+			'pwa_metadata_enabled' => 1,
 			'pwa_short_name' => 'Old',
 			'pwa_icon_small' => 'old-small.png',
 			'pwa_icon_large' => 'old-large.png',
@@ -811,6 +816,7 @@ class controller_acp_test extends \phpbb_test_case
 	protected function pwa_template_vars($u_action): array
 	{
 		return [
+			'S_PWA_METADATA_ENABLED' => true,
 			'S_PWA_SHOW_INSTALL_BANNER' => true,
 			'PWA_SHORT_NAME' => 'Old',
 			'PWA_SHORT_NAME_PLACEHOLDER' => 'Board & 😀 Fo',

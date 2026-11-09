@@ -177,6 +177,25 @@ class functional_test extends \phpbb_functional_test_case
 		$this->assertEquals(json_encode($expected), self::get_content());
 	}
 
+	public function test_pwa_metadata_output_can_be_disabled()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(1, $crawler->filter('link[rel="manifest"]'));
+		$this->assertCount(1, $crawler->filter('meta[name="apple-mobile-web-app-capable"]'));
+
+		$this->set_pwa_option('pwa_metadata_enabled', 0);
+
+		$crawler = self::request('GET', 'index.php');
+		$this->assertCount(0, $crawler->filter('link[rel="manifest"]'));
+		$this->assertCount(0, $crawler->filter('meta[name="mobile-web-app-capable"]'));
+		$this->assertCount(0, $crawler->filter('meta[name="apple-mobile-web-app-capable"]'));
+
+		$this->set_pwa_option('pwa_metadata_enabled', 1);
+	}
+
 	public function test_popup_prompt()
 	{
 		$this->login();
@@ -253,6 +272,17 @@ class functional_test extends \phpbb_functional_test_case
 	{
 		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=webpush&sid=' . $this->sid);
 		$form = $crawler->selectButton('Submit')->form();
+		$values = $form->getValues();
+		$values["config[{$option}]"] = $value;
+		$form->setValues($values);
+		$crawler = self::submit($form);
+		$this->assertEquals(1, $crawler->filter('.successbox')->count());
+	}
+
+	protected function set_pwa_option($option, $value)
+	{
+		$crawler = self::request('GET', 'adm/index.php?i=-phpbb-webpushnotifications-acp-wpn_acp_module&mode=pwa&sid=' . $this->sid);
+		$form = $crawler->selectButton('submit')->form();
 		$values = $form->getValues();
 		$values["config[{$option}]"] = $value;
 		$form->setValues($values);

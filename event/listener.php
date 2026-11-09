@@ -170,6 +170,7 @@ class listener implements EventSubscriberInterface
 	public function pwa_manifest()
 	{
 		$this->template->assign_vars([
+			'S_PWA_METADATA_ENABLED' => !empty($this->config['pwa_metadata_enabled']),
 			'U_MANIFEST_URL'	=> $this->controller_helper->route('phpbb_webpushnotifications_manifest_controller'),
 			'U_TOUCH_ICON'		=> $this->config['pwa_icon_small'] ? ext::PWA_ICON_DIR . '/' . $this->config['pwa_icon_small'] : null,
 			'SHORT_SITE_NAME'	=> $this->config['pwa_short_name'] ?: $this->trim_shortname($this->config['sitename']),

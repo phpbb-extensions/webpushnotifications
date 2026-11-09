@@ -72,6 +72,8 @@ $lang = array_merge($lang, [
 
 	// PWA Settings
 	'ACP_PWA_SETTINGS_EXPLAIN'	=> 'Progressive Web Apps (PWAs) allow users to install your board on their mobile device and use it like an app. These settings control the app name, icons, colours, and install prompts shown to users.',
+	'PWA_METADATA_ENABLED'		=> 'Output PWA metadata',
+	'PWA_METADATA_ENABLED_EXPLAIN'=> 'Output the web app manifest link and related PWA metadata in the page header. Disable this if another extension or your style already provides the board’s PWA metadata. This does not disable Web Push or the app install banner.',
 	'PWA_SHORT_NAME'			=> 'Short site name',
 	'PWA_SHORT_NAME_EXPLAIN'	=> 'Your site name in 12 characters or fewer, which may be used as a label for an icon on a mobile device’s home screen. (If this field is left empty, the first 12 characters of the <samp>Site name</samp> will be used.)',
 	'PWA_SHORT_NAME_INVALID'	=> '“Short site name” exceeds the 12 character limit.',

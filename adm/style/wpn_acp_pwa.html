@@ -19,6 +19,11 @@
 	<fieldset>
 		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
 		<dl>
+			<dt><label>{{ lang('PWA_METADATA_ENABLED') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_METADATA_ENABLED_EXPLAIN') }}</span></dt>
+			<dd><label><input type="radio" class="radio" name="config[pwa_metadata_enabled]" value="1"{% if S_PWA_METADATA_ENABLED %} checked="checked"{% endif %}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="config[pwa_metadata_enabled]" value="0"{% if not S_PWA_METADATA_ENABLED %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
+		</dl>
+		<dl>
 			<dt><label for="pwa_short_name">{{ lang('PWA_SHORT_NAME') ~ lang('COLON') }}</label><br><span>{{ lang('PWA_SHORT_NAME_EXPLAIN') }}</span></dt>
 			<dd><input id="pwa_short_name" type="text" size="40" maxlength="12" name="config[pwa_short_name]" value="{{ PWA_SHORT_NAME }}" placeholder="{{ PWA_SHORT_NAME_PLACEHOLDER|e('html_attr') }}"></dd>
 		</dl>

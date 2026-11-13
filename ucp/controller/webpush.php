@@ -262,8 +262,8 @@ class webpush
 
 		return json_encode([
 			'heading'	=> ext::decode_entities($this->config['sitename'], ENT_QUOTES),
-			'title'		=> strip_tags(ext::decode_entities($notification->get_title())),
-			'text'		=> strip_tags(ext::decode_entities($notification->get_reference())),
+			'title'		=> ext::decode_entities(strip_tags($notification->get_title()), ENT_QUOTES),
+			'text'		=> ext::decode_entities(strip_tags($notification->get_reference()), ENT_QUOTES),
 			'url'		=> htmlspecialchars_decode($notification->get_url()),
 			'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 		]);

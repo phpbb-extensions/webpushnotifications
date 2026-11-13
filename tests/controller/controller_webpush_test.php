@@ -696,8 +696,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 	{
 		$notification = $this->createMock(\phpbb\notification\type\type_interface::class);
 		$notification->method('users_to_query')->willReturn([]);
-		$notification->method('get_title')->willReturn('A &amp; <b>title</b>');
-		$notification->method('get_reference')->willReturn('A &quot;reference&quot;');
+		$notification->method('get_title')->willReturn('<strong>Private Message</strong> from Alice &amp; Bob:');
+		$notification->method('get_reference')->willReturn('&quot;She said &quot;hello&quot; &amp; asked about a &lt; b in &lt;div&gt; tags&quot;');
 		$notification->method('get_url')->willReturn('viewtopic.php?p=1&amp;x=2');
 		$notification->method('get_avatar')->willReturn('<img src="phpBB/images/avatar.png" alt="">');
 		$this->notification_manager->expects(self::once())
@@ -712,8 +712,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 		])), true);
 
 		self::assertSame('yourdomain.com', $data['heading']);
-		self::assertSame('A & title', $data['title']);
-		self::assertSame('A &quot;reference&quot;', $data['text']);
+		self::assertSame('Private Message from Alice & Bob:', $data['title']);
+		self::assertSame('"She said "hello" & asked about a < b in <div> tags"', $data['text']);
 		self::assertSame('viewtopic.php?p=1&x=2', $data['url']);
 		self::assertStringEndsWith('/images/avatar.png', $data['avatar']['src']);
 	}

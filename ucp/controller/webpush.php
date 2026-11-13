@@ -275,7 +275,7 @@ class webpush
 	}
 
 	/**
-	 * Convert a board-relative notification URL to an absolute URL
+	 * Convert a relative notification URL to an absolute URL
 	 *
 	 * @param string $url Notification URL
 	 * @return string
@@ -287,8 +287,18 @@ class webpush
 			return $url;
 		}
 
-		$relative_url = ltrim($url, '/');
-		return $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $relative_url);
+		if (strpos($url, '//') === 0)
+		{
+			$scheme = parse_url($this->get_board_url(), PHP_URL_SCHEME);
+			return (is_string($scheme) ? $scheme . ':' : '') . $url;
+		}
+
+		if (strpos($url, '/') === 0)
+		{
+			return generate_board_url(true) . $url;
+		}
+
+		return $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $url);
 	}
 
 	/**

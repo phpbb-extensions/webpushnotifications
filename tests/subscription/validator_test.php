@@ -16,8 +16,20 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 class validator_test extends \phpbb_test_case
 {
+	private const VALID_VAPID_PRIVATE_KEY = 'SrlbBEVgibWmKHYbDPu4Y2XvDWPjeGcc9fC16jq01xU';
 	private const VALID_PUBLIC_KEY = 'BGsX0fLhLEJH-Lzm5WOkQPJ3A32BLeszoPShOUXYmMKWT-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU';
 	private const VALID_AUTH_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAA';
+	private const VALID_VAPID_PUBLIC_KEY = 'BIcGkq1Ncj3a2-J0UW-1A0NETLjvxZzNLiYBiPVMKNjgwmwPi5jyK87VfS4FZn9n7S9pLMQzjV3LmFuOnRSOvmI';
+
+	public function test_valid_vapid_keys(): void
+	{
+		self::assertTrue(validator::is_valid_vapid_keys(self::VALID_VAPID_PUBLIC_KEY, self::VALID_VAPID_PRIVATE_KEY));
+	}
+
+	public function test_invalid_vapid_keys(): void
+	{
+		self::assertFalse(validator::is_valid_vapid_keys(str_repeat('A', 30), str_repeat('B', 30)));
+	}
 
 	public function valid_key_data(): array
 	{

@@ -110,6 +110,31 @@ namespace phpbb\webpushnotifications\tests\notification
 			self::assertSame([], $method->removed_subscriptions);
 		}
 
+		public function test_invalid_vapid_config_logs_failure_without_throwing(): void
+		{
+			global $config;
+
+			$GLOBALS['phpbb_wpn_test_banned_users'] = [];
+			$log = $this->createMock(\phpbb\log\log_interface::class);
+			$log->expects(self::once())->method('add')->with(
+				'critical',
+				ANONYMOUS,
+				'',
+				'LOG_WEBPUSH_MESSAGE_FAIL',
+				false,
+				self::callback(static function(array $arguments): bool {
+					return isset($arguments[0]) && strpos($arguments[0], 'Public key should be 65 bytes long') !== false;
+				})
+			);
+			$method = $this->create_method($log);
+			$config['wpn_webpush_vapid_public'] = str_repeat('A', 30);
+			$method->add_to_queue($this->create_notification(2));
+
+			$method->send_queued_notifications();
+
+			self::assertSame([], $method->get_queue());
+		}
+
 		private function create_method($log = null, $user_loader = null, $assets_version = 1): testable_webpush
 		{
 			global $config, $phpbb_root_path, $phpEx, $user;

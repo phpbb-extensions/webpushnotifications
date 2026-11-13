@@ -14,12 +14,38 @@ use Base64Url\Base64Url;
 use Brick\Math\BigInteger;
 use Jose\Component\Core\Util\Ecc\NistCurve;
 use Minishlink\WebPush\Utils;
+use Minishlink\WebPush\VAPID;
 
 /**
  * Web Push subscription key validator
  */
 class validator
 {
+	/**
+	 * Validate VAPID identification keys
+	 *
+	 * @param string $public_key VAPID public key
+	 * @param string $private_key VAPID private key
+	 * @return bool
+	 */
+	public static function is_valid_vapid_keys(string $public_key, string $private_key): bool
+	{
+		try
+		{
+			VAPID::validate([
+				'subject' => 'https://example.com',
+				'publicKey' => $public_key,
+				'privateKey' => $private_key,
+			]);
+
+			return true;
+		}
+		catch (\Throwable $exception)
+		{
+			return false;
+		}
+	}
+
 	/**
 	 * Check that an endpoint is a plain HTTPS URL with a well-formed hostname
 	 *

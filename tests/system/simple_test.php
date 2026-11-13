@@ -70,6 +70,25 @@ class simple_test extends \phpbb_test_case
 	{
 		self::assertSame('A&B "quote"', \phpbb\webpushnotifications\ext::decode_entities('A&amp;B &quot;quote&quot;', ENT_QUOTES));
 	}
+
+	public function mcp_log_language_data(): array
+	{
+		return [
+			'English' => ['en', '<strong>Removed Web Push subscription:</strong><br>» %s'],
+			'Russian' => ['ru', '<strong>Удалена подписка на браузерные push—уведомления:</strong><br>» %s'],
+		];
+	}
+
+	/**
+	 * @dataProvider mcp_log_language_data
+	 */
+	public function test_mcp_log_language(string $language, string $expected): void
+	{
+		$lang = [];
+		include __DIR__ . '/../../language/' . $language . '/info_mcp_webpushnotifications.php';
+
+		self::assertSame($expected, $lang['LOG_WEBPUSH_SUBSCRIPTION_REMOVED']);
+	}
 }
 
 class testable_ext extends \phpbb\webpushnotifications\ext

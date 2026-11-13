@@ -241,7 +241,17 @@ class webpush extends base implements extended_method_interface
 			],
 		];
 
-		$web_push = new \Minishlink\WebPush\WebPush($auth);
+		try
+		{
+			$web_push = new \Minishlink\WebPush\WebPush($auth);
+		}
+		catch (\Throwable $exception)
+		{
+			$this->log->add('critical', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$exception->getMessage()]);
+			$this->empty_queue();
+			$this->remove_invalid_subscriptions($invalid_subscriptions);
+			return;
+		}
 
 		$number_of_notifications = 0;
 

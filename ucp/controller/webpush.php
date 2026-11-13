@@ -248,10 +248,16 @@ class webpush
 	{
 		$row_data = json_decode($notification_data, true);
 
-		// Old notification data is pre-parsed and just needs to be returned
+		// Old notification data is pre-parsed, but its URL is relative to the board root.
 		if (isset($row_data['heading']))
 		{
-			return $notification_data;
+			if (is_string($row_data['url'] ?? null) && parse_url($row_data['url'], PHP_URL_SCHEME) === null)
+			{
+				$relative_url = ltrim($row_data['url'], '/');
+				$row_data['url'] = $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $relative_url);
+			}
+
+			return json_encode($row_data);
 		}
 
 		// Get notification from row_data
@@ -531,7 +537,7 @@ class webpush
 	}
 
 	/**
-	 * Returns the board url (and caches it in the function)
+	 * Returns the board URL
 	 *
 	 * @return string the generated board url
 	 */

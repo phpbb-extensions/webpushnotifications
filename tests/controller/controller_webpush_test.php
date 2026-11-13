@@ -68,6 +68,12 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->config = new \phpbb\config\config([
 			'allow_nocensors'	=> false,
 			'sitename'			=> 'yourdomain.com',
+			'force_server_vars'	=> true,
+			'server_protocol'	=> 'http://',
+			'server_name'		=> 'localhost',
+			'server_port'		=> 80,
+			'script_path'		=> '/phpBB',
+			'cookie_secure'		=> false,
 		]);
 		$config = $this->config;
 		$this->controller_helper = $this->createMock(\phpbb\controller\helper::class);
@@ -151,7 +157,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'heading' => 'yourdomain.com',
 			'title' => 'Quoted by Guest in:',
 			'text' => '"Welcome to phpBB"',
-			'url' => 'phpBB/viewtopic.php?p=1#p1',
+			'url' => 'http://localhost/phpBB/viewtopic.php?p=1#p1',
 			'avatar' => ['src' => ''],
 		];
 	}
@@ -318,6 +324,32 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$response_data = json_decode($json_response->getContent(), true);
 
 		$this->assertEquals($this->getExpectedResponse(), $response_data);
+	}
+
+	public function legacy_notification_url_data(): array
+	{
+		return [
+			'board relative' => ['./viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
+			'leading slash' => ['/viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
+			'absolute HTTPS' => ['https://example.com/viewtopic.php?p=1', 'https://example.com/viewtopic.php?p=1'],
+			'absolute HTTP' => ['http://example.com/viewtopic.php?p=1', 'http://example.com/viewtopic.php?p=1'],
+			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
+		];
+	}
+
+	/**
+	 * @dataProvider legacy_notification_url_data
+	 */
+	public function test_legacy_notification_urls_are_normalized(string $url, string $expected): void
+	{
+		$method = new ReflectionMethod($this->controller, 'get_notification_data');
+		$method->setAccessible(true);
+		$data = json_decode($method->invoke($this->controller, json_encode([
+			'heading' => 'Board',
+			'url' => $url,
+		])), true);
+
+		self::assertSame($expected, $data['url']);
 	}
 
 	/**

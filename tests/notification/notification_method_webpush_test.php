@@ -879,36 +879,34 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 	}
 
 	/**
-	 * Test is_subscription_unauthorized method with various HTTP status codes
+	 * Authentication failures retain subscription ownership while expired subscriptions are removed
 	 */
-	public function test_is_subscription_unauthorized(): void
+	public function test_should_remove_subscription(): void
 	{
-		$reflection = new \ReflectionMethod($this->notification_method_webpush, 'is_subscription_unauthorized');
+		$reflection = new \ReflectionMethod($this->notification_method_webpush, 'should_remove_subscription');
 		$reflection->setAccessible(true);
 
-		// Test 401 status (should return true)
+		// 401/403 identify VAPID authentication failures, not expired endpoints.
 		$response_401 = $this->createMockResponse(401);
 		$request_401 = $this->createMockRequest();
 		$report_401 = new \Minishlink\WebPush\MessageSentReport($request_401, $response_401, false, 'Unauthorized');
-		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_401), 'Expected 401 to be treated as unauthorized');
+		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_401), 'Expected 401 subscription ownership to be retained');
 
-		// Test 403 status (should return true for invalid VAPID/subscription mismatches)
 		$response_403 = $this->createMockResponse(403);
 		$request_403 = $this->createMockRequest();
 		$report_403 = new \Minishlink\WebPush\MessageSentReport($request_403, $response_403, false, 'Forbidden');
-		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_403), 'Expected 403 to be treated as a permanent authorization failure');
+		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_403), 'Expected 403 subscription ownership to be retained');
 
-		// Test 404 status (should return false, handled by isSubscriptionExpired)
+		// 404/410 identify expired endpoints and remain eligible for cleanup.
 		$response_404 = $this->createMockResponse(404);
 		$request_404 = $this->createMockRequest();
 		$report_404 = new \Minishlink\WebPush\MessageSentReport($request_404, $response_404, false, 'Not Found');
-		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_404), 'Expected 404 to not be treated as unauthorized');
+		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_404), 'Expected 404 subscription to be removed');
 
-		// Test 410 status (should return false, handled by isSubscriptionExpired)
 		$response_410 = $this->createMockResponse(410);
 		$request_410 = $this->createMockRequest();
 		$report_410 = new \Minishlink\WebPush\MessageSentReport($request_410, $response_410, false, 'Gone');
-		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_410), 'Expected 410 to not be treated as unauthorized');
+		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_410), 'Expected 410 subscription to be removed');
 
 		// Test 429 status (should return false, temporary error)
 		$response_429 = $this->createMockResponse(429);

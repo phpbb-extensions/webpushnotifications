@@ -25,7 +25,7 @@
 		</row>
 		<row>
 			<value>2</value>
-			<value><![CDATA[{"heading":"yourdomain.com","title":"Quoted by Guest in:","text":"\"Welcome to phpBB\"","url":"phpBB\/viewtopic.php?p=1#p1","avatar":{"src":""}}]]></value>
+			<value><![CDATA[{"heading":"yourdomain.com","title":"Quoted by Guest in:","text":"\"Welcome to phpBB\"","url":".\/viewtopic.php?p=1#p1","avatar":{"src":""}}]]></value>
 			<value>488c17afe4f18714c235b395e21b78df1c3d78bf1e13d0633ed9425d2eebf967</value>
 			<value>2</value>
 			<value>4</value>

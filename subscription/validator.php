@@ -12,7 +12,9 @@ namespace phpbb\webpushnotifications\subscription;
 
 use Base64Url\Base64Url;
 use Brick\Math\BigInteger;
+use Jose\Component\Core\JWK;
 use Jose\Component\Core\Util\Ecc\NistCurve;
+use Jose\Component\Signature\Algorithm\ES256;
 use Minishlink\WebPush\Utils;
 use Minishlink\WebPush\VAPID;
 
@@ -32,13 +34,30 @@ class validator
 	{
 		try
 		{
-			VAPID::validate([
+			$vapid = VAPID::validate([
 				'subject' => 'https://example.com',
 				'publicKey' => $public_key,
 				'privateKey' => $private_key,
 			]);
 
-			return true;
+			if (!self::is_valid($public_key, Base64Url::encode(substr($vapid['privateKey'], 0, 16))))
+			{
+				return false;
+			}
+
+			[$x, $y] = Utils::unserializePublicKey($vapid['publicKey']);
+			$key = new JWK([
+				'kty' => 'EC',
+				'crv' => 'P-256',
+				'x' => Base64Url::encode($x),
+				'y' => Base64Url::encode($y),
+				'd' => Base64Url::encode($vapid['privateKey']),
+			]);
+			$algorithm = new ES256();
+			$input = 'phpBB VAPID key pair validation';
+			$signature = $algorithm->sign($key, $input);
+
+			return $algorithm->verify($key, $input, $signature);
 		}
 		catch (\Throwable $exception)
 		{

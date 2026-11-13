@@ -10,6 +10,7 @@
 
 namespace phpbb\webpushnotifications\tests\subscription;
 
+use Base64Url\Base64Url;
 use phpbb\webpushnotifications\subscription\validator;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -29,6 +30,23 @@ class validator_test extends \phpbb_test_case
 	public function test_invalid_vapid_keys(): void
 	{
 		self::assertFalse(validator::is_valid_vapid_keys(str_repeat('A', 30), str_repeat('B', 30)));
+	}
+
+	public function invalid_vapid_key_data(): array
+	{
+		return [
+			'mismatched pair' => [self::VALID_VAPID_PUBLIC_KEY, 'IE5OYlmfWsMbBU1lzvr0bxrxVAXIteSkAnwGlZIhmRk'],
+			'off-curve public point' => [Base64Url::encode("\x04" . str_repeat("\x00", 64)), self::VALID_VAPID_PRIVATE_KEY],
+			'invalid public encoding' => [str_repeat('*', 87), self::VALID_VAPID_PRIVATE_KEY],
+		];
+	}
+
+	/**
+	 * @dataProvider invalid_vapid_key_data
+	 */
+	public function test_invalid_vapid_public_keys(string $public_key, string $private_key): void
+	{
+		self::assertFalse(validator::is_valid_vapid_keys($public_key, $private_key));
 	}
 
 	public function valid_key_data(): array

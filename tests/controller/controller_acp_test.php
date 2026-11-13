@@ -18,6 +18,7 @@ class controller_acp_test extends \phpbb_test_case
 {
 	private const VALID_VAPID_PUBLIC_KEY = 'BIcGkq1Ncj3a2-J0UW-1A0NETLjvxZzNLiYBiPVMKNjgwmwPi5jyK87VfS4FZn9n7S9pLMQzjV3LmFuOnRSOvmI';
 	private const VALID_VAPID_PRIVATE_KEY = 'SrlbBEVgibWmKHYbDPu4Y2XvDWPjeGcc9fC16jq01xU';
+	private const OTHER_VAPID_PUBLIC_KEY = 'BDnYSJHVZBxq834LqDGr893IfazEez7q-jYH2QBNlT0ji2C9UwGosiqz8Dp_ZN23lqAngBZyRjXVWF4ZLA8X2zI';
 
 	/** @var bool */
 	public static $valid_form = true;
@@ -250,6 +251,21 @@ class controller_acp_test extends \phpbb_test_case
 					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 				],
 				true,
+			],
+			'changed public key requires private key' => [
+				array_merge($valid, [
+					'wpn_webpush_vapid_public' => self::OTHER_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => '',
+				]),
+				[
+					'S_ERROR' => true,
+					'ERROR_MSG' => 'WEBPUSH_VAPID_KEYS_INVALID',
+				],
+				[
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
+				],
+				false,
 			],
 			'invalid enabled VAPID keys are rejected' => [
 				array_merge($valid, [

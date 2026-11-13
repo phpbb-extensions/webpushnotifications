@@ -211,15 +211,17 @@ class webpush extends base implements extended_method_interface
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);
 		$invalid_subscriptions = [];
 
-		// Validate each stored subscription once so malformed keys cannot interrupt the delivery batch.
+		// Validate each stored subscription once so malformed data cannot interrupt the delivery batch.
 		foreach ($user_subscription_map as $user_id => $subscriptions)
 		{
 			$valid_subscriptions = [];
 			$user = $this->user_loader->get_user($user_id);
 			foreach ($subscriptions as $subscription)
 			{
-				if (!is_string($subscription['p256dh'] ?? null)
+				if (!is_string($subscription['endpoint'] ?? null)
+					|| !is_string($subscription['p256dh'] ?? null)
 					|| !is_string($subscription['auth'] ?? null)
+					|| !$this->is_valid_endpoint_url($subscription['endpoint'])
 					|| !subscription_validator::is_valid($subscription['p256dh'], $subscription['auth']))
 				{
 					$invalid_subscriptions[$subscription['subscription_id']] = $user;
@@ -447,6 +449,18 @@ class webpush extends base implements extended_method_interface
 		$this->db->sql_freeresult($result);
 
 		return $user_subscription_map;
+	}
+
+	/**
+	 * Check whether a stored subscription endpoint is valid for delivery
+	 * Wrapper used here exists only as test seam
+	 *
+	 * @param string $endpoint Push subscription endpoint URL
+	 * @return bool
+	 */
+	protected function is_valid_endpoint_url(string $endpoint): bool
+	{
+		return subscription_validator::is_valid_endpoint_url($endpoint);
 	}
 
 	/**

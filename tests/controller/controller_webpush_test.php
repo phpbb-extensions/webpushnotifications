@@ -579,6 +579,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'no_host'				=> ['not_a_url'],
 			'disallowed_host'		=> ['https://evil.example.com/push/endpoint'],
 			'disallowed_subdomain'	=> ['https://evil.fcm.googleapis.com.attacker.com/push'],
+			'malformed_allowed_suffix' => ['https://evil.example.com\\.push.apple.com/x'],
 			'empty_string'			=> [''],
 		];
 	}
@@ -671,6 +672,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 			['https://evil.example.com/push/endpoint', false],
 			// Invalid: subdomain spoofing
 			['https://evil.fcm.googleapis.com.attacker.com/push', false],
+			// Invalid: malformed host with an allowed suffix
+			['https://evil.example.com\\.push.apple.com/x', false],
 			// Invalid: not a URL
 			['not_a_url', false],
 			// Invalid: bare wildcard domain without subdomain

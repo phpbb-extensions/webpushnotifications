@@ -21,6 +21,25 @@ use Minishlink\WebPush\Utils;
 class validator
 {
 	/**
+	 * Check that an endpoint is a plain HTTPS URL with a well-formed hostname
+	 *
+	 * @param string $endpoint Push subscription endpoint URL
+	 * @return bool
+	 */
+	public static function is_valid_endpoint_url(string $endpoint): bool
+	{
+		$parts = parse_url($endpoint);
+
+		return is_array($parts)
+			&& strtolower($parts['scheme'] ?? '') === 'https'
+			&& !isset($parts['user'])
+			&& !isset($parts['pass'])
+			&& (!isset($parts['port']) || $parts['port'] === 443)
+			&& is_string($parts['host'] ?? null)
+			&& filter_var($parts['host'], FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+	}
+
+	/**
 	 * Validate Web Push subscription keys
 	 *
 	 * @param string $public_key P-256 public key encoded with Base64URL

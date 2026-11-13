@@ -41,6 +41,7 @@ class webpush
 	public const PUSH_SERVICE_WHITELIST = [
 		'android.googleapis.com',
 		'fcm.googleapis.com',
+		'jmt17.google.com',
 		'updates.push.services.mozilla.com',
 		'updates-autopush.stage.mozaws.net',
 		'updates-autopush.dev.mozaws.net',
@@ -305,17 +306,12 @@ class webpush
 	 */
 	public function is_valid_endpoint(string $endpoint): bool
 	{
-		$parts = parse_url($endpoint);
-
-		if (!is_array($parts)
-			|| strtolower($parts['scheme'] ?? '') !== 'https'
-			|| (isset($parts['port']) && $parts['port'] !== 443)
-			|| !is_string($parts['host'] ?? null)
-			|| empty($parts['host']))
+		if (!subscription_validator::is_valid_endpoint_url($endpoint))
 		{
 			return false;
 		}
 
+		$parts = parse_url($endpoint);
 		$host = strtolower($parts['host']);
 
 		if (in_array($host, self::PUSH_SERVICE_WHITELIST, true))

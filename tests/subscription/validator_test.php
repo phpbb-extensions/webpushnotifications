@@ -56,4 +56,27 @@ class validator_test extends \phpbb_test_case
 	{
 		self::assertFalse(validator::is_valid($public_key, $auth_token));
 	}
+
+	public function endpoint_url_data(): array
+	{
+		return [
+			'allowed exact host' => ['https://fcm.googleapis.com/fcm/send/test', true],
+			'allowed wildcard host' => ['https://api.push.apple.com/3/device/test', true],
+			'insecure scheme' => ['http://api.push.apple.com/3/device/test', false],
+			'nonstandard port' => ['https://api.push.apple.com:8443/3/device/test', false],
+			'username' => ['https://user@api.push.apple.com/3/device/test', false],
+			'password' => ['https://user:pass@api.push.apple.com/3/device/test', false],
+			'malformed wildcard host' => ['https://evil.example.com\\.push.apple.com/x', false],
+			'percent-encoded wildcard host' => ['https://evil%2epush.apple.com/x', false],
+			'invalid hostname label' => ['https://-evil.push.apple.com/x', false],
+		];
+	}
+
+	/**
+	 * @dataProvider endpoint_url_data
+	 */
+	public function test_valid_endpoint_url(string $endpoint, bool $expected): void
+	{
+		self::assertSame($expected, validator::is_valid_endpoint_url($endpoint));
+	}
 }

@@ -330,7 +330,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 	{
 		return [
 			'board relative' => ['./viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
-			'leading slash' => ['/viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
+			'origin relative' => ['/viewtopic.php?p=1', 'http://localhost/viewtopic.php?p=1'],
+			'protocol relative' => ['//example.com/viewtopic.php?p=1', 'http://example.com/viewtopic.php?p=1'],
 			'absolute HTTPS' => ['https://example.com/viewtopic.php?p=1', 'https://example.com/viewtopic.php?p=1'],
 			'absolute HTTP' => ['http://example.com/viewtopic.php?p=1', 'http://example.com/viewtopic.php?p=1'],
 			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
@@ -729,6 +730,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 		return [
 			'board relative' => ['viewtopic.php?p=1&amp;x=2', 'http://localhost/phpBB/viewtopic.php?p=1&x=2'],
 			'route relative' => ['./../../../ucp.php?i=pm&amp;p=4', 'http://localhost/phpBB/ucp.php?i=pm&p=4'],
+			'origin relative' => ['/viewtopic.php?p=1', 'http://localhost/viewtopic.php?p=1'],
+			'protocol relative' => ['//example.com/topic/1', 'http://example.com/topic/1'],
 			'absolute HTTPS' => ['https://example.com/topic/1', 'https://example.com/topic/1'],
 			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
 		];

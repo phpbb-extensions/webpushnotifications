@@ -43,12 +43,14 @@ async function settle() {
 	await new Promise(resolve => setImmediate(resolve));
 }
 
-async function runScenario({stored = [], expirationTime = 0, applicationServerKey = [1, 2, 3], click = false}) {
+async function runScenario({stored = [], expirationTime = 0, applicationServerKey = [1, 2, 3], click = false, storageThrows = false}) {
 	const calls = {fetch: 0, subscribe: 0, unsubscribe: 0};
 	const subscribeButton = createButton('subscribe_webpush');
 	const unsubscribeButton = createButton('unsubscribe_webpush');
+	const denyButton = createButton('wpn_popup_deny');
 	subscribeButton.classList.owner = subscribeButton;
 	unsubscribeButton.classList.owner = unsubscribeButton;
+	denyButton.classList.owner = denyButton;
 
 	const popup = {
 		style: {display: 'none'},
@@ -102,7 +104,10 @@ async function runScenario({stored = [], expirationTime = 0, applicationServerKe
 			return null;
 		},
 		getElementById(id) {
-			return id === 'wpn_popup_prompt' ? popup : null;
+			if (id === 'wpn_popup_prompt') {
+				return popup;
+			}
+			return id === 'wpn_popup_deny' ? denyButton : null;
 		},
 		addEventListener() {},
 		removeEventListener() {},
@@ -140,12 +145,21 @@ async function runScenario({stored = [], expirationTime = 0, applicationServerKe
 		},
 		localStorage: {
 			getItem(key) {
+				if (storageThrows) {
+					throw new Error('Browser storage is restricted');
+				}
 				return storage.get(key) || null;
 			},
 			setItem(key, value) {
+				if (storageThrows) {
+					throw new Error('Browser storage is restricted');
+				}
 				storage.set(key, value);
 			},
 			removeItem(key) {
+				if (storageThrows) {
+					throw new Error('Browser storage is restricted');
+				}
 				storage.delete(key);
 			},
 		},
@@ -196,7 +210,7 @@ async function runScenario({stored = [], expirationTime = 0, applicationServerKe
 		await settle();
 	}
 
-	return {calls, popup, subscribeButton, unsubscribeButton};
+	return {calls, popup, subscribeButton, unsubscribeButton, denyButton};
 }
 
 async function run() {
@@ -219,6 +233,18 @@ async function run() {
 
 	const explicit = await runScenario({stored: [], click: true});
 	assert.deepEqual(explicit.calls, {fetch: 1, subscribe: 1, unsubscribe: 1}, 'explicit opt-in may replace foreign subscription');
+
+	const restrictedStorage = await runScenario({stored: [], storageThrows: true});
+	assert.equal(restrictedStorage.popup.style.display, 'flex', 'restricted storage must not interrupt popup initialization');
+	assert.doesNotThrow(() => restrictedStorage.denyButton.listeners.click({
+		stopPropagation() {},
+	}), 'restricted storage must not interrupt popup dismissal');
+	assert.equal(restrictedStorage.popup.style.display, 'none', 'popup must close when denial cannot be stored');
+
+	const restrictedStorageOptIn = await runScenario({stored: [], click: true, storageThrows: true});
+	assert.deepEqual(restrictedStorageOptIn.calls, {fetch: 1, subscribe: 1, unsubscribe: 1}, 'restricted storage must not make successful opt-in fail');
+	assert.equal(restrictedStorageOptIn.subscribeButton.hidden, true, 'successful opt-in must show subscribed state with restricted storage');
+	assert.equal(restrictedStorageOptIn.unsubscribeButton.hidden, false, 'successful opt-in must allow unsubscribe with restricted storage');
 }
 
 run().catch(error => {

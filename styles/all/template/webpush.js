@@ -636,15 +636,27 @@ function PhpbbWebpush() {
 		key: 'wpn_popup_denied',
 
 		set() {
-			localStorage.setItem(this.key, 'true');
+			try {
+				localStorage.setItem(this.key, 'true');
+			} catch (e) {
+				// Browser storage may be disabled or restricted.
+			}
 		},
 
 		get() {
-			return localStorage.getItem(this.key);
+			try {
+				return localStorage.getItem(this.key);
+			} catch (e) {
+				return null;
+			}
 		},
 
 		remove() {
-			localStorage.removeItem(this.key);
+			try {
+				localStorage.removeItem(this.key);
+			} catch (e) {
+				// Browser storage may be disabled or restricted.
+			}
 		}
 	};
 }

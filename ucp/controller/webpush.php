@@ -251,10 +251,9 @@ class webpush
 		// Old notification data is pre-parsed, but its URL is relative to the board root.
 		if (isset($row_data['heading']))
 		{
-			if (is_string($row_data['url'] ?? null) && parse_url($row_data['url'], PHP_URL_SCHEME) === null)
+			if (is_string($row_data['url'] ?? null))
 			{
-				$relative_url = ltrim($row_data['url'], '/');
-				$row_data['url'] = $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $relative_url);
+				$row_data['url'] = $this->normalize_notification_url($row_data['url']);
 			}
 
 			return json_encode($row_data);
@@ -270,9 +269,26 @@ class webpush
 			'heading'	=> ext::decode_entities($this->config['sitename'], ENT_QUOTES),
 			'title'		=> ext::decode_entities(strip_tags($notification->get_title()), ENT_QUOTES),
 			'text'		=> ext::decode_entities(strip_tags($notification->get_reference()), ENT_QUOTES),
-			'url'		=> htmlspecialchars_decode($notification->get_url()),
+			'url'		=> $this->normalize_notification_url(htmlspecialchars_decode($notification->get_url())),
 			'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 		]);
+	}
+
+	/**
+	 * Convert a board-relative notification URL to an absolute URL
+	 *
+	 * @param string $url Notification URL
+	 * @return string
+	 */
+	protected function normalize_notification_url(string $url): string
+	{
+		if (parse_url($url, PHP_URL_SCHEME) !== null)
+		{
+			return $url;
+		}
+
+		$relative_url = ltrim($url, '/');
+		return $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $relative_url);
 	}
 
 	/**

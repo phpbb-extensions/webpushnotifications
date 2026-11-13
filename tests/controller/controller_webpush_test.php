@@ -724,13 +724,26 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals($expected, $this->controller->is_valid_endpoint($endpoint));
 	}
 
-	public function test_current_notification_data_is_rendered(): void
+	public function current_notification_url_data(): array
+	{
+		return [
+			'board relative' => ['viewtopic.php?p=1&amp;x=2', 'http://localhost/phpBB/viewtopic.php?p=1&x=2'],
+			'route relative' => ['./../../../ucp.php?i=pm&amp;p=4', 'http://localhost/phpBB/ucp.php?i=pm&p=4'],
+			'absolute HTTPS' => ['https://example.com/topic/1', 'https://example.com/topic/1'],
+			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
+		];
+	}
+
+	/**
+	 * @dataProvider current_notification_url_data
+	 */
+	public function test_current_notification_data_is_rendered(string $url, string $expected_url): void
 	{
 		$notification = $this->createMock(\phpbb\notification\type\type_interface::class);
 		$notification->method('users_to_query')->willReturn([]);
 		$notification->method('get_title')->willReturn('<strong>Private Message</strong> from Alice &amp; Bob:');
 		$notification->method('get_reference')->willReturn('&quot;She said &quot;hello&quot; &amp; asked about a &lt; b in &lt;div&gt; tags&quot;');
-		$notification->method('get_url')->willReturn('viewtopic.php?p=1&amp;x=2');
+		$notification->method('get_url')->willReturn($url);
 		$notification->method('get_avatar')->willReturn('<img src="phpBB/images/avatar.png" alt="">');
 		$this->notification_manager->expects(self::once())
 			->method('get_item_type_class')
@@ -746,7 +759,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 		self::assertSame('yourdomain.com', $data['heading']);
 		self::assertSame('Private Message from Alice & Bob:', $data['title']);
 		self::assertSame('"She said "hello" & asked about a < b in <div> tags"', $data['text']);
-		self::assertSame('viewtopic.php?p=1&x=2', $data['url']);
+		self::assertSame($expected_url, $data['url']);
 		self::assertStringEndsWith('/images/avatar.png', $data['avatar']['src']);
 	}
 

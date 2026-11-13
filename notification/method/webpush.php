@@ -211,15 +211,17 @@ class webpush extends base implements extended_method_interface
 		$user_subscription_map = $this->get_user_subscription_map($notify_users);
 		$invalid_subscriptions = [];
 
-		// Validate each stored subscription once so malformed keys cannot interrupt the delivery batch.
+		// Validate each stored subscription once so malformed data cannot interrupt the delivery batch.
 		foreach ($user_subscription_map as $user_id => $subscriptions)
 		{
 			$valid_subscriptions = [];
 			$user = $this->user_loader->get_user($user_id);
 			foreach ($subscriptions as $subscription)
 			{
-				if (!is_string($subscription['p256dh'] ?? null)
+				if (!is_string($subscription['endpoint'] ?? null)
+					|| !is_string($subscription['p256dh'] ?? null)
 					|| !is_string($subscription['auth'] ?? null)
+					|| !$this->is_valid_endpoint_url($subscription['endpoint'])
 					|| !subscription_validator::is_valid($subscription['p256dh'], $subscription['auth']))
 				{
 					$invalid_subscriptions[$subscription['subscription_id']] = $user;
@@ -239,7 +241,17 @@ class webpush extends base implements extended_method_interface
 			],
 		];
 
-		$web_push = new \Minishlink\WebPush\WebPush($auth);
+		try
+		{
+			$web_push = new \Minishlink\WebPush\WebPush($auth);
+		}
+		catch (\Throwable $exception)
+		{
+			$this->log->add('critical', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$exception->getMessage()]);
+			$this->empty_queue();
+			$this->remove_invalid_subscriptions($invalid_subscriptions);
+			return;
+		}
 
 		$number_of_notifications = 0;
 
@@ -300,10 +312,10 @@ class webpush extends base implements extended_method_interface
 				if (!$report->isSuccess())
 				{
 					// Fill array of endpoints to remove if subscription has expired or is permanently gone.
-					// Library checks for 404/410; we also check for 401/403 auth failures and endpoints
+					// Library checks for 404/410; we also check endpoints
 					// using the .invalid TLD (e.g. permanently-removed.invalid), which per RFC 6761 are
 					// guaranteed to never resolve and are used as a sentinel for dead subscriptions.
-					if ($report->isSubscriptionExpired() || $this->is_subscription_unauthorized($report) || $this->is_endpoint_permanently_removed($report->getEndpoint()))
+					if ($this->should_remove_subscription($report))
 					{
 						$expired_endpoints[] = $report->getEndpoint();
 					}
@@ -450,6 +462,18 @@ class webpush extends base implements extended_method_interface
 	}
 
 	/**
+	 * Check whether a stored subscription endpoint is valid for delivery
+	 * Wrapper used here exists only as test seam
+	 *
+	 * @param string $endpoint Push subscription endpoint URL
+	 * @return bool
+	 */
+	protected function is_valid_endpoint_url(string $endpoint): bool
+	{
+		return subscription_validator::is_valid_endpoint_url($endpoint);
+	}
+
+	/**
 	 * Remove subscriptions
 	 *
 	 * @param array $subscription_ids Subscription ids to remove
@@ -540,20 +564,19 @@ class webpush extends base implements extended_method_interface
 	}
 
 	/**
-	 * Check if subscription push failed with a permanent authorization error
+	 * Check if a failed subscription should be removed
 	 *
-	 * 401/403 indicate the push service no longer accepts this subscription,
-	 * typically due to revoked credentials, rotated VAPID keys, or the
-	 * subscription no longer being valid for the current credentials.
+	 * Authentication failures are not proof that a subscription expired. In
+	 * particular, a VAPID key rotation returns 401/403 until the browser can
+	 * recreate its subscription, so those rows must remain as ownership records.
 	 *
 	 * @param \Minishlink\WebPush\MessageSentReport $report
 	 *
-	 * @return bool True if subscription returned 401 Unauthorized or 403 Forbidden
+	 * @return bool True if the subscription is expired or permanently gone
 	 */
-	protected function is_subscription_unauthorized(\Minishlink\WebPush\MessageSentReport $report): bool
+	protected function should_remove_subscription(\Minishlink\WebPush\MessageSentReport $report): bool
 	{
-		$response = $report->getResponse();
-		return $response && in_array($response->getStatusCode(), [401, 403], true);
+		return $report->isSubscriptionExpired() || $this->is_endpoint_permanently_removed($report->getEndpoint());
 	}
 
 	/**

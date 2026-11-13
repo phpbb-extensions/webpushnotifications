@@ -68,6 +68,12 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->config = new \phpbb\config\config([
 			'allow_nocensors'	=> false,
 			'sitename'			=> 'yourdomain.com',
+			'force_server_vars'	=> true,
+			'server_protocol'	=> 'http://',
+			'server_name'		=> 'localhost',
+			'server_port'		=> 80,
+			'script_path'		=> '/phpBB',
+			'cookie_secure'		=> false,
 		]);
 		$config = $this->config;
 		$this->controller_helper = $this->createMock(\phpbb\controller\helper::class);
@@ -151,7 +157,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'heading' => 'yourdomain.com',
 			'title' => 'Quoted by Guest in:',
 			'text' => '"Welcome to phpBB"',
-			'url' => 'phpBB/viewtopic.php?p=1#p1',
+			'url' => 'http://localhost/phpBB/viewtopic.php?p=1#p1',
 			'avatar' => ['src' => ''],
 		];
 	}
@@ -320,6 +326,32 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals($this->getExpectedResponse(), $response_data);
 	}
 
+	public function legacy_notification_url_data(): array
+	{
+		return [
+			'board relative' => ['./viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
+			'leading slash' => ['/viewtopic.php?p=1', 'http://localhost/phpBB/viewtopic.php?p=1'],
+			'absolute HTTPS' => ['https://example.com/viewtopic.php?p=1', 'https://example.com/viewtopic.php?p=1'],
+			'absolute HTTP' => ['http://example.com/viewtopic.php?p=1', 'http://example.com/viewtopic.php?p=1'],
+			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
+		];
+	}
+
+	/**
+	 * @dataProvider legacy_notification_url_data
+	 */
+	public function test_legacy_notification_urls_are_normalized(string $url, string $expected): void
+	{
+		$method = new ReflectionMethod($this->controller, 'get_notification_data');
+		$method->setAccessible(true);
+		$data = json_decode($method->invoke($this->controller, json_encode([
+			'heading' => 'Board',
+			'url' => $url,
+		])), true);
+
+		self::assertSame($expected, $data['url']);
+	}
+
 	/**
 	 * @throws SyntaxError
 	 * @throws RuntimeError
@@ -327,17 +359,10 @@ class controller_webpush_test extends \phpbb_database_test_case
 	 */
 	public function test_worker()
 	{
-		$this->config['force_server_vars'] = true;
-		$this->config['server_protocol'] = 'https://';
-		$this->config['server_name'] = 'example.com';
-		$this->config['server_port'] = 443;
-		$this->config['script_path'] = '/forum';
-		$this->config['cookie_secure'] = true;
 		$this->template->expects(self::once())
 			->method('render')
 			->with('@phpbb_webpushnotifications/push_worker.js.twig', [
 				'U_WEBPUSH_GET_NOTIFICATION' => 'test_route',
-				'U_BOARD_URL' => 'https://example.com/forum',
 				'ASSETS_VERSION' => '1.0',
 			])
 			->willReturn('rendered_content');
@@ -586,6 +611,7 @@ class controller_webpush_test extends \phpbb_database_test_case
 			'no_host'				=> ['not_a_url'],
 			'disallowed_host'		=> ['https://evil.example.com/push/endpoint'],
 			'disallowed_subdomain'	=> ['https://evil.fcm.googleapis.com.attacker.com/push'],
+			'malformed_allowed_suffix' => ['https://evil.example.com\\.push.apple.com/x'],
 			'empty_string'			=> [''],
 		];
 	}
@@ -678,6 +704,8 @@ class controller_webpush_test extends \phpbb_database_test_case
 			['https://evil.example.com/push/endpoint', false],
 			// Invalid: subdomain spoofing
 			['https://evil.fcm.googleapis.com.attacker.com/push', false],
+			// Invalid: malformed host with an allowed suffix
+			['https://evil.example.com\\.push.apple.com/x', false],
 			// Invalid: not a URL
 			['not_a_url', false],
 			// Invalid: bare wildcard domain without subdomain
@@ -696,13 +724,26 @@ class controller_webpush_test extends \phpbb_database_test_case
 		$this->assertEquals($expected, $this->controller->is_valid_endpoint($endpoint));
 	}
 
-	public function test_current_notification_data_is_rendered(): void
+	public function current_notification_url_data(): array
+	{
+		return [
+			'board relative' => ['viewtopic.php?p=1&amp;x=2', 'http://localhost/phpBB/viewtopic.php?p=1&x=2'],
+			'route relative' => ['./../../../ucp.php?i=pm&amp;p=4', 'http://localhost/phpBB/ucp.php?i=pm&p=4'],
+			'absolute HTTPS' => ['https://example.com/topic/1', 'https://example.com/topic/1'],
+			'unsafe scheme unchanged for worker rejection' => ['javascript:alert(1)', 'javascript:alert(1)'],
+		];
+	}
+
+	/**
+	 * @dataProvider current_notification_url_data
+	 */
+	public function test_current_notification_data_is_rendered(string $url, string $expected_url): void
 	{
 		$notification = $this->createMock(\phpbb\notification\type\type_interface::class);
 		$notification->method('users_to_query')->willReturn([]);
-		$notification->method('get_title')->willReturn('A &amp; <b>title</b>');
-		$notification->method('get_reference')->willReturn('A &quot;reference&quot;');
-		$notification->method('get_url')->willReturn('viewtopic.php?p=1&amp;x=2');
+		$notification->method('get_title')->willReturn('<strong>Private Message</strong> from Alice &amp; Bob:');
+		$notification->method('get_reference')->willReturn('&quot;She said &quot;hello&quot; &amp; asked about a &lt; b in &lt;div&gt; tags&quot;');
+		$notification->method('get_url')->willReturn($url);
 		$notification->method('get_avatar')->willReturn('<img src="phpBB/images/avatar.png" alt="">');
 		$this->notification_manager->expects(self::once())
 			->method('get_item_type_class')
@@ -716,9 +757,9 @@ class controller_webpush_test extends \phpbb_database_test_case
 		])), true);
 
 		self::assertSame('yourdomain.com', $data['heading']);
-		self::assertSame('A & title', $data['title']);
-		self::assertSame('A &quot;reference&quot;', $data['text']);
-		self::assertSame('viewtopic.php?p=1&x=2', $data['url']);
+		self::assertSame('Private Message from Alice & Bob:', $data['title']);
+		self::assertSame('"She said "hello" & asked about a < b in <div> tags"', $data['text']);
+		self::assertSame($expected_url, $data['url']);
 		self::assertStringEndsWith('/images/avatar.png', $data['avatar']['src']);
 	}
 

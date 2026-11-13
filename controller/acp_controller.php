@@ -21,6 +21,7 @@ use phpbb\symfony_request;
 use phpbb\template\template;
 use phpbb\user;
 use phpbb\webpushnotifications\ext;
+use phpbb\webpushnotifications\subscription\validator as subscription_validator;
 
 class acp_controller
 {
@@ -223,6 +224,15 @@ class acp_controller
 		{
 			// Validate config values
 			validate_config_vars($display_settings, $config_array, $this->errors);
+
+			if (empty($this->errors)
+				&& !subscription_validator::is_valid_vapid_keys(
+					$config_array['wpn_webpush_vapid_public'] ?? '',
+					$config_array['wpn_webpush_vapid_private'] ?? $this->config['wpn_webpush_vapid_private']
+				))
+			{
+				$this->errors[] = $this->lang->lang('WEBPUSH_VAPID_KEYS_INVALID');
+			}
 		}
 
 		if ($this->display_errors())

@@ -140,6 +140,11 @@ function PhpbbWebpush() {
 				return;
 			}
 
+			// A subscription this account does not own was made by another member on this browser.
+			if (!subscriptions.some(stored => stored.endpoint === subscription.endpoint)) {
+				return;
+			}
+
 			if (shouldRefreshSubscription(subscription)) {
 				await refreshSubscription(registration, subscription);
 				return;

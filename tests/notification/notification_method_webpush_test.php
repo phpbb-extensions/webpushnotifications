@@ -151,7 +151,7 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$phpbb_container->setParameter('tables.phpbb.wpn.notification_push', 'phpbb_wpn_notification_push');
 		$phpbb_container->setParameter('tables.phpbb.wpn.push_subscriptions', 'phpbb_wpn_push_subscriptions');
 
-		$this->notification_method_webpush = new webpush(
+		$this->notification_method_webpush = new integration_testable_webpush(
 			$phpbb_container->get('config'),
 			$phpbb_container->get('dbal.conn'),
 			$phpbb_container->get('log'),
@@ -787,6 +787,40 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 		$this->db->sql_freeresult($result);
 	}
 
+	public function test_malformed_endpoint_does_not_interrupt_other_users_delivery(): void
+	{
+		$malformed_subscription = $this->create_subscription_for_user(2);
+		$valid_subscription = $this->create_subscription_for_user(3);
+		$push_subscriptions_table = $this->container->getParameter('tables.phpbb.wpn.push_subscriptions');
+		$malformed_endpoint = 'https://evil.example.com\\.push.apple.com/x';
+
+		$sql = 'UPDATE ' . $push_subscriptions_table . "
+			SET endpoint = '" . $this->db->sql_escape($malformed_endpoint) . "'
+			WHERE endpoint = '" . $this->db->sql_escape($malformed_subscription['endpoint']) . "'";
+		$this->db->sql_query($sql);
+
+		$this->notifications->add_notifications('notification.type.post', [
+			'post_time' => 1349413322,
+			'poster_id' => 1,
+			'topic_title' => '',
+			'post_subject' => '',
+			'post_username' => '',
+			'forum_name' => '',
+			'forum_id' => '1',
+			'post_id' => '2',
+			'topic_id' => '1',
+		]);
+
+		$this->assertNotEmpty($this->get_messages_for_subscription($valid_subscription['clientHash']));
+
+		$sql = 'SELECT COUNT(*) AS subscription_count
+			FROM ' . $push_subscriptions_table . "
+			WHERE endpoint = '" . $this->db->sql_escape($malformed_endpoint) . "'";
+		$result = $this->db->sql_query($sql);
+		$this->assertSame(0, (int) $this->db->sql_fetchfield('subscription_count'));
+		$this->db->sql_freeresult($result);
+	}
+
 	public function test_get_ucp_template_data_uses_millisecond_expiration_time(): void
 	{
 		$this->user->data['user_id'] = 2;
@@ -845,36 +879,34 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 	}
 
 	/**
-	 * Test is_subscription_unauthorized method with various HTTP status codes
+	 * Authentication failures retain subscription ownership while expired subscriptions are removed
 	 */
-	public function test_is_subscription_unauthorized(): void
+	public function test_should_remove_subscription(): void
 	{
-		$reflection = new \ReflectionMethod($this->notification_method_webpush, 'is_subscription_unauthorized');
+		$reflection = new \ReflectionMethod($this->notification_method_webpush, 'should_remove_subscription');
 		$reflection->setAccessible(true);
 
-		// Test 401 status (should return true)
+		// 401/403 identify VAPID authentication failures, not expired endpoints.
 		$response_401 = $this->createMockResponse(401);
 		$request_401 = $this->createMockRequest();
 		$report_401 = new \Minishlink\WebPush\MessageSentReport($request_401, $response_401, false, 'Unauthorized');
-		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_401), 'Expected 401 to be treated as unauthorized');
+		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_401), 'Expected 401 subscription ownership to be retained');
 
-		// Test 403 status (should return true for invalid VAPID/subscription mismatches)
 		$response_403 = $this->createMockResponse(403);
 		$request_403 = $this->createMockRequest();
 		$report_403 = new \Minishlink\WebPush\MessageSentReport($request_403, $response_403, false, 'Forbidden');
-		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_403), 'Expected 403 to be treated as a permanent authorization failure');
+		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_403), 'Expected 403 subscription ownership to be retained');
 
-		// Test 404 status (should return false, handled by isSubscriptionExpired)
+		// 404/410 identify expired endpoints and remain eligible for cleanup.
 		$response_404 = $this->createMockResponse(404);
 		$request_404 = $this->createMockRequest();
 		$report_404 = new \Minishlink\WebPush\MessageSentReport($request_404, $response_404, false, 'Not Found');
-		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_404), 'Expected 404 to not be treated as unauthorized');
+		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_404), 'Expected 404 subscription to be removed');
 
-		// Test 410 status (should return false, handled by isSubscriptionExpired)
 		$response_410 = $this->createMockResponse(410);
 		$request_410 = $this->createMockRequest();
 		$report_410 = new \Minishlink\WebPush\MessageSentReport($request_410, $response_410, false, 'Gone');
-		$this->assertFalse($reflection->invoke($this->notification_method_webpush, $report_410), 'Expected 410 to not be treated as unauthorized');
+		$this->assertTrue($reflection->invoke($this->notification_method_webpush, $report_410), 'Expected 410 subscription to be removed');
 
 		// Test 429 status (should return false, temporary error)
 		$response_429 = $this->createMockResponse(429);
@@ -1330,5 +1362,14 @@ class notification_method_webpush_test extends \phpbb_tests_notification_base
 			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_wpn_push_subscriptions')),
 			$this->db->sql_fetchrowset($this->db->sql_query('SELECT * FROM phpbb_push_subscriptions'))
 		);
+	}
+}
+
+class integration_testable_webpush extends webpush
+{
+	protected function is_valid_endpoint_url(string $endpoint): bool
+	{
+		return strpos($endpoint, 'http://localhost:9012/notify/') === 0
+			|| parent::is_valid_endpoint_url($endpoint);
 	}
 }

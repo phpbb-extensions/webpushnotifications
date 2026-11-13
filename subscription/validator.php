@@ -12,14 +12,78 @@ namespace phpbb\webpushnotifications\subscription;
 
 use Base64Url\Base64Url;
 use Brick\Math\BigInteger;
+use Jose\Component\Core\JWK;
 use Jose\Component\Core\Util\Ecc\NistCurve;
+use Jose\Component\Signature\Algorithm\ES256;
 use Minishlink\WebPush\Utils;
+use Minishlink\WebPush\VAPID;
 
 /**
  * Web Push subscription key validator
  */
 class validator
 {
+	/**
+	 * Validate VAPID identification keys
+	 *
+	 * @param string $public_key VAPID public key
+	 * @param string $private_key VAPID private key
+	 * @return bool
+	 */
+	public static function is_valid_vapid_keys(string $public_key, string $private_key): bool
+	{
+		try
+		{
+			$vapid = VAPID::validate([
+				'subject' => 'https://example.com',
+				'publicKey' => $public_key,
+				'privateKey' => $private_key,
+			]);
+
+			if (!self::is_valid($public_key, Base64Url::encode(substr($vapid['privateKey'], 0, 16))))
+			{
+				return false;
+			}
+
+			[$x, $y] = Utils::unserializePublicKey($vapid['publicKey']);
+			$key = new JWK([
+				'kty' => 'EC',
+				'crv' => 'P-256',
+				'x' => Base64Url::encode($x),
+				'y' => Base64Url::encode($y),
+				'd' => Base64Url::encode($vapid['privateKey']),
+			]);
+			$algorithm = new ES256();
+			$input = 'phpBB VAPID key pair validation';
+			$signature = $algorithm->sign($key, $input);
+
+			return $algorithm->verify($key, $input, $signature);
+		}
+		catch (\Throwable $exception)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Check that an endpoint is a plain HTTPS URL with a well-formed hostname
+	 *
+	 * @param string $endpoint Push subscription endpoint URL
+	 * @return bool
+	 */
+	public static function is_valid_endpoint_url(string $endpoint): bool
+	{
+		$parts = parse_url($endpoint);
+
+		return is_array($parts)
+			&& strtolower($parts['scheme'] ?? '') === 'https'
+			&& !isset($parts['user'])
+			&& !isset($parts['pass'])
+			&& (!isset($parts['port']) || $parts['port'] === 443)
+			&& is_string($parts['host'] ?? null)
+			&& filter_var($parts['host'], FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+	}
+
 	/**
 	 * Validate Web Push subscription keys
 	 *

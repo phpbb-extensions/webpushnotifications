@@ -16,6 +16,10 @@ require_once __DIR__ . '/../../../../../includes/functions_acp.php';
 
 class controller_acp_test extends \phpbb_test_case
 {
+	private const VALID_VAPID_PUBLIC_KEY = 'BIcGkq1Ncj3a2-J0UW-1A0NETLjvxZzNLiYBiPVMKNjgwmwPi5jyK87VfS4FZn9n7S9pLMQzjV3LmFuOnRSOvmI';
+	private const VALID_VAPID_PRIVATE_KEY = 'SrlbBEVgibWmKHYbDPu4Y2XvDWPjeGcc9fC16jq01xU';
+	private const OTHER_VAPID_PUBLIC_KEY = 'BDnYSJHVZBxq834LqDGr893IfazEez7q-jYH2QBNlT0ji2C9UwGosiqz8Dp_ZN23lqAngBZyRjXVWF4ZLA8X2zI';
+
 	/** @var bool */
 	public static $valid_form = true;
 
@@ -213,8 +217,8 @@ class controller_acp_test extends \phpbb_test_case
 	{
 		$valid = [
 			'wpn_webpush_enable' => 1,
-			'wpn_webpush_vapid_public' => str_repeat('a', 25),
-			'wpn_webpush_vapid_private' => str_repeat('b', 25),
+			'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+			'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 			'wpn_webpush_dropdown_subscribe' => 1,
 			'wpn_webpush_method_enabled' => 0,
 			'wpn_webpush_popup_prompt' => 1,
@@ -228,8 +232,8 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => '',
 				],
 				[
-					'wpn_webpush_vapid_public' => str_repeat('a', 25),
-					'wpn_webpush_vapid_private' => str_repeat('b', 25),
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 					'wpn_webpush_method_enabled' => 0,
 				],
 				true,
@@ -243,10 +247,25 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => '',
 				],
 				[
-					'wpn_webpush_vapid_public' => str_repeat('a', 25),
-					'wpn_webpush_vapid_private' => 'existing-private-key',
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 				],
 				true,
+			],
+			'changed public key requires private key' => [
+				array_merge($valid, [
+					'wpn_webpush_vapid_public' => self::OTHER_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => '',
+				]),
+				[
+					'S_ERROR' => true,
+					'ERROR_MSG' => 'WEBPUSH_VAPID_KEYS_INVALID',
+				],
+				[
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
+				],
+				false,
 			],
 			'invalid enabled VAPID keys are rejected' => [
 				array_merge($valid, [
@@ -258,8 +277,23 @@ class controller_acp_test extends \phpbb_test_case
 					'ERROR_MSG' => 'SETTING_TOO_SHORT<br>SETTING_TOO_SHORT',
 				],
 				[
-					'wpn_webpush_vapid_public' => 'existing-public-key',
-					'wpn_webpush_vapid_private' => 'existing-private-key',
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
+				],
+				false,
+			],
+			'invalid VAPID key encoding is rejected' => [
+				array_merge($valid, [
+					'wpn_webpush_vapid_public' => str_repeat('A', 30),
+					'wpn_webpush_vapid_private' => str_repeat('B', 30),
+				]),
+				[
+					'S_ERROR' => true,
+					'ERROR_MSG' => 'WEBPUSH_VAPID_KEYS_INVALID',
+				],
+				[
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 				],
 				false,
 			],
@@ -276,7 +310,7 @@ class controller_acp_test extends \phpbb_test_case
 				[
 					'wpn_webpush_enable' => 0,
 					'wpn_webpush_vapid_public' => '',
-					'wpn_webpush_vapid_private' => 'existing-private-key',
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
 				],
 				true,
 			],
@@ -288,8 +322,8 @@ class controller_acp_test extends \phpbb_test_case
 	 */
 	public function test_save_settings_validates_and_persists_webpush_config(array $input, array $error_vars, array $expected_config, $expect_saved): void
 	{
-		$this->config['wpn_webpush_vapid_public'] = 'existing-public-key';
-		$this->config['wpn_webpush_vapid_private'] = 'existing-private-key';
+		$this->config['wpn_webpush_vapid_public'] = self::VALID_VAPID_PUBLIC_KEY;
+		$this->config['wpn_webpush_vapid_private'] = self::VALID_VAPID_PRIVATE_KEY;
 
 		$this->request->method('variable')
 			->with('config', ['' => ''], true)

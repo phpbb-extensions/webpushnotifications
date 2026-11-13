@@ -53,6 +53,7 @@ $lang = array_merge($lang, [
 	'WEBPUSH_ROTATE_VAPID_KEYS_CONFIRM'=> 'Saving new keys will invalidate all existing Web Push subscriptions. Users will not receive Web Push notifications until their next visit to the board, when their subscriptions will be recreated.',
 	'WEBPUSH_VAPID_KEYS_GENERATED'=> 'New key pair generated. Submit this form to activate it.',
 	'WEBPUSH_VAPID_KEYS_GENERATION_FAILED'=> 'Could not generate a key pair in this browser. Enter a valid pair manually or try a supported browser.',
+	'WEBPUSH_VAPID_KEYS_INVALID'	=> 'The VAPID identification keys are invalid.',
 	'WEBPUSH_VAPID_ROTATION_WARNING'=> '<strong>Important:</strong> Changing either key invalidates all existing Web Push subscriptions.',
 	'WEBPUSH_VAPID_PUBLIC'			=> 'Server identification public key',
 	'WEBPUSH_VAPID_PUBLIC_EXPLAIN'	=> 'Shared with push services to authenticate messages sent from your board.',

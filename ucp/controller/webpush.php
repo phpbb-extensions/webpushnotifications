@@ -41,6 +41,7 @@ class webpush
 	public const PUSH_SERVICE_WHITELIST = [
 		'android.googleapis.com',
 		'fcm.googleapis.com',
+		'jmt17.google.com',
 		'updates.push.services.mozilla.com',
 		'updates-autopush.stage.mozaws.net',
 		'updates-autopush.dev.mozaws.net',
@@ -247,10 +248,15 @@ class webpush
 	{
 		$row_data = json_decode($notification_data, true);
 
-		// Old notification data is pre-parsed and just needs to be returned
+		// Old notification data is pre-parsed, but its URL is relative to the board root.
 		if (isset($row_data['heading']))
 		{
-			return $notification_data;
+			if (is_string($row_data['url'] ?? null))
+			{
+				$row_data['url'] = $this->normalize_notification_url($row_data['url']);
+			}
+
+			return json_encode($row_data);
 		}
 
 		// Get notification from row_data
@@ -261,11 +267,28 @@ class webpush
 
 		return json_encode([
 			'heading'	=> ext::decode_entities($this->config['sitename'], ENT_QUOTES),
-			'title'		=> strip_tags(ext::decode_entities($notification->get_title())),
-			'text'		=> strip_tags(ext::decode_entities($notification->get_reference())),
-			'url'		=> htmlspecialchars_decode($notification->get_url()),
+			'title'		=> ext::decode_entities(strip_tags($notification->get_title()), ENT_QUOTES),
+			'text'		=> ext::decode_entities(strip_tags($notification->get_reference()), ENT_QUOTES),
+			'url'		=> $this->normalize_notification_url(htmlspecialchars_decode($notification->get_url())),
 			'avatar'	=> $this->prepare_avatar($notification->get_avatar()),
 		]);
+	}
+
+	/**
+	 * Convert a board-relative notification URL to an absolute URL
+	 *
+	 * @param string $url Notification URL
+	 * @return string
+	 */
+	protected function normalize_notification_url(string $url): string
+	{
+		if (parse_url($url, PHP_URL_SCHEME) !== null)
+		{
+			return $url;
+		}
+
+		$relative_url = ltrim($url, '/');
+		return $this->get_board_url() . preg_replace('#^(?:(?:\.\.?)/)+#', '', $relative_url);
 	}
 
 	/**
@@ -280,7 +303,6 @@ class webpush
 	{
 		$content = $this->template->render('@phpbb_webpushnotifications/push_worker.js.twig', [
 			'U_WEBPUSH_GET_NOTIFICATION'	=> $this->controller_helper->route('phpbb_webpushnotifications_ucp_push_get_notification_controller'),
-			'U_BOARD_URL'					=> generate_board_url(),
 			'ASSETS_VERSION'				=> $this->config['assets_version'],
 		]);
 
@@ -306,17 +328,12 @@ class webpush
 	 */
 	public function is_valid_endpoint(string $endpoint): bool
 	{
-		$parts = parse_url($endpoint);
-
-		if (!is_array($parts)
-			|| strtolower($parts['scheme'] ?? '') !== 'https'
-			|| (isset($parts['port']) && $parts['port'] !== 443)
-			|| !is_string($parts['host'] ?? null)
-			|| empty($parts['host']))
+		if (!subscription_validator::is_valid_endpoint_url($endpoint))
 		{
 			return false;
 		}
 
+		$parts = parse_url($endpoint);
 		$host = strtolower($parts['host']);
 
 		if (in_array($host, self::PUSH_SERVICE_WHITELIST, true))
@@ -536,7 +553,7 @@ class webpush
 	}
 
 	/**
-	 * Returns the board url (and caches it in the function)
+	 * Returns the board URL
 	 *
 	 * @return string the generated board url
 	 */

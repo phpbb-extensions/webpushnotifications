@@ -304,6 +304,7 @@ class webpush extends base implements extended_method_interface
 
 		// List to fill with expired subscriptions based on return
 		$expired_endpoints = [];
+		$delivery_failures = [];
 
 		try
 		{
@@ -321,8 +322,7 @@ class webpush extends base implements extended_method_interface
 					}
 					else
 					{
-						$report_data = json_sanitizer::sanitize($report->jsonSerialize());
-						$this->log->add('admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$report_data['reason']]);
+						$this->add_delivery_failure($delivery_failures, $report);
 					}
 				}
 			}
@@ -331,6 +331,8 @@ class webpush extends base implements extended_method_interface
 		{
 			$this->log->add('critical', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$exception->getMessage()]);
 		}
+
+		$this->log_delivery_failures($delivery_failures);
 
 		// We're done, empty the queue
 		$this->empty_queue();
@@ -595,5 +597,46 @@ class webpush extends base implements extended_method_interface
 	{
 		$host = parse_url($endpoint, PHP_URL_HOST);
 		return is_string($host) && substr($host, -strlen('.invalid')) === '.invalid';
+	}
+
+	/**
+	 * Group a delivery failure by response category
+	 *
+	 * @param array $failures Grouped delivery failures
+	 * @param \Minishlink\WebPush\MessageSentReport $report Failed delivery report
+	 * @return void
+	 */
+	protected function add_delivery_failure(array &$failures, \Minishlink\WebPush\MessageSentReport $report): void
+	{
+		$response = $report->getResponse();
+		$category = $response ? 'http:' . $response->getStatusCode() : 'network';
+
+		if (!isset($failures[$category]))
+		{
+			$report_data = json_sanitizer::sanitize(['reason' => $report->getReason()]);
+			$failures[$category] = [
+				'count' => 0,
+				'reason' => (string) ($report_data['reason'] ?? ''),
+			];
+		}
+
+		$failures[$category]['count']++;
+	}
+
+	/**
+	 * Log delivery failures once per response category
+	 *
+	 * @param array $failures Grouped delivery failures
+	 * @return void
+	 */
+	protected function log_delivery_failures(array $failures): void
+	{
+		foreach ($failures as $failure)
+		{
+			$reason = $failure['count'] > 1
+				? $failure['count'] . ' × ' . $failure['reason']
+				: $failure['reason'];
+			$this->log->add('admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, [$reason]);
+		}
 	}
 }

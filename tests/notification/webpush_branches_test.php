@@ -135,6 +135,64 @@ namespace phpbb\webpushnotifications\tests\notification
 			self::assertSame([], $method->get_queue());
 		}
 
+		public function test_delivery_failures_are_logged_once_per_category(): void
+		{
+			$log = $this->createMock(\phpbb\log\log_interface::class);
+			$log->expects(self::exactly(3))->method('add')->withConsecutive(
+				['admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, ['3 × Unauthorized']],
+				['admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, ['2 × Forbidden']],
+				['admin', ANONYMOUS, '', 'LOG_WEBPUSH_MESSAGE_FAIL', false, ['2 × DNS failure one']]
+			);
+			$method = $this->create_method($log);
+			$reports = [
+				$this->create_failed_report(401, 'Unauthorized'),
+				$this->create_failed_report(401, 'Unauthorized again'),
+				$this->create_failed_report(401, 'Unauthorized once more'),
+				$this->create_failed_report(403, 'Forbidden'),
+				$this->create_failed_report(403, 'Forbidden again'),
+				$this->create_failed_report(null, 'DNS failure one'),
+				$this->create_failed_report(null, 'DNS failure two'),
+			];
+
+			$method->log_delivery_failures_for_test($reports);
+		}
+
+		public function test_single_delivery_failure_keeps_original_reason(): void
+		{
+			$log = $this->createMock(\phpbb\log\log_interface::class);
+			$log->expects(self::once())->method('add')->with(
+				'admin',
+				ANONYMOUS,
+				'',
+				'LOG_WEBPUSH_MESSAGE_FAIL',
+				false,
+				['Too Many Requests']
+			);
+
+			$this->create_method($log)->log_delivery_failures_for_test([
+				$this->create_failed_report(429, 'Too Many Requests'),
+			]);
+		}
+
+		private function create_failed_report(?int $status_code, string $reason): \Minishlink\WebPush\MessageSentReport
+		{
+			$uri = $this->createMock(\Psr\Http\Message\UriInterface::class);
+			$uri->method('__toString')->willReturn('https://push.example.test/endpoint');
+			$body = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+			$body->method('getContents')->willReturn('payload');
+			$request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
+			$request->method('getUri')->willReturn($uri);
+			$request->method('getBody')->willReturn($body);
+			$response = null;
+			if ($status_code !== null)
+			{
+				$response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+				$response->method('getStatusCode')->willReturn($status_code);
+			}
+
+			return new \Minishlink\WebPush\MessageSentReport($request, $response, false, $reason);
+		}
+
 		private function create_method($log = null, $user_loader = null, $assets_version = 1): testable_webpush
 		{
 			global $config, $phpbb_root_path, $phpEx, $user;
@@ -195,6 +253,16 @@ namespace phpbb\webpushnotifications\tests\notification
 			$property = new \ReflectionProperty(\phpbb\webpushnotifications\notification\method\webpush::class, 'push_token_map');
 			$property->setAccessible(true);
 			$property->setValue($this, [$type_id => [$item_id => [$user_id => $token]]]);
+		}
+
+		public function log_delivery_failures_for_test(array $reports): void
+		{
+			$failures = [];
+			foreach ($reports as $report)
+			{
+				$this->add_delivery_failure($failures, $report);
+			}
+			$this->log_delivery_failures($failures);
 		}
 
 		protected function get_user_subscription_map(array $notify_users): array

@@ -13,16 +13,20 @@
 	gap: 14px;
 }
 
-.vapid-credentials-icon {
+.vapid-credentials-icon,
+.vapid-confirm-icon {
 	font-size: 18px;
-	background: #105289;
 	border-radius: 50%;
-	color: #ffffff;
 	display: flex;
 	flex: 0 0 42px;
 	justify-content: center;
 	align-items: center;
 	height: 42px;
+}
+
+.vapid-credentials-icon {
+	background: #105289;
+	color: #ffffff;
 }
 
 .vapid-credentials-summary {
@@ -201,15 +205,8 @@
 }
 
 .vapid-confirm-icon {
-	font-size: 18px;
 	background: #fff0c2;
-	border-radius: 50%;
 	color: #8a6500;
-	display: flex;
-	flex: 0 0 42px;
-	justify-content: center;
-	align-items: center;
-	height: 42px;
 }
 
 .vapid-confirm-message h3 {

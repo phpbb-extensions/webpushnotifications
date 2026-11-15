@@ -240,6 +240,15 @@ class acp_controller
 			return;
 		}
 
+		// Store VAPID keys in the unpadded Base64URL form reported by browsers.
+		foreach (['wpn_webpush_vapid_public', 'wpn_webpush_vapid_private'] as $key_name)
+		{
+			if (isset($config_array[$key_name]))
+			{
+				$config_array[$key_name] = rtrim($config_array[$key_name], '=');
+			}
+		}
+
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_CONFIG_WEBPUSH');
 
 		foreach (array_keys($display_settings) as $config_name)

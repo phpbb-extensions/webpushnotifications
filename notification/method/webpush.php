@@ -60,7 +60,7 @@ class webpush extends base implements extended_method_interface
 	public const MOZILLA_FALLBACK_PADDING = 2820;
 
 	/** @var array Map for storing push token between db insertion and sending of notifications */
-	private array $push_token_map = [];
+	private $push_token_map = [];
 
 	/**
 	 * Notification Method Web Push constructor

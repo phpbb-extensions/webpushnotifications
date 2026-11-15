@@ -238,6 +238,36 @@ class controller_acp_test extends \phpbb_test_case
 				],
 				true,
 			],
+			'padded VAPID keys are stored without padding' => [
+				array_merge($valid, [
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY . '=',
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY . '=',
+				]),
+				[
+					'S_ERROR' => false,
+					'ERROR_MSG' => '',
+				],
+				[
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
+				],
+				true,
+			],
+			'excessive VAPID key padding is rejected' => [
+				array_merge($valid, [
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY . '==',
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY . '=',
+				]),
+				[
+					'S_ERROR' => true,
+					'ERROR_MSG' => 'WEBPUSH_VAPID_KEYS_INVALID',
+				],
+				[
+					'wpn_webpush_vapid_public' => self::VALID_VAPID_PUBLIC_KEY,
+					'wpn_webpush_vapid_private' => self::VALID_VAPID_PRIVATE_KEY,
+				],
+				false,
+			],
 			'blank existing private key is preserved' => [
 				array_merge($valid, [
 					'wpn_webpush_vapid_private' => '',

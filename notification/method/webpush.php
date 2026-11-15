@@ -60,7 +60,7 @@ class webpush extends base implements extended_method_interface
 	public const MOZILLA_FALLBACK_PADDING = 2820;
 
 	/** @var array Map for storing push token between db insertion and sending of notifications */
-	private $push_token_map = [];
+	private array $push_token_map = [];
 
 	/**
 	 * Notification Method Web Push constructor
@@ -198,7 +198,7 @@ class webpush extends base implements extended_method_interface
 		// Load all the users we need
 		$notify_users = array_diff($user_ids, $banned_users);
 
-		// If we have no users (e.g. all recipients are banned) empty queue and exit
+		// Empty the queue and exit if there are no users (e.g. all recipients are banned).
 		if (empty($notify_users))
 		{
 			$this->empty_queue();

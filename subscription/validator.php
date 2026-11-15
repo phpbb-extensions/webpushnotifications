@@ -35,6 +35,7 @@ class validator
 		try
 		{
 			$vapid = VAPID::validate([
+				// Placeholder required by VAPID::validate(); delivery uses the configured board URL.
 				'subject' => 'https://example.com',
 				'publicKey' => $public_key,
 				'privateKey' => $private_key,

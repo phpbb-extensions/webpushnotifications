@@ -18,7 +18,7 @@
 		<legend>{{ lang('GENERAL_SETTINGS') }}</legend>
 		<dl>
 			<dt><label>{{ lang('WEBPUSH_ENABLE') ~ lang('COLON') }}</label><br><span>{{ lang('WEBPUSH_ENABLE_EXPLAIN') }}</span></dt>
-			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="1" {% if S_WEBPUSH_ENABLE %}checked="checked"{% endif %}> {{ lang('YES') }}</label>
+			<dd><label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="1"{% if S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('YES') }}</label>
 				<label><input type="radio" class="radio" name="config[wpn_webpush_enable]" value="0"{% if not S_WEBPUSH_ENABLE %} checked="checked"{% endif %}> {{ lang('NO') }}</label></dd>
 		</dl>
 		<dl>

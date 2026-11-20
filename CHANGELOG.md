@@ -1,5 +1,23 @@
 # Changelog
 
+### 1.2.0 - 2026-10-18
+
+- Added automatic PWA theme and background colour detection from installed board styles.
+- Added automatic VAPID key generation during installation.
+- Redesigned VAPID credential management in the ACP to better protect private keys and warn administrators before rotating keys.
+- Added Web Push disclosure to the board privacy policy.
+- Added automatic removal of push subscriptions and notification data when users are deleted.
+- Added a new option in the PWA settings to toggle PWA metadata output on or off.
+- Synchronised Web Push subscription controls across the notification dropdown, UCP, and subscription prompt.
+- Added validation to prevent invalid or mismatched VAPID key pairs from being saved in the ACP.
+- Prevented malformed subscriptions from interrupting push delivery to other recipients.
+- Improved automatic subscription recovery after VAPID key rotation.
+- Prevented push subscriptions from being automatically reassigned when multiple members use the same browser profile.
+- Fixed push notification links opening incorrect pages when phpBB is installed in a subdirectory.
+- Fixed quotes, ampersands, and HTML-like text displaying incorrectly in push notifications.
+- Improved error handling for malformed requests, subscription changes, missing notification dropdowns, and form tokens.
+- Improved JavaScript escaping and notification-link validation.
+
 ### 1.1.0 - 2026-05-28
 
 - Added a new **PWA settings** section to the ACP alongside the existing Web Push settings.

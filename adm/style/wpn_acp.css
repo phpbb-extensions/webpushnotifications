@@ -139,6 +139,7 @@
 }
 
 .vapid-private-field {
+	font-size: 1em;
 	display: flex;
 	align-items: center;
 	gap: 5px;

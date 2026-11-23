@@ -82,7 +82,7 @@
 								autocomplete="off"
 								spellcheck="false"
 								autocapitalize="none"
-								placeholder="{{ (S_VAPID_PRIVATE_CONFIGURED ? lang('WEBPUSH_VAPID_PRIVATE_KEEP') : lang('WEBPUSH_VAPID_PRIVATE_ENTER'))|e('html_attr') }}"
+								placeholder="{{ lang(S_VAPID_PRIVATE_CONFIGURED ? 'WEBPUSH_VAPID_PRIVATE_KEEP' : 'WEBPUSH_VAPID_PRIVATE_ENTER')|e('html_attr') }}"
 								value="">
 							<button
 								type="button"
